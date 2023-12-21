@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>power cycles</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>power cycles</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="tabs" id="tabs">
+      <span class="tab active" data-mode="carnot">carnot</span>
+      <span class="tab" data-mode="otto">otto</span>
+      <span class="tab" data-mode="diesel">diesel</span>
+      <span class="tab" data-mode="brayton">brayton</span>
+      <span class="tab" data-mode="rankine">rankine</span>
+    </div>
+
+    <div class="section" id="panel_carnot">
+      <h2>carnot</h2>
+      <div class="field">
+        <label>TH, TL</label>
+        <div class="row">
+          <input type="number" id="th" placeholder="high temp" step="any">
+          <input type="number" id="tl" placeholder="low temp" step="any">
+          <select id="ct_unit" style="width: 90px">
+            <option value="k">K</option>
+            <option value="c">&deg;C</option>
+          </select>
+        </div>
+      </div>
+      <button onclick="solve_carnot()">solve</button>
+      <div class="formula">&eta; = 1 &minus; TL/TH</div>
+    </div>
+
+    <div class="section" id="panel_otto" style="display:none">
+      <h2>otto</h2>
+      <div class="field">
+        <label>compression ratio r</label>
+        <input type="number" id="or" placeholder="r" step="any">
+      </div>
+      <div class="field">
+        <label>k</label>
+        <input type="number" id="ok" value="1.4" step="any">
+      </div>
+      <button onclick="solve_otto()">solve</button>
+      <div class="formula">&eta; = 1 &minus; 1/r<sup>k&minus;1</sup></div>
+    </div>
+
+    <div class="section" id="panel_diesel" style="display:none">
+      <h2>diesel</h2>
+      <div class="field">
+        <label>compression ratio r</label>
+        <input type="number" id="dr" placeholder="r" step="any">
+      </div>
+      <div class="field">
+        <label>cutoff ratio rc</label>
+        <input type="number" id="drc" placeholder="rc" step="any">
+      </div>
+      <div class="field">
+        <label>k</label>
+        <input type="number" id="dk" value="1.4" step="any">
+      </div>
+      <button onclick="solve_diesel()">solve</button>
+      <div class="formula">&eta; = 1 &minus; (rc<sup>k</sup> &minus; 1) / (r<sup>k&minus;1</sup> &middot; k &middot; (rc &minus; 1))</div>
+    </div>
+
+    <div class="section" id="panel_brayton" style="display:none">
+      <h2>brayton</h2>
+      <div class="field">
+        <label>pressure ratio rp</label>
+        <input type="number" id="brp" placeholder="rp" step="any">
+      </div>
+      <div class="field">
+        <label>k</label>
+        <input type="number" id="bk" value="1.4" step="any">
+      </div>
+      <button onclick="solve_brayton()">solve</button>
+      <div class="formula">&eta; = 1 &minus; 1/rp<sup>(k&minus;1)/k</sup></div>
+    </div>
+
+    <div class="section" id="panel_rankine" style="display:none">
+      <h2>rankine</h2>
+      <div class="field">
+        <label>h1 (turbine inlet)</label>
+        <input type="number" id="rh1" placeholder="kJ/kg" step="any">
+      </div>
+      <div class="field">
+        <label>h2 (turbine exit)</label>
+        <input type="number" id="rh2" placeholder="kJ/kg" step="any">
+      </div>
+      <div class="field">
+        <label>h3 (pump inlet)</label>
+        <input type="number" id="rh3" placeholder="kJ/kg" step="any">
+      </div>
+      <div class="field">
+        <label>h4 (pump exit)</label>
+        <input type="number" id="rh4" placeholder="kJ/kg" step="any">
+      </div>
+      <button onclick="solve_rankine()">solve</button>
+      <div class="formula">&eta; = (wt &minus; wp) / qin, wt = h1 &minus; h2, wp = h4 &minus; h3, qin = h1 &minus; h4</div>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function render(lines) {
+      document.getElementById("lines").innerHTML = lines.map(function (l) {
+        return '<div class="result-line"><span class="label">' + l[0] + "</span><span class=\"value\">" + l[1] + "</span></div>";
+      }).join("");
+      document.getElementById("results").style.display = "block";
+    }
+
+    function pct(n) {
+      return fmt(n * 100, 5) + "%";
+    }
+
+    function to_k(n, unit) { return unit === "c" ? n + 273.15 : n; }
+
+    function solve_carnot() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      const th = val("th"), tl = val("tl");
+      if (th === null || tl === null) { err.textContent = "enter both temperatures"; return; }
+      const unit = document.getElementById("ct_unit").value;
+      const thk = to_k(th, unit), tlk = to_k(tl, unit);
+      if (thk <= 0 || tlk <= 0 || thk <= tlk) { err.textContent = "need TH > TL > 0"; return; }
+      const eta = 1 - tlk / thk;
+      render([
+        ["thermal efficiency", pct(eta)],
+        ["refrigerator COP (TL/(TH&minus;TL))", fmt(tlk / (thk - tlk), 5)],
+        ["heat pump COP (TH/(TH&minus;TL))", fmt(thk / (thk - tlk), 5)]
+      ]);
+    }
+
+    function solve_otto() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      const r = val("or"), k = val("ok");
+      if (r === null || k === null) { err.textContent = "enter r and k"; return; }
+      if (r <= 1 || k <= 1) { err.textContent = "need r > 1 and k > 1"; return; }
+      render([["thermal efficiency", pct(1 - 1 / Math.pow(r, k - 1))]]);
+    }
+
+    function solve_diesel() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      const r = val("dr"), rc = val("drc"), k = val("dk");
+      if (r === null || rc === null || k === null) { err.textContent = "enter r, rc, and k"; return; }
+      if (r <= 1 || rc <= 1 || k <= 1) { err.textContent = "need r, rc, k all greater than 1"; return; }
+      const eta = 1 - (Math.pow(rc, k) - 1) / (Math.pow(r, k - 1) * k * (rc - 1));
+      render([["thermal efficiency", pct(eta)]]);
+    }
+
+    function solve_brayton() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      const rp = val("brp"), k = val("bk");
+      if (rp === null || k === null) { err.textContent = "enter rp and k"; return; }
+      if (rp <= 1 || k <= 1) { err.textContent = "need rp > 1 and k > 1"; return; }
+      render([["thermal efficiency", pct(1 - 1 / Math.pow(rp, (k - 1) / k))]]);
+    }
+
+    function solve_rankine() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      const h1 = val("rh1"), h2 = val("rh2"), h3 = val("rh3"), h4 = val("rh4");
+      if (h1 === null || h2 === null || h3 === null || h4 === null) { err.textContent = "enter all four enthalpies"; return; }
+      const wt = h1 - h2;
+      const wp = h4 - h3;
+      const qin = h1 - h4;
+      if (qin <= 0) { err.textContent = "qin must be positive, check your enthalpies"; return; }
+      const eta = (wt - wp) / qin;
+      render([
+        ["turbine work wt", fmt(wt, 6) + " kJ/kg"],
+        ["pump work wp", fmt(wp, 6) + " kJ/kg"],
+        ["heat in qin", fmt(qin, 6) + " kJ/kg"],
+        ["thermal efficiency", pct(eta)]
+      ]);
+    }
+
+    document.getElementById("tabs").addEventListener("click", function (e) {
+      const tab = e.target.closest(".tab");
+      if (!tab) return;
+      const mode = tab.getAttribute("data-mode");
+      document.querySelectorAll(".tab").forEach(function (el) { el.classList.remove("active"); });
+      tab.classList.add("active");
+      document.querySelectorAll(".section").forEach(function (el) { el.style.display = "none"; });
+      document.getElementById("panel_" + mode).style.display = "block";
+      document.getElementById("err").textContent = "";
+      document.getElementById("results").style.display = "none";
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>steam tables</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>steam tables</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="tabs" id="tabs">
+      <span class="tab active" data-mode="satT">saturated (temperature)</span>
+      <span class="tab" data-mode="satP">saturated (pressure)</span>
+      <span class="tab" data-mode="super">superheated</span>
+    </div>
+
+    <div class="section" id="panel_satT">
+      <h2>saturated, by temperature</h2>
+      <div class="field">
+        <label>temperature T</label>
+        <input type="number" id="sat_t" placeholder="&deg;C" step="any">
+      </div>
+      <div class="field">
+        <label>quality x (optional, 0&ndash;1)</label>
+        <input type="number" id="sat_t_x" placeholder="leave blank for saturated states" step="any" min="0" max="1">
+      </div>
+      <button onclick="sat_temp()">look up</button>
+      <div class="note">valid from 1 &deg;C to 373 &deg;C</div>
+    </div>
+
+    <div class="section" id="panel_satP" style="display:none">
+      <h2>saturated, by pressure</h2>
+      <div class="field">
+        <label>pressure p</label>
+        <input type="number" id="sat_p" placeholder="kPa" step="any">
+      </div>
+      <div class="field">
+        <label>quality x (optional, 0&ndash;1)</label>
+        <input type="number" id="sat_p_x" placeholder="leave blank for saturated states" step="any" min="0" max="1">
+      </div>
+      <button onclick="sat_press()">look up</button>
+      <div class="note">valid from 1 kPa to 22000 kPa</div>
+    </div>
+
+    <div class="section" id="panel_super" style="display:none">
+      <h2>superheated vapor</h2>
+      <div class="field">
+        <label>pressure p</label>
+        <input type="number" id="sup_p" placeholder="MPa" step="any">
+      </div>
+      <div class="field">
+        <label>temperature T</label>
+        <input type="number" id="sup_t" placeholder="&deg;C" step="any">
+      </div>
+      <button onclick="superheat()">look up</button>
+      <div class="note">pressures 0.01&ndash;20 MPa, up to 700 &deg;C</div>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="steam-data.js"></script>
+  <script src="../../js/common.js"></script>
+  <script>
+    // row layouts, columns are zero-based:
+    // satT: [T(degC), psat(kPa), vf, vg, uf, ug, hf, hg, sf, sg]
+    // satP: [p(kPa), Tsat(degC), vf, vg, uf, ug, hf, hg, sf, sg]
+
+    function render(values) {
+      document.getElementById("lines").innerHTML = values.map(function (l) {
+        return '<div class="result-line"><span class="label">' + l[0] + "</span><span class=\"value\">" + l[1] + "</span></div>";
+      }).join("");
+      document.getElementById("results").style.display = "block";
+    }
+
+    function sat_output(row, x, other_label, other_value) {
+      const vf = row[2], vg = row[3], uf = row[4], ug = row[5], hf = row[6], hg = row[7], sf = row[8], sg = row[9];
+      const out = [
+        [other_label, other_value],
+        ["v<sub>f</sub>", fmt(vf, 6) + " m&sup3;/kg"],
+        ["v<sub>g</sub>", fmt(vg, 6) + " m&sup3;/kg"],
+        ["v<sub>fg</sub>", fmt(vg - vf, 6) + " m&sup3;/kg"],
+        ["u<sub>f</sub>", fmt(uf, 6) + " kJ/kg"],
+        ["u<sub>g</sub>", fmt(ug, 6) + " kJ/kg"],
+        ["u<sub>fg</sub>", fmt(ug - uf, 6) + " kJ/kg"],
+        ["h<sub>f</sub>", fmt(hf, 6) + " kJ/kg"],
+        ["h<sub>g</sub>", fmt(hg, 6) + " kJ/kg"],
+        ["h<sub>fg</sub>", fmt(hg - hf, 6) + " kJ/kg"],
+        ["s<sub>f</sub>", fmt(sf, 6) + " kJ/(kg&middot;K)"],
+        ["s<sub>g</sub>", fmt(sg, 6) + " kJ/(kg&middot;K)"],
+        ["s<sub>fg</sub>", fmt(sg - sf, 6) + " kJ/(kg&middot;K)"]
+      ];
+      if (x !== null) {
+        out.push(["mixture at x = " + fmt(x, 4), ""]);
+        out.push(["<span class=\"muted\">v</span>", fmt(mix(vf, vg, x), 6) + " m&sup3;/kg"]);
+        out.push(["<span class=\"muted\">u</span>", fmt(mix(uf, ug, x), 6) + " kJ/kg"]);
+        out.push(["<span class=\"muted\">h</span>", fmt(mix(hf, hg, x), 6) + " kJ/kg"]);
+        out.push(["<span class=\"muted\">s</span>", fmt(mix(sf, sg, x), 6) + " kJ/(kg&middot;K)"]);
+      }
+      render(out);
+    }
+
+    function sat_temp() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      const t = val("sat_t");
+      const x = val("sat_t_x");
+      if (t === null) { err.textContent = "enter a temperature"; return; }
+      if (t < 1 || t > 373) { err.textContent = "temperature out of range (1 to 373 &deg;C)"; return; }
+      if (x !== null && (x < 0 || x > 1)) { err.textContent = "quality must be between 0 and 1"; return; }
+      const row = table_interp(STEAM_DATA.satT, t, 0);
+      sat_output(row, x, "p<sub>sat</sub>", fmt(row[1], 6) + " kPa");
+    }
+
+    function sat_press() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      const p = val("sat_p");
+      const x = val("sat_p_x");
+      if (p === null) { err.textContent = "enter a pressure"; return; }
+      if (p < 1 || p > 22000) { err.textContent = "pressure out of range (1 to 22000 kPa)"; return; }
+      if (x !== null && (x < 0 || x > 1)) { err.textContent = "quality must be between 0 and 1"; return; }
+      const row = table_interp(STEAM_DATA.satP, p, 0);
+      sat_output(row, x, "T<sub>sat</sub>", fmt(row[1], 6) + " &deg;C");
+    }
+
+    function tsat_from_p_kpa(p) {
+      return table_interp(STEAM_DATA.satP, p, 0)[1];
+    }
+
+    function row_interp(rows, t) {
+      return table_interp(rows, t, 0);
+    }
+
+    function superheat() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      const p_mpa = val("sup_p");
+      const t = val("sup_t");
+      if (p_mpa === null || t === null) { err.textContent = "enter both pressure and temperature"; return; }
+      const arr = STEAM_DATA.super;
+      if (p_mpa < arr[0].p - 1e-9) { err.textContent = "pressure below 0.01 MPa, use the saturated tables"; return; }
+      if (p_mpa > arr[arr.length - 1].p + 1e-9) { err.textContent = "pressure above 20 MPa"; return; }
+
+      const tsat = tsat_from_p_kpa(p_mpa * 1000);
+      if (t < tsat - 1e-6) {
+        err.textContent = "below the saturation temperature here (" + fmt(tsat, 5) + " &deg;C), this is a two-phase state. use saturated tables with a quality";
+        return;
+      }
+
+      let row;
+      for (let i = 1; i < arr.length; i++) {
+        if (p_mpa <= arr[i].p) {
+          const lo = arr[i - 1], hi = arr[i];
+          const rlo = row_interp(lo.rows, t);
+          const rhi = row_interp(hi.rows, t);
+          const f = (p_mpa - lo.p) / (hi.p - lo.p);
+          row = [t];
+          for (let c = 1; c < rlo.length; c++) row.push(rlo[c] + (rhi[c] - rlo[c]) * f);
+          break;
+        }
+      }
+
+      render([
+        ["state", "superheated vapor"],
+        ["p", fmt(p_mpa, 6) + " MPa  (" + fmt(p_mpa * 1000, 6) + " kPa)"],
+        ["T", fmt(t, 6) + " &deg;C"],
+        ["T<sub>sat</sub>", fmt(tsat, 6) + " &deg;C"],
+        ["v", fmt(row[1], 6) + " m&sup3;/kg"],
+        ["u", fmt(row[2], 6) + " kJ/kg"],
+        ["h", fmt(row[3], 6) + " kJ/kg"],
+        ["s", fmt(row[4], 6) + " kJ/(kg&middot;K)"]
+      ]);
+    }
+
+    document.getElementById("tabs").addEventListener("click", function (e) {
+      const tab = e.target.closest(".tab");
+      if (!tab) return;
+      const mode = tab.getAttribute("data-mode");
+      document.querySelectorAll(".tab").forEach(function (el) { el.classList.remove("active"); });
+      tab.classList.add("active");
+      document.getElementById("panel_satT").style.display = mode === "satT" ? "block" : "none";
+      document.getElementById("panel_satP").style.display = mode === "satP" ? "block" : "none";
+      document.getElementById("panel_super").style.display = mode === "super" ? "block" : "none";
+      document.getElementById("err").textContent = "";
+      document.getElementById("results").style.display = "none";
+    });
+  </script>
+</body>
+</html>

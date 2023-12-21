@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>entropy change</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>entropy change</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="tabs" id="tabs">
+      <span class="tab active" data-mode="ds">ideal gas &Delta;s</span>
+      <span class="tab" data-mode="isen">isentropic relation</span>
+    </div>
+
+    <div class="section" id="panel_ds">
+      <h2>ideal gas entropy change (constant cp)</h2>
+      <div class="field">
+        <label>cp</label>
+        <input type="number" id="cp" placeholder="kJ/(kg&middot;K)" step="any">
+      </div>
+      <div class="field">
+        <label>R</label>
+        <input type="number" id="rg" placeholder="kJ/(kg&middot;K)" step="any">
+      </div>
+      <div class="field">
+        <label>T1, T2</label>
+        <div class="row">
+          <input type="number" id="t1" placeholder="T1" step="any">
+          <input type="number" id="t2" placeholder="T2" step="any">
+          <select id="t_unit" style="width: 90px">
+            <option value="k">K</option>
+            <option value="c">&deg;C</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>p1, p2</label>
+        <div class="row">
+          <input type="number" id="p1" placeholder="p1" step="any">
+          <input type="number" id="p2" placeholder="p2" step="any">
+        </div>
+      </div>
+      <div class="note">pressures are ratio-only, so any consistent unit works</div>
+      <button onclick="solve_ds()">solve</button>
+      <div class="formula">&Delta;s = cp&middot;ln(T2/T1) &minus; R&middot;ln(p2/p1)</div>
+    </div>
+
+    <div class="section" id="panel_isen" style="display:none">
+      <h2>isentropic relation (s1 = s2)</h2>
+      <div class="field">
+        <label>k (specific heat ratio)</label>
+        <input type="number" id="k" placeholder="1.4" step="any">
+      </div>
+      <div class="field">
+        <label>T1, T2</label>
+        <div class="row">
+          <input type="number" id="it1" placeholder="T1" step="any">
+          <input type="number" id="it2" placeholder="T2 (blank to solve)" step="any">
+          <select id="it_unit" style="width: 90px">
+            <option value="k">K</option>
+            <option value="c">&deg;C</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>p1, p2</label>
+        <div class="row">
+          <input type="number" id="ip1" placeholder="p1" step="any">
+          <input type="number" id="ip2" placeholder="p2 (blank to solve)" step="any">
+        </div>
+      </div>
+      <button onclick="solve_isen()">solve</button>
+      <div class="formula">T2/T1 = (p2/p1)<sup>(k&minus;1)/k</sup></div>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function to_k(n, unit) { return unit === "c" ? n + 273.15 : n; }
+
+    function render(lines) {
+      document.getElementById("lines").innerHTML = lines.map(function (l) {
+        return '<div class="result-line"><span class="label">' + l[0] + "</span><span class=\"value\">" + l[1] + "</span></div>";
+      }).join("");
+      document.getElementById("results").style.display = "block";
+    }
+
+    function solve_ds() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      const cp = val("cp"), r = val("rg");
+      const t1 = val("t1"), t2 = val("t2");
+      const p1 = val("p1"), p2 = val("p2");
+      if (cp === null || r === null || t1 === null || t2 === null || p1 === null || p2 === null) {
+        err.textContent = "fill every field"; return;
+      }
+      const unit = document.getElementById("t_unit").value;
+      const tk1 = to_k(t1, unit), tk2 = to_k(t2, unit);
+      if (tk1 <= 0 || tk2 <= 0 || p1 <= 0 || p2 <= 0) { err.textContent = "temperatures and pressures must be positive"; return; }
+
+      const ds = cp * Math.log(tk2 / tk1) - r * Math.log(p2 / p1);
+      render([
+        ["&Delta;s", fmt(ds, 6) + " kJ/(kg&middot;K)"]
+      ]);
+    }
+
+    function solve_isen() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      const k = val("k");
+      const t1 = val("it1"), t2 = val("it2");
+      const p1 = val("ip1"), p2 = val("ip2");
+      if (k === null || k <= 1) { err.textContent = "enter k > 1"; return; }
+      const unit = document.getElementById("it_unit").value;
+      const tk1 = t1 === null ? null : to_k(t1, unit);
+      const tk2 = t2 === null ? null : to_k(t2, unit);
+
+      const known = [tk1, tk2, p1, p2].filter(function (x) { return x !== null; }).length;
+      if (known !== 3) { err.textContent = "leave exactly one of T2, p2 blank"; return; }
+      if (tk1 === null || p1 === null) { err.textContent = "T1 and p1 are required"; return; }
+
+      let out_t2 = tk2, out_p2 = p2;
+      if (tk2 === null) {
+        out_t2 = tk1 * Math.pow(p2 / p1, (k - 1) / k);
+      } else if (p2 === null) {
+        out_p2 = p1 * Math.pow(tk2 / tk1, k / (k - 1));
+      }
+
+      render([
+        ["T2", fmt(out_t2, 6) + " K"],
+        ["p2", fmt(out_p2, 6)]
+      ]);
+    }
+
+    document.getElementById("tabs").addEventListener("click", function (e) {
+      const tab = e.target.closest(".tab");
+      if (!tab) return;
+      const mode = tab.getAttribute("data-mode");
+      document.querySelectorAll(".tab").forEach(function (el) { el.classList.remove("active"); });
+      tab.classList.add("active");
+      document.getElementById("panel_ds").style.display = mode === "ds" ? "block" : "none";
+      document.getElementById("panel_isen").style.display = mode === "isen" ? "block" : "none";
+      document.getElementById("err").textContent = "";
+      document.getElementById("results").style.display = "none";
+    });
+  </script>
+</body>
+</html>

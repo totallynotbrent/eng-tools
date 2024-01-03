@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>reaction forces</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>reaction forces</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">simply supported beam, pin at A and roller at B. loads are downward-positive, distances measured from A.</p>
+
+      <div class="field">
+        <label>span L</label>
+        <input type="number" id="len" placeholder="m" step="any">
+      </div>
+
+      <div class="field">
+        <label>point load 1 (magnitude, distance from A)</label>
+        <div class="row">
+          <input type="number" id="p1" placeholder="load" step="any">
+          <input type="number" id="x1" placeholder="distance" step="any">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>point load 2</label>
+        <div class="row">
+          <input type="number" id="p2" placeholder="load" step="any">
+          <input type="number" id="x2" placeholder="distance" step="any">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>point load 3</label>
+        <div class="row">
+          <input type="number" id="p3" placeholder="load" step="any">
+          <input type="number" id="x3" placeholder="distance" step="any">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>uniform distributed load w (full span, optional)</label>
+        <input type="number" id="udl" placeholder="load per length" step="any">
+      </div>
+
+      <button onclick="solve_reactions()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">&Sigma;M<sub>A</sub> = 0, &Sigma;F<sub>y</sub> = 0</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_reactions() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const L = val("len");
+      if (L === null || L <= 0) { err.textContent = "enter a positive span"; return; }
+
+      const loads = [];
+      let total = 0;
+      for (let i = 1; i <= 3; i++) {
+        const p = val("p" + i), x = val("x" + i);
+        if (p !== null && x !== null) {
+          if (x < 0 || x > L) { err.textContent = "point load " + i + " must sit on the beam"; return; }
+          loads.push([p, x]);
+          total += p;
+        } else if (p !== null || x !== null) {
+          err.textContent = "point load " + i + " needs both a magnitude and a distance";
+          return;
+        }
+      }
+
+      const w = val("udl");
+      if (w !== null) total += w * L;
+
+      let sum_m = 0;
+      for (const l of loads) sum_m += l[0] * l[1];
+      if (w !== null) sum_m += w * L * L / 2;
+
+      const by = sum_m / L;
+      const ay = total - by;
+
+      render_lines("lines", [
+        ["reaction at A (Ay)", fmt(ay, 6) + " up"],
+        ["reaction at B (By)", fmt(by, 6) + " up"],
+        ["total downward load", fmt(total, 6)],
+        ["moment about A", fmt(sum_m, 6)]
+      ]);
+    }
+  </script>
+</body>
+</html>

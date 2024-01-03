@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>truss solver</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>truss solver</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">planar truss by joint equilibrium. units stay consistent with your loads. member force is tension when positive, compression when negative.</p>
+
+      <div class="field">
+        <label>nodes (one per line: x y, add pin or roller for a support)</label>
+        <textarea id="nodes" rows="5">0 0 pin
+4 0 roller
+2 3</textarea>
+      </div>
+
+      <div class="field">
+        <label>members (one per line: nodeA nodeB, 1-based)</label>
+        <textarea id="members" rows="5">1 2
+1 3
+2 3</textarea>
+      </div>
+
+      <div class="field">
+        <label>loads (one per line: node Fx Fy)</label>
+        <textarea id="loads" rows="3">3 0 -10</textarea>
+      </div>
+
+      <button onclick="solve_truss()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function parse_lines(text) {
+      const out = [];
+      for (let raw of text.split("\n")) {
+        raw = raw.trim();
+        if (!raw || raw[0] === "#") continue;
+        const tok = raw.split(/[\s,]+/).filter(function (t) { return t; });
+        if (tok.length) out.push(tok);
+      }
+      return out;
+    }
+
+    function solve_truss() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const node_lines = parse_lines(document.getElementById("nodes").value);
+      const member_lines = parse_lines(document.getElementById("members").value);
+      const load_lines = parse_lines(document.getElementById("loads").value);
+
+      const nodes = [];
+      for (let i = 0; i < node_lines.length; i++) {
+        const t = node_lines[i];
+        const x = parseFloat(t[0]), y = parseFloat(t[1]);
+        if (!isFinite(x) || !isFinite(y)) { err.textContent = "node " + (i + 1) + " needs x and y"; return; }
+        let type = "free";
+        if (t[2] === "pin" || t[2] === "roller") type = t[2];
+        nodes.push({ x: x, y: y, type: type });
+      }
+      if (nodes.length < 2) { err.textContent = "add at least two nodes"; return; }
+
+      const members = [];
+      for (let i = 0; i < member_lines.length; i++) {
+        const t = member_lines[i];
+        const a = parseInt(t[0]) - 1, b = parseInt(t[1]) - 1;
+        if (a < 0 || b < 0 || a >= nodes.length || b >= nodes.length) {
+          err.textContent = "member " + (i + 1) + " references a bad node";
+          return;
+        }
+        if (a === b) { err.textContent = "member " + (i + 1) + " connects a node to itself"; return; }
+        members.push([a, b]);
+      }
+
+      const loads = [];
+      for (let i = 0; i < load_lines.length; i++) {
+        const t = load_lines[i];
+        const ni = parseInt(t[0]) - 1;
+        const fx = parseFloat(t[1]), fy = parseFloat(t[2]);
+        if (ni < 0 || ni >= nodes.length || !isFinite(fx) || !isFinite(fy)) {
+          err.textContent = "load " + (i + 1) + " is malformed";
+          return;
+        }
+        loads.push({ n: ni, fx: fx, fy: fy });
+      }
+
+      const n = nodes.length, m = members.length;
+      const rxn = [];
+      for (let i = 0; i < n; i++) {
+        if (nodes[i].type === "pin") { rxn.push({ n: i, c: "x" }); rxn.push({ n: i, c: "y" }); }
+        else if (nodes[i].type === "roller") { rxn.push({ n: i, c: "y" }); }
+      }
+      const r = rxn.length;
+      const nu = m + r, ne = 2 * n;
+
+      if (ne !== nu) {
+        const what = ne < nu ? "statically indeterminate" : "unstable, not enough members/supports";
+        err.textContent = "2n = " + ne + " but unknowns = " + nu + " (" + m + " members + " + r + " reactions): " + what;
+        return;
+      }
+
+      const A = [], P = [];
+      for (let e = 0; e < ne; e++) { A.push(new Array(nu).fill(0)); P.push(0); }
+
+      for (let k = 0; k < m; k++) {
+        const a = members[k][0], b = members[k][1];
+        const dx = nodes[b].x - nodes[a].x;
+        const dy = nodes[b].y - nodes[a].y;
+        const L = Math.hypot(dx, dy);
+        if (L < 1e-9) { err.textContent = "member " + (k + 1) + " has zero length"; return; }
+        const ex = dx / L, ey = dy / L;
+        A[2 * a][k] -= ex; A[2 * a + 1][k] -= ey;
+        A[2 * b][k] += ex; A[2 * b + 1][k] += ey;
+      }
+
+      for (let j = 0; j < r; j++) {
+        const row = rxn[j].c === "x" ? 2 * rxn[j].n : 2 * rxn[j].n + 1;
+        A[row][m + j] = 1;
+      }
+
+      for (const ld of loads) { P[2 * ld.n] += ld.fx; P[2 * ld.n + 1] += ld.fy; }
+      for (let i = 0; i < ne; i++) P[i] = -P[i];
+
+      const x = gauss_solve(A, P);
+      if (x === null) { err.textContent = "singular system, checks as a mechanism or bad geometry"; return; }
+
+      const lines = [];
+      for (let k = 0; k < m; k++) {
+        const f = x[k];
+        const label = "member " + (members[k][0] + 1) + "-" + (members[k][1] + 1);
+        lines.push([label, fmt(f, 6) + (f > 0 ? "  (tension)" : f < 0 ? "  (compression)" : "")]);
+      }
+      for (let j = 0; j < r; j++) {
+        lines.push(["R" + rxn[j].c + " @ node " + (rxn[j].n + 1), fmt(x[m + j], 6)]);
+      }
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

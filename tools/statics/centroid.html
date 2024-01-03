@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>centroid and moment of inertia</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>centroid and moment of inertia</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">composite area. give each shape its size and its own centroid position, empty rows are skipped.</p>
+
+      <div class="field">
+        <label>shape 1</label>
+        <select id="type1"><option value="rect">rectangle</option><option value="circle">circle</option><option value="tri">triangle</option></select>
+        <div class="row" style="margin-top:0.4rem">
+          <input type="number" id="d1a" placeholder="b or r" step="any">
+          <input type="number" id="d1b" placeholder="h (not for circle)" step="any">
+        </div>
+        <div class="row" style="margin-top:0.4rem">
+          <input type="number" id="cx1" placeholder="centroid x" step="any">
+          <input type="number" id="cy1" placeholder="centroid y" step="any">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>shape 2</label>
+        <select id="type2"><option value="rect">rectangle</option><option value="circle">circle</option><option value="tri">triangle</option></select>
+        <div class="row" style="margin-top:0.4rem">
+          <input type="number" id="d2a" placeholder="b or r" step="any">
+          <input type="number" id="d2b" placeholder="h (not for circle)" step="any">
+        </div>
+        <div class="row" style="margin-top:0.4rem">
+          <input type="number" id="cx2" placeholder="centroid x" step="any">
+          <input type="number" id="cy2" placeholder="centroid y" step="any">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>shape 3</label>
+        <select id="type3"><option value="rect">rectangle</option><option value="circle">circle</option><option value="tri">triangle</option></select>
+        <div class="row" style="margin-top:0.4rem">
+          <input type="number" id="d3a" placeholder="b or r" step="any">
+          <input type="number" id="d3b" placeholder="h (not for circle)" step="any">
+        </div>
+        <div class="row" style="margin-top:0.4rem">
+          <input type="number" id="cx3" placeholder="centroid x" step="any">
+          <input type="number" id="cy3" placeholder="centroid y" step="any">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>shape 4</label>
+        <select id="type4"><option value="rect">rectangle</option><option value="circle">circle</option><option value="tri">triangle</option></select>
+        <div class="row" style="margin-top:0.4rem">
+          <input type="number" id="d4a" placeholder="b or r" step="any">
+          <input type="number" id="d4b" placeholder="h (not for circle)" step="any">
+        </div>
+        <div class="row" style="margin-top:0.4rem">
+          <input type="number" id="cx4" placeholder="centroid x" step="any">
+          <input type="number" id="cy4" placeholder="centroid y" step="any">
+        </div>
+      </div>
+
+      <button onclick="solve_centroid()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">parallel axis: I = &Sigma;(I<sub>self</sub> + A&middot;d&sup2;)</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_centroid() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const shapes = [];
+      for (let i = 1; i <= 4; i++) {
+        const type = document.getElementById("type" + i).value;
+        const d1 = val("d" + i + "a"), d2 = val("d" + i + "b");
+        const cx = val("cx" + i), cy = val("cy" + i);
+        if (d1 === null && d2 === null && cx === null && cy === null) continue;
+        if (d1 === null || cx === null || cy === null) {
+          err.textContent = "shape " + i + " needs its size and centroid position";
+          return;
+        }
+        if (type !== "circle" && d2 === null) { err.textContent = "shape " + i + " needs both dimensions"; return; }
+
+        let A, ixx, iyy;
+        if (type === "rect") {
+          const b = d1, h = d2;
+          A = b * h; ixx = b * h * h * h / 12; iyy = h * b * b * b / 12;
+        } else if (type === "circle") {
+          const r = d1;
+          A = Math.PI * r * r; ixx = Math.PI * Math.pow(r, 4) / 4; iyy = ixx;
+        } else {
+          const b = d1, h = d2;
+          A = b * h / 2; ixx = b * h * h * h / 36; iyy = h * b * b * b / 36;
+        }
+        shapes.push({ A: A, ixx: ixx, iyy: iyy, cx: cx, cy: cy });
+      }
+
+      if (!shapes.length) { err.textContent = "add at least one shape"; return; }
+
+      let at = 0, sx = 0, sy = 0;
+      for (const s of shapes) { at += s.A; sx += s.A * s.cx; sy += s.A * s.cy; }
+      const xb = sx / at, yb = sy / at;
+
+      let itx = 0, ity = 0;
+      for (const s of shapes) {
+        itx += s.ixx + s.A * Math.pow(s.cy - yb, 2);
+        ity += s.iyy + s.A * Math.pow(s.cx - xb, 2);
+      }
+
+      render_lines("lines", [
+        ["total area", fmt(at, 6)],
+        ["centroid x", fmt(xb, 6)],
+        ["centroid y", fmt(yb, 6)],
+        ["Ixx (about centroid)", fmt(itx, 6)],
+        ["Iyy (about centroid)", fmt(ity, 6)],
+        ["radius of gyration x", fmt(Math.sqrt(itx / at), 6)],
+        ["radius of gyration y", fmt(Math.sqrt(ity / at), 6)]
+      ]);
+    }
+  </script>
+</body>
+</html>

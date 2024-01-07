@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>rc time constant</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>rc time constant</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <div class="field">
+        <label>resistance R</label>
+        <input type="number" id="res" placeholder="&Omega;" step="any">
+      </div>
+      <div class="field">
+        <label>capacitance C</label>
+        <input type="number" id="cap" placeholder="F" step="any">
+      </div>
+      <div class="field">
+        <label>initial voltage V0 (optional)</label>
+        <input type="number" id="v0" placeholder="V" step="any">
+      </div>
+      <div class="field">
+        <label>time t (optional)</label>
+        <input type="number" id="tt" placeholder="s" step="any">
+      </div>
+
+      <button onclick="solve_rc()">solve</button>
+      <div class="note">C is in farads, so microfarads are 1e-6. charge: V0(1 &minus; e<sup>-t/&tau;</sup>), discharge: V0&middot;e<sup>-t/&tau;</sup></div>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_rc() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const r = val("res"), c = val("cap");
+      if (r === null || c === null) { err.textContent = "enter R and C"; return; }
+      if (r <= 0 || c <= 0) { err.textContent = "R and C must be positive"; return; }
+
+      const tau = r * c;
+      const lines = [["time constant &tau; = RC", fmt(tau, 6) + " s"]];
+
+      const v0 = val("v0"), t = val("tt");
+      if (v0 !== null && t !== null) {
+        const charge = v0 * (1 - Math.exp(-t / tau));
+        const discharge = v0 * Math.exp(-t / tau);
+        lines.push(["V at t (charging)", fmt(charge, 6) + " V"]);
+        lines.push(["V at t (discharging)", fmt(discharge, 6) + " V"]);
+      }
+
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

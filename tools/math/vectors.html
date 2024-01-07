@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>vector operations</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>vector operations</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">two 3d vectors. use it for dot and cross products, projections, and r &times; F moments.</p>
+
+      <div class="field">
+        <label>vector a (ax, ay, az)</label>
+        <div class="row">
+          <input type="number" id="ax" step="any" placeholder="ax">
+          <input type="number" id="ay" step="any" placeholder="ay">
+          <input type="number" id="az" step="any" placeholder="az">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>vector b (bx, by, bz)</label>
+        <div class="row">
+          <input type="number" id="bx" step="any" placeholder="bx">
+          <input type="number" id="by" step="any" placeholder="by">
+          <input type="number" id="bz" step="any" placeholder="bz">
+        </div>
+      </div>
+
+      <button onclick="solve_vec()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_vec() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const ax = val("ax"), ay = val("ay"), az = val("az");
+      const bx = val("bx"), by = val("by"), bz = val("bz");
+      if (ax === null || ay === null || az === null || bx === null || by === null || bz === null) {
+        err.textContent = "fill all six components";
+        return;
+      }
+
+      const maga = Math.hypot(ax, ay, az);
+      const magb = Math.hypot(bx, by, bz);
+      const dot = ax * bx + ay * by + az * bz;
+      const cx = ay * bz - az * by;
+      const cy = az * bx - ax * bz;
+      const cz = ax * by - ay * bx;
+      const magc = Math.hypot(cx, cy, cz);
+
+      const lines = [
+        ["|a|", fmt(maga, 6)],
+        ["|b|", fmt(magb, 6)],
+        ["a &middot; b", fmt(dot, 6)],
+        ["a &times; b", "(" + fmt(cx, 6) + ", " + fmt(cy, 6) + ", " + fmt(cz, 6) + ")"],
+        ["|a &times; b|", fmt(magc, 6)]
+      ];
+
+      if (magb > 0) {
+        const pscalar = dot / magb;
+        lines.push(["projection of a onto b", fmt(pscalar, 6) + " &middot; b&circ;"]);
+        lines.push(["projection components", "(" + fmt(pscalar * bx / magb, 6) + ", " + fmt(pscalar * by / magb, 6) + ", " + fmt(pscalar * bz / magb, 6) + ")"]);
+      } else {
+        lines.push(["projection of a onto b", "n/a (b is zero)"]);
+      }
+
+      if (maga > 0 && magb > 0) {
+        const cos = Math.max(-1, Math.min(1, dot / (maga * magb)));
+        lines.push(["angle between", fmt(Math.acos(cos) * 180 / Math.PI, 6) + " &deg;"]);
+      }
+
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>resistors and capacitors</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>resistors and capacitors</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">series and parallel equivalents for a list of values.</p>
+
+      <div class="field">
+        <label>values</label>
+        <input type="text" id="values" placeholder="10, 20, 30">
+      </div>
+
+      <div class="field">
+        <label>element</label>
+        <select id="elem">
+          <option value="r">resistor</option>
+          <option value="c">capacitor</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>connection</label>
+        <select id="conn">
+          <option value="series">series</option>
+          <option value="parallel">parallel</option>
+        </select>
+      </div>
+
+      <button onclick="solve_equiv()">solve</button>
+      <div class="note">capacitors combine opposite to resistors: series adds reciprocals, parallel just sums.</div>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_equiv() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const raw = document.getElementById("values").value;
+      const nums = raw.split(/[\s,]+/).filter(function (t) { return t !== ""; }).map(parseFloat);
+      if (!nums.length || nums.some(function (n) { return !isFinite(n); })) {
+        err.textContent = "enter a list of numbers";
+        return;
+      }
+      if (nums.some(function (n) { return n <= 0; })) { err.textContent = "values must be positive"; return; }
+
+      const elem = document.getElementById("elem").value;
+      const conn = document.getElementById("conn").value;
+
+      let eq;
+      if (elem === "r") {
+        if (conn === "series") eq = nums.reduce(function (a, b) { return a + b; }, 0);
+        else eq = 1 / nums.reduce(function (a, b) { return a + 1 / b; }, 0);
+      } else {
+        if (conn === "parallel") eq = nums.reduce(function (a, b) { return a + b; }, 0);
+        else eq = 1 / nums.reduce(function (a, b) { return a + 1 / b; }, 0);
+      }
+
+      const unit = elem === "r" ? " &Omega;" : " F";
+      render_lines("lines", [["equivalent " + (elem === "r" ? "resistance" : "capacitance"), fmt(eq, 6) + unit]]);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ohm's law and power</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>ohm's law and power</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">leave one of V, I, R blank and it solves for it. power is computed from the result.</p>
+
+      <div class="field">
+        <label>voltage V</label>
+        <input type="number" id="volt" placeholder="V" step="any">
+      </div>
+
+      <div class="field">
+        <label>current I</label>
+        <input type="number" id="curr" placeholder="A" step="any">
+      </div>
+
+      <div class="field">
+        <label>resistance R</label>
+        <input type="number" id="res" placeholder="&Omega;" step="any">
+      </div>
+
+      <button onclick="solve_ohm()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">V = IR, P = VI = I&sup2;R = V&sup2;/R</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_ohm() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const v = val("volt"), i = val("curr"), r = val("res");
+      const known = [v, i, r].filter(function (x) { return x !== null; }).length;
+      if (known !== 2) { err.textContent = "leave exactly one of V, I, R blank"; return; }
+
+      let ov = v, oi = i, or = r;
+      if (v === null) { ov = i * r; }
+      else if (i === null) { if (r === 0) { err.textContent = "R is zero"; return; } oi = v / r; }
+      else if (r === null) { if (i === 0) { err.textContent = "I is zero"; return; } or = v / i; }
+
+      const p = ov * oi;
+      render_lines("lines", [
+        ["voltage", fmt(ov, 6) + " V"],
+        ["current", fmt(oi, 6) + " A"],
+        ["resistance", fmt(or, 6) + " &Omega;"],
+        ["power P = VI", fmt(p, 6) + " W"]
+      ]);
+    }
+  </script>
+</body>
+</html>

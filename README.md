@@ -1,10 +1,10 @@
-# aero tools
+# eng tools
 
 homework calculators for engineering and math
 
 ## Summary
 
-A static site of browser calculators I use for aerospace engineering and math homework. Each page does one calculation: plug in what you know and it fills in the rest. Everything runs in the browser, nothing is stored or sent anywhere.
+A static site of browser calculators I use for engineering and math homework. Each page does one calculation: plug in what you know and it fills in the rest. Everything runs in the browser, nothing is stored or sent anywhere.
 
 ## Project structure
 
@@ -42,4 +42,4 @@ node tests/verify.js
 
 ## Contributing
 
-Branch off main, open a PR, and merge without fast-forward. Keep files small, use snake_case where it applies, LF line endings only, and keep any class or semester reference out of the pages.
+Branch off main, open a PR, and merge without fast-forward. Keep files small, use snake_case where it applies, and LF line endings only.

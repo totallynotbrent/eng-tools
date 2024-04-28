@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>standard atmosphere</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>standard atmosphere</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">ISA temperature, pressure, density, and speed of sound by altitude, up to 20 km.</p>
+
+      <div class="field">
+        <label>altitude h</label>
+        <input type="number" id="alt" step="any" placeholder="m">
+      </div>
+
+      <button onclick="solve_isa()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">troposphere and lower stratosphere piecewise, &gamma; = 1.4, R = 287.05 J/kgK</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    const T0 = 288.15, P0 = 101325, L = 0.0065, G0 = 9.80665, R = 287.0529, GAMMA = 1.4;
+    const RHO0 = P0 / (R * T0);
+    const EXP = G0 / (L * R);
+
+    function solve_isa() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const h = val("alt");
+      if (h === null) { err.textContent = "enter an altitude"; return; }
+      if (h < 0 || h > 20000) { err.textContent = "altitude must be between 0 and 20000 m"; return; }
+
+      let t, p;
+      if (h < 11000) {
+        t = T0 - L * h;
+        p = P0 * Math.pow(t / T0, EXP);
+      } else {
+        t = 216.65;
+        const p11 = P0 * Math.pow(216.65 / T0, EXP);
+        p = p11 * Math.exp(-G0 * (h - 11000) / (R * 216.65));
+      }
+      const rho = p / (R * t);
+      const a = Math.sqrt(GAMMA * R * t);
+
+      render_lines("lines", [
+        ["temperature T", fmt(t, 4) + " K (" + fmt(t - 273.15, 4) + " &deg;C)"],
+        ["pressure p", fmt(p, 4) + " Pa"],
+        ["density &rho;", fmt(rho, 6) + " kg/m&sup3;"],
+        ["speed of sound a", fmt(a, 4) + " m/s"],
+        ["p / p0", fmt(p / P0, 6)],
+        ["&rho; / &rho;0", fmt(rho / RHO0, 6)]
+      ]);
+    }
+  </script>
+</body>
+</html>

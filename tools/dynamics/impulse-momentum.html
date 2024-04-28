@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>impulse and momentum</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>impulse and momentum</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">impulse equals the change in momentum: J = F&Delta;t = m&Delta;v.</p>
+
+      <div class="field">
+        <label>mass m</label>
+        <input type="number" id="mass" step="any" placeholder="kg">
+      </div>
+      <div class="field">
+        <label>initial velocity vi</label>
+        <input type="number" id="vi" step="any" placeholder="m/s">
+      </div>
+      <div class="field">
+        <label>final velocity vf</label>
+        <input type="number" id="vf" step="any" placeholder="m/s">
+      </div>
+
+      <div class="field">
+        <label>force F and time &Delta;t (optional, gives J = F&Delta;t)</label>
+        <div class="row">
+          <input type="number" id="force" step="any" placeholder="F (N)">
+          <input type="number" id="dt" step="any" placeholder="&Delta;t (s)">
+        </div>
+      </div>
+
+      <button onclick="solve_impulse()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_impulse() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const m = val("mass"), vi = val("vi"), vf = val("vf");
+      if (m === null || vi === null || vf === null) { err.textContent = "fill m, vi, and vf"; return; }
+
+      const dv = vf - vi;
+      const dp = m * dv;
+      const lines = [
+        ["change in velocity &Delta;v", fmt(dv, 6) + " m/s"],
+        ["momentum change &Delta;p", fmt(dp, 6) + " kg&middot;m/s"],
+        ["impulse J", fmt(dp, 6) + " N&middot;s"]
+      ];
+
+      const f = val("force"), dt = val("dt");
+      if (f !== null && dt !== null) {
+        lines.push(["J from F&Delta;t", fmt(f * dt, 6) + " N&middot;s"]);
+      } else if (f !== null || dt !== null) {
+        err.textContent = "enter both F and dt, or neither";
+        return;
+      }
+
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

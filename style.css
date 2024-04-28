@@ -66,6 +66,14 @@ a:hover { text-decoration: underline; }
 .tool-list .t-name { font-weight: 600; }
 .tool-list .t-desc { margin-left: 0.75rem; color: var(--muted); font-size: 0.9rem; }
 
+.group {
+  margin: 1.4rem 0 0.4rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
 .section { margin-bottom: 1.6rem; }
 
 .section h2 {

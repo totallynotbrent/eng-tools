@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>differential equations</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>differential equations</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">numerical solution of y' = a&middot;y + b with euler and rk4, shown next to the exact answer.</p>
+
+      <div class="field">
+        <label>coefficient a and constant b</label>
+        <div class="row">
+          <input type="number" id="coef" step="any" placeholder="a" value="1">
+          <input type="number" id="const" step="any" placeholder="b" value="0">
+        </div>
+      </div>
+      <div class="field">
+        <label>initial value y0 and start time t0</label>
+        <div class="row">
+          <input type="number" id="y0" step="any" placeholder="y0" value="1">
+          <input type="number" id="t0" step="any" placeholder="t0" value="0">
+        </div>
+      </div>
+      <div class="field">
+        <label>end time tf and steps n</label>
+        <div class="row">
+          <input type="number" id="tf" step="any" placeholder="tf" value="1">
+          <input type="number" id="steps" step="any" placeholder="n" value="10">
+        </div>
+      </div>
+
+      <button onclick="solve_ode()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function exact_y(a, b, y0, t) {
+      if (a === 0) return y0 + b * t;
+      return (y0 + b / a) * Math.exp(a * t) - b / a;
+    }
+
+    function solve_ode() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const a = val("coef"), b = val("const"), y0 = val("y0");
+      const t0 = val("t0"), tf = val("tf"), n = val("steps");
+      if (a === null || b === null || y0 === null || t0 === null || tf === null || n === null) {
+        err.textContent = "fill every field";
+        return;
+      }
+      if (n <= 0 || Math.floor(n) !== n) { err.textContent = "steps n must be a positive integer"; return; }
+      if (tf <= t0) { err.textContent = "tf must be after t0"; return; }
+
+      const h = (tf - t0) / n;
+      let ye = y0, yr = y0, t = t0;
+      for (let i = 0; i < n; i++) {
+        ye = ye + h * (a * ye + b);
+        const k1 = a * yr + b;
+        const k2 = a * (yr + h / 2 * k1) + b;
+        const k3 = a * (yr + h / 2 * k2) + b;
+        const k4 = a * (yr + h * k3) + b;
+        yr = yr + h / 6 * (k1 + 2 * k2 + 2 * k3 + k4);
+        t += h;
+      }
+      const exact = exact_y(a, b, y0, tf - t0);
+
+      render_lines("lines", [
+        ["step size h", fmt(h, 6)],
+        ["exact y(tf)", fmt(exact, 6)],
+        ["euler y(tf)", fmt(ye, 6)],
+        ["rk4 y(tf)", fmt(yr, 6)]
+      ]);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>torsion</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>torsion</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">angle of twist and max shear stress in a solid circular shaft.</p>
+
+      <div class="field">
+        <label>torque T</label>
+        <input type="number" id="torque" step="any" placeholder="N&middot;m">
+      </div>
+      <div class="field">
+        <label>length L</label>
+        <input type="number" id="length" step="any" placeholder="m">
+      </div>
+      <div class="field">
+        <label>shear modulus G</label>
+        <input type="number" id="shear" step="any" placeholder="Pa">
+      </div>
+      <div class="field">
+        <label>shaft radius r</label>
+        <input type="number" id="radius" step="any" placeholder="m">
+      </div>
+
+      <button onclick="solve_torsion()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">J = &pi;r&#8308;/2, &phi; = TL/(GJ), &tau;max = Tr/J</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_torsion() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const t = val("torque"), l = val("length"), g = val("shear"), r = val("radius");
+      if (t === null || l === null || g === null || r === null) { err.textContent = "fill all four fields"; return; }
+      if (r <= 0 || g <= 0) { err.textContent = "radius and G must be positive"; return; }
+
+      const j = Math.PI * Math.pow(r, 4) / 2;
+      const phi = t * l / (g * j);
+      const tmax = t * r / j;
+
+      render_lines("lines", [
+        ["polar moment J", fmt(j, 6) + " m&#8308;"],
+        ["angle of twist &phi;", fmt(phi, 6) + " rad (" + fmt(phi * 180 / Math.PI, 6) + " &deg;)"],
+        ["max shear &tau;max", fmt(tmax, 6) + " Pa"]
+      ]);
+    }
+  </script>
+</body>
+</html>

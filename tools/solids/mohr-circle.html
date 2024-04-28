@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mohr's circle</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>mohr's circle</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">principal stresses and max shear from a plane stress state. &tau;xy positive in the sign convention where tension is positive.</p>
+
+      <div class="field">
+        <label>normal stress &sigma;x</label>
+        <input type="number" id="sx" step="any" placeholder="Pa">
+      </div>
+      <div class="field">
+        <label>normal stress &sigma;y</label>
+        <input type="number" id="sy" step="any" placeholder="Pa">
+      </div>
+      <div class="field">
+        <label>shear stress &tau;xy</label>
+        <input type="number" id="txy" step="any" placeholder="Pa">
+      </div>
+
+      <button onclick="solve_mohr()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">R = &radic;(((&sigma;x &minus; &sigma;y)/2)&sup2; + &tau;xy&sup2;)</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_mohr() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const sx = val("sx"), sy = val("sy"), txy = val("txy");
+      if (sx === null || sy === null || txy === null) { err.textContent = "fill all three stresses"; return; }
+
+      const avg = (sx + sy) / 2;
+      const rd = (sx - sy) / 2;
+      const r = Math.hypot(rd, txy);
+      const s1 = avg + r, s2 = avg - r;
+      const thp = 0.5 * Math.atan2(txy, rd) * 180 / Math.PI;
+
+      render_lines("lines", [
+        ["principal stress &sigma;1", fmt(s1, 6) + " Pa"],
+        ["principal stress &sigma;2", fmt(s2, 6) + " Pa"],
+        ["max shear &tau;max", fmt(r, 6) + " Pa"],
+        ["principal angle &theta;p", fmt(thp, 6) + " &deg;"],
+        ["average stress &sigma;avg", fmt(avg, 6) + " Pa"]
+      ]);
+    }
+  </script>
+</body>
+</html>

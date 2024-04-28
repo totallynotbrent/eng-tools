@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>projectile motion</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>projectile motion</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">flight time, range, and max height from launch speed, angle, and initial height. air resistance ignored.</p>
+
+      <div class="field">
+        <label>launch speed v0</label>
+        <input type="number" id="v0" step="any" placeholder="m/s">
+      </div>
+      <div class="field">
+        <label>launch angle &theta;</label>
+        <input type="number" id="angle" step="any" placeholder="&deg;">
+      </div>
+      <div class="field">
+        <label>initial height h0</label>
+        <input type="number" id="h0" step="any" placeholder="m" value="0">
+      </div>
+      <div class="field">
+        <label>gravity g</label>
+        <input type="number" id="grav" step="any" placeholder="m/s&sup2;" value="9.81">
+      </div>
+
+      <button onclick="solve_proj()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_proj() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const v0 = val("v0"), ang = val("angle"), h0 = val("h0") || 0, g = val("grav");
+      if (v0 === null || ang === null || g === null) { err.textContent = "fill v0, angle, and g"; return; }
+      if (v0 < 0 || g <= 0) { err.textContent = "v0 must be non-negative and g positive"; return; }
+
+      const th = ang * Math.PI / 180;
+      const vx = v0 * Math.cos(th), vy = v0 * Math.sin(th);
+      const tflight = (vy + Math.sqrt(vy * vy + 2 * g * h0)) / g;
+      const range = vx * tflight;
+      const hmax = h0 + vy * vy / (2 * g);
+
+      render_lines("lines", [
+        ["horizontal vx", fmt(vx, 6) + " m/s"],
+        ["vertical vy", fmt(vy, 6) + " m/s"],
+        ["flight time", fmt(tflight, 6) + " s"],
+        ["range", fmt(range, 6) + " m"],
+        ["max height", fmt(hmax, 6) + " m"]
+      ]);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>relative velocity</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>relative velocity</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">velocity of A as seen from B, in 2d. each velocity is a magnitude and a direction angle from the +x axis.</p>
+
+      <div class="field">
+        <label>velocity of A</label>
+        <div class="row">
+          <input type="number" id="va" step="any" placeholder="magnitude">
+          <input type="number" id="aa" step="any" placeholder="angle &deg;">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>velocity of B</label>
+        <div class="row">
+          <input type="number" id="vb" step="any" placeholder="magnitude">
+          <input type="number" id="ab" step="any" placeholder="angle &deg;">
+        </div>
+      </div>
+
+      <button onclick="solve_relv()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_relv() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const va = val("va"), aa = val("aa"), vb = val("vb"), ab = val("ab");
+      if (va === null || aa === null || vb === null || ab === null) { err.textContent = "fill both magnitudes and angles"; return; }
+
+      const ta = aa * Math.PI / 180, tb = ab * Math.PI / 180;
+      const vax = va * Math.cos(ta), vay = va * Math.sin(ta);
+      const vbx = vb * Math.cos(tb), vby = vb * Math.sin(tb);
+      const rx = vax - vbx, ry = vay - vby;
+      const mag = Math.hypot(rx, ry);
+      const dir = Math.atan2(ry, rx) * 180 / Math.PI;
+
+      render_lines("lines", [
+        ["vA components", "(" + fmt(vax, 6) + ", " + fmt(vay, 6) + ")"],
+        ["vB components", "(" + fmt(vbx, 6) + ", " + fmt(vby, 6) + ")"],
+        ["vA/B magnitude", fmt(mag, 6)],
+        ["vA/B direction", fmt(dir, 6) + " &deg; from +x"]
+      ]);
+    }
+  </script>
+</body>
+</html>

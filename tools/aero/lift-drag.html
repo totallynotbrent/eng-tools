@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>lift and drag</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>lift and drag</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">dynamic pressure, lift, and drag. enter a drag coefficient directly, or leave it blank and give a polar CD0 + k&middot;CL&sup2;.</p>
+
+      <div class="field">
+        <label>density &rho;</label>
+        <input type="number" id="rho" step="any" placeholder="kg/m&sup3;" value="1.225">
+      </div>
+      <div class="field">
+        <label>velocity V</label>
+        <input type="number" id="vel" step="any" placeholder="m/s">
+      </div>
+      <div class="field">
+        <label>wing area S</label>
+        <input type="number" id="area" step="any" placeholder="m&sup2;">
+      </div>
+      <div class="field">
+        <label>lift coefficient CL</label>
+        <input type="number" id="cl" step="any" placeholder="dimensionless">
+      </div>
+      <div class="field">
+        <label>drag coefficient CD (direct, optional)</label>
+        <input type="number" id="cd" step="any" placeholder="dimensionless">
+      </div>
+      <div class="field">
+        <label>polar CD0 and k (used if CD is blank)</label>
+        <div class="row">
+          <input type="number" id="cd0" step="any" placeholder="CD0">
+          <input type="number" id="k" step="any" placeholder="k">
+        </div>
+      </div>
+
+      <button onclick="solve_ld()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">q = &frac12;&rho;V&sup2;, L = q&middot;S&middot;CL, D = q&middot;S&middot;CD</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_ld() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const rho = val("rho"), v = val("vel"), s = val("area"), cl = val("cl");
+      if (rho === null || v === null || s === null || cl === null) { err.textContent = "fill rho, V, S, and CL"; return; }
+      if (rho < 0 || v < 0 || s <= 0) { err.textContent = "check rho, V, and S"; return; }
+
+      const q = 0.5 * rho * v * v;
+      const lift = q * s * cl;
+
+      let cd = val("cd");
+      let mode = "direct";
+      if (cd === null) {
+        const cd0 = val("cd0"), k = val("k");
+        if (cd0 === null || k === null) { err.textContent = "give CD directly or both CD0 and k"; return; }
+        cd = cd0 + k * cl * cl;
+        mode = "polar";
+      }
+      const drag = q * s * cd;
+
+      const lines = [
+        ["dynamic pressure q", fmt(q, 6) + " Pa"],
+        ["lift L", fmt(lift, 6) + " N"],
+        ["drag D", fmt(drag, 6) + " N"],
+        ["effective CD (" + mode + ")", fmt(cd, 6)],
+        ["lift to drag L/D", fmt(lift / drag, 6)]
+      ];
+
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>rotational motion</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>rotational motion</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">constant angular acceleration, torque, and an rpm to rad/s switch.</p>
+
+      <div class="field">
+        <label>initial angular velocity &omega;0</label>
+        <input type="number" id="w0" step="any" placeholder="rad/s" value="0">
+      </div>
+      <div class="field">
+        <label>angular acceleration &alpha;</label>
+        <input type="number" id="alpha" step="any" placeholder="rad/s&sup2;" value="0">
+      </div>
+      <div class="field">
+        <label>time t</label>
+        <input type="number" id="tt" step="any" placeholder="s" value="0">
+      </div>
+
+      <div class="field">
+        <label>rpm (converts to rad/s)</label>
+        <input type="number" id="rpm" step="any" placeholder="rpm">
+      </div>
+
+      <div class="field">
+        <label>moment of inertia I and torque &tau; = I&alpha;</label>
+        <div class="row">
+          <input type="number" id="inertia" step="any" placeholder="I (kg&middot;m&sup2;)">
+          <input type="number" id="torque" step="any" placeholder="&tau; (N&middot;m, optional)">
+        </div>
+      </div>
+
+      <button onclick="solve_rot()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_rot() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const w0 = val("w0") || 0, a = val("alpha") || 0, t = val("tt") || 0;
+      const lines = [];
+      if (t !== null) {
+        const w = w0 + a * t;
+        const th = w0 * t + 0.5 * a * t * t;
+        lines.push(["final &omega;", fmt(w, 6) + " rad/s"]);
+        lines.push(["angular displacement &theta;", fmt(th, 6) + " rad (" + fmt(th / (2 * Math.PI), 6) + " rev)"]);
+      }
+
+      const rpm = val("rpm");
+      if (rpm !== null) lines.push(["rpm in rad/s", fmt(rpm * 2 * Math.PI / 60, 6) + " rad/s"]);
+
+      const inertia = val("inertia");
+      if (inertia !== null && a !== null) {
+        lines.push(["torque &tau; = I&alpha;", fmt(inertia * a, 6) + " N&middot;m"]);
+      }
+
+      if (!lines.length) { err.textContent = "fill at least one section"; return; }
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

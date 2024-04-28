@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>range and endurance</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>range and endurance</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">breguet range plus block time, for a jet or a propeller. c is the specific fuel consumption in 1/s (tsfc or psfc times g).</p>
+
+      <div class="field">
+        <label>propulsion</label>
+        <select id="mode">
+          <option value="jet">jet</option>
+          <option value="prop">propeller</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>cruise velocity V</label>
+        <input type="number" id="vel" step="any" placeholder="m/s">
+      </div>
+      <div class="field">
+        <label>lift to drag L/D</label>
+        <input type="number" id="ld" step="any" placeholder="dimensionless">
+      </div>
+      <div class="field">
+        <label>start weight W0 and end weight W1</label>
+        <div class="row">
+          <input type="number" id="w0" step="any" placeholder="W0">
+          <input type="number" id="w1" step="any" placeholder="W1">
+        </div>
+      </div>
+      <div class="field">
+        <label>specific fuel consumption c (1/s)</label>
+        <input type="number" id="sfc" step="any" placeholder="1/s">
+      </div>
+      <div class="field">
+        <label>propeller efficiency &eta; (prop only)</label>
+        <input type="number" id="eta" step="any" placeholder="dimensionless">
+      </div>
+
+      <button onclick="solve_range()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">jet R = (V/c)(L/D)ln(W0/W1), prop R = (&eta;/c)(L/D)ln(W0/W1)</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_range() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const mode = document.getElementById("mode").value;
+      const v = val("vel"), ld = val("ld"), w0 = val("w0"), w1 = val("w1"), c = val("sfc");
+      if (v === null || ld === null || w0 === null || w1 === null || c === null) {
+        err.textContent = "fill V, L/D, W0, W1, and c";
+        return;
+      }
+      if (w1 <= 0 || w0 <= w1 || c <= 0) { err.textContent = "need W0 > W1 > 0 and c > 0"; return; }
+
+      const lnr = Math.log(w0 / w1);
+      let range;
+      if (mode === "jet") {
+        range = (v / c) * ld * lnr;
+      } else {
+        const eta = val("eta");
+        if (eta === null) { err.textContent = "propeller needs eta"; return; }
+        range = (eta / c) * ld * lnr;
+      }
+      const endurance = range / v;
+
+      render_lines("lines", [
+        ["range", fmt(range, 4) + " m (" + fmt(range / 1000, 4) + " km)"],
+        ["block time", fmt(endurance, 4) + " s (" + fmt(endurance / 3600, 4) + " h)"]
+      ]);
+    }
+  </script>
+</body>
+</html>

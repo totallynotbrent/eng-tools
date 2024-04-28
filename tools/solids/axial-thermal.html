@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>axial and thermal deformation</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>axial and thermal deformation</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">total stretch from an axial load and a temperature change. &delta;mech = PL/(AE), &delta;therm = &alpha;L&Delta;T.</p>
+
+      <div class="field">
+        <label>axial load P</label>
+        <input type="number" id="load" step="any" placeholder="N">
+      </div>
+      <div class="field">
+        <label>length L</label>
+        <input type="number" id="length" step="any" placeholder="m">
+      </div>
+      <div class="field">
+        <label>area A</label>
+        <input type="number" id="area" step="any" placeholder="m&sup2;">
+      </div>
+      <div class="field">
+        <label>young's modulus E</label>
+        <input type="number" id="modulus" step="any" placeholder="Pa">
+      </div>
+      <div class="field">
+        <label>coefficient of thermal expansion &alpha;</label>
+        <input type="number" id="alpha" step="any" placeholder="1/&deg;C" value="0">
+      </div>
+      <div class="field">
+        <label>temperature change &Delta;T</label>
+        <input type="number" id="dt" step="any" placeholder="&deg;C" value="0">
+      </div>
+
+      <button onclick="solve_axial()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_axial() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const p = val("load"), l = val("length"), a = val("area"), e = val("modulus");
+      const alpha = val("alpha") || 0, dt = val("dt") || 0;
+      if (p === null || l === null || a === null || e === null) { err.textContent = "fill P, L, A, and E"; return; }
+      if (a <= 0 || e <= 0) { err.textContent = "A and E must be positive"; return; }
+
+      const dmech = p * l / (a * e);
+      const dtherm = alpha * l * dt;
+      const sigma = p / a;
+
+      render_lines("lines", [
+        ["mechanical &delta;", fmt(dmech, 6) + " m"],
+        ["thermal &delta;", fmt(dtherm, 6) + " m"],
+        ["total &delta;", fmt(dmech + dtherm, 6) + " m"],
+        ["axial stress &sigma;", fmt(sigma, 6) + " Pa"]
+      ]);
+    }
+  </script>
+</body>
+</html>

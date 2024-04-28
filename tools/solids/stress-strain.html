@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>stress and strain</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>stress and strain</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">hooke's law &sigma; = E&middot;&epsilon;. leave one of E, &sigma;, &epsilon; blank and it solves for it.</p>
+
+      <div class="field">
+        <label>young's modulus E</label>
+        <input type="number" id="e_mod" step="any" placeholder="Pa">
+      </div>
+      <div class="field">
+        <label>stress &sigma;</label>
+        <input type="number" id="stress" step="any" placeholder="Pa">
+      </div>
+      <div class="field">
+        <label>strain &epsilon;</label>
+        <input type="number" id="strain" step="any" placeholder="dimensionless">
+      </div>
+
+      <div class="field">
+        <label>axial force F and area A (optional, gives &sigma; = F/A)</label>
+        <div class="row">
+          <input type="number" id="force" step="any" placeholder="F (N)">
+          <input type="number" id="area" step="any" placeholder="A (m&sup2;)">
+        </div>
+      </div>
+
+      <button onclick="solve_hooke()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_hooke() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const e = val("e_mod"), s = val("stress"), ep = val("strain");
+      const known = [e, s, ep].filter(function (x) { return x !== null; }).length;
+      if (known !== 2) { err.textContent = "fill exactly two of E, sigma, epsilon"; return; }
+
+      let ove = e, ovs = s, ovep = ep;
+      if (e === null) { if (ep === 0) { err.textContent = "epsilon is zero"; return; } ove = s / ep; }
+      else if (s === null) { ovs = e * ep; }
+      else if (ep === null) { if (e === 0) { err.textContent = "E is zero"; return; } ovep = s / e; }
+
+      const lines = [
+        ["young's modulus E", fmt(ove, 6) + " Pa"],
+        ["stress &sigma;", fmt(ovs, 6) + " Pa"],
+        ["strain &epsilon;", fmt(ovep, 6)]
+      ];
+
+      const f = val("force"), a = val("area");
+      if (f !== null && a !== null) {
+        if (a <= 0) { err.textContent = "area must be positive"; return; }
+        lines.push(["&sigma; from F/A", fmt(f / a, 6) + " Pa"]);
+      } else if (f !== null || a !== null) {
+        err.textContent = "enter both F and A, or neither";
+        return;
+      }
+
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

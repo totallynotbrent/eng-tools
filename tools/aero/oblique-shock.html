@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>oblique shock</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>oblique shock</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">oblique shock relations from upstream mach and deflection angle. use the strong-solution toggle if the flow stays subsonic after the shock.</p>
+
+      <div class="field">
+        <label>upstream mach M1</label>
+        <input type="number" id="m1" step="any" placeholder="M1">
+      </div>
+      <div class="field">
+        <label>deflection angle &theta; (deg)</label>
+        <input type="number" id="theta" step="any" placeholder="&deg;">
+      </div>
+      <div class="field">
+        <label>ratio of specific heats &gamma; (optional)</label>
+        <input type="number" id="gamma" step="any" placeholder="1.4">
+      </div>
+      <div class="field">
+        <label>solution branch</label>
+        <select id="branch">
+          <option value="weak">weak (supersonic downstream)</option>
+          <option value="strong">strong (subsonic downstream)</option>
+        </select>
+      </div>
+
+      <button onclick="solve_oblique()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">tan θ = 2 cot β (M₁² sin²β − 1) / (M₁²(γ + cos 2β) + 2)</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function theta_beta(m1, beta, g) {
+      const s2 = Math.pow(Math.sin(beta), 2);
+      const num = 2 * (1 / Math.tan(beta)) * (m1 * m1 * s2 - 1);
+      const den = m1 * m1 * (g + Math.cos(2 * beta)) + 2;
+      return Math.atan(num / den);
+    }
+
+    function solve_oblique() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const m1 = val("m1"), theta_deg = val("theta"), g = val("gamma") || 1.4;
+      if (m1 === null || theta_deg === null) { err.textContent = "fill M1 and theta"; return; }
+      if (m1 <= 1) { err.textContent = "oblique shocks need supersonic M1 > 1"; return; }
+      if (g <= 1) { err.textContent = "gamma must be greater than 1"; return; }
+
+      const theta = theta_deg * Math.PI / 180;
+      const mu = Math.asin(1 / m1);
+
+      // scan wave angle beta from mach angle up to 90 deg, bracket sign changes of theta-beta
+      const roots = [];
+      const n = 8000;
+      let prev_beta = mu, prev_f = theta_beta(m1, mu, g) - theta;
+      for (let i = 1; i <= n; i++) {
+        const beta = mu + (Math.PI / 2 - mu) * (i / n);
+        const f = theta_beta(m1, beta, g) - theta;
+        if (prev_f * f <= 0 && f !== prev_f) {
+          let x0 = prev_beta, x1 = beta;
+          for (let it = 0; it < 60; it++) {
+            const mid = (x0 + x1) / 2;
+            if (theta_beta(m1, mid, g) - theta > 0) x1 = mid; else x0 = mid;
+          }
+          roots.push((x0 + x1) / 2);
+        }
+        prev_beta = beta; prev_f = f;
+      }
+
+      if (!roots.length) { err.textContent = "no shock solution, deflection exceeds the max for this mach"; return; }
+
+      const strong = document.getElementById("branch").value === "strong";
+      let beta;
+      if (strong && roots.length > 1) beta = roots[roots.length - 1];
+      else beta = roots[0];
+
+      const mn1 = m1 * Math.sin(beta);
+      const mn2sq = (1 + (g - 1) / 2 * mn1 * mn1) / (g * mn1 * mn1 - (g - 1) / 2);
+      const mn2 = Math.sqrt(mn2sq);
+      const m2 = mn2 / Math.sin(beta - theta);
+      const p2p1 = 1 + 2 * g / (g + 1) * (mn1 * mn1 - 1);
+      const r2r1 = ((g + 1) * mn1 * mn1) / ((g - 1) * mn1 * mn1 + 2);
+      const t2t1 = p2p1 / r2r1;
+
+      render_lines("lines", [
+        ["wave angle &beta;", fmt(beta * 180 / Math.PI, 6) + " &deg;"],
+        ["downstream mach M2", fmt(m2, 6)],
+        ["pressure ratio P2/P1", fmt(p2p1, 6)],
+        ["density ratio &rho;2/&rho;1", fmt(r2r1, 6)],
+        ["temperature ratio T2/T1", fmt(t2t1, 6)]
+      ]);
+    }
+  </script>
+</body>
+</html>

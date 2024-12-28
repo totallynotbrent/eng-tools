@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>prandtl-meyer expansion</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>prandtl-meyer expansion</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">mach number through a centered expansion fan from entry mach and deflection angle.</p>
+
+      <div class="field">
+        <label>entry mach M1</label>
+        <input type="number" id="m1" step="any" placeholder="M1">
+      </div>
+      <div class="field">
+        <label>deflection angle &theta; (deg, positive = expansion)</label>
+        <input type="number" id="theta" step="any" placeholder="&deg;">
+      </div>
+      <div class="field">
+        <label>ratio of specific heats &gamma; (optional)</label>
+        <input type="number" id="gamma" step="any" placeholder="1.4">
+      </div>
+
+      <button onclick="solve_pm()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">&nu;(M) = &radic;((γ+1)/(γ−1)) · atan&radic;((γ−1)/(γ+1)(M²−1)) − atan&radic;(M²−1)</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function prandtl_meyer(m, g) {
+      const k = Math.sqrt((g + 1) / (g - 1));
+      const m2m1 = Math.sqrt(m * m - 1);
+      return k * Math.atan(m2m1 / k) - Math.atan(m2m1);
+    }
+
+    function solve_pm() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const m1 = val("m1"), theta_deg = val("theta"), g = val("gamma") || 1.4;
+      if (m1 === null || theta_deg === null) { err.textContent = "fill M1 and theta"; return; }
+      if (m1 < 1) { err.textContent = "expansion needs supersonic M1 >= 1"; return; }
+      if (g <= 1) { err.textContent = "gamma must be greater than 1"; return; }
+
+      const nu1 = prandtl_meyer(m1, g);
+      const nu2 = nu1 + theta_deg * Math.PI / 180;
+      const nu_max = (Math.PI / 2) * (Math.sqrt((g + 1) / (g - 1)) - 1);
+      if (nu2 < 0 || nu2 > nu_max) { err.textContent = "deflection pushes past the vacuum limit"; return; }
+
+      // invert nu(m) with bisection on mach from 1 to a large cap
+      let lo = 1.0001, hi = 50;
+      for (let i = 0; i < 80; i++) {
+        const mid = (lo + hi) / 2;
+        if (prandtl_meyer(mid, g) < nu2) lo = mid; else hi = mid;
+      }
+      const m2 = (lo + hi) / 2;
+
+      render_lines("lines", [
+        ["entry &nu;(M1)", fmt(nu1 * 180 / Math.PI, 6) + " &deg;"],
+        ["exit &nu;(M2)", fmt(nu2 * 180 / Math.PI, 6) + " &deg;"],
+        ["exit mach M2", fmt(m2, 6)]
+      ]);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>normal shock</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>normal shock</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">conditions downstream of a normal shock from the upstream mach number.</p>
+
+      <div class="field">
+        <label>upstream mach M1</label>
+        <input type="number" id="m1" step="any" placeholder="M1">
+      </div>
+      <div class="field">
+        <label>ratio of specific heats &gamma; (optional)</label>
+        <input type="number" id="gamma" step="any" placeholder="1.4">
+      </div>
+
+      <button onclick="solve_shock()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_shock() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const m1 = val("m1"), g = val("gamma") || 1.4;
+      if (m1 === null) { err.textContent = "enter upstream mach"; return; }
+      if (m1 <= 1) { err.textContent = "a shock needs supersonic flow, M1 > 1"; return; }
+      if (g <= 1) { err.textContent = "gamma must be greater than 1"; return; }
+
+      const m2sq = (1 + (g - 1) / 2 * m1 * m1) / (g * m1 * m1 - (g - 1) / 2);
+      const m2 = Math.sqrt(m2sq);
+      const p2p1 = 1 + 2 * g / (g + 1) * (m1 * m1 - 1);
+      const r2r1 = ((g + 1) * m1 * m1) / ((g - 1) * m1 * m1 + 2);
+      const t2t1 = p2p1 / r2r1;
+
+      render_lines("lines", [
+        ["downstream mach M2", fmt(m2, 6)],
+        ["pressure ratio P2 / P1", fmt(p2p1, 6)],
+        ["density ratio &rho;2 / &rho;1", fmt(r2r1, 6)],
+        ["temperature ratio T2 / T1", fmt(t2t1, 6)]
+      ]);
+    }
+  </script>
+</body>
+</html>

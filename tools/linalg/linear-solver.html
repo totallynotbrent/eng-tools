@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>linear system solver</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>linear system solver</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">solve Ax = b for a 2x2 or 3x3 system.</p>
+
+      <div class="field">
+        <label>size</label>
+        <select id="size">
+          <option value="2">2x2</option>
+          <option value="3">3x3</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>matrix A (row 1)</label>
+        <div class="row">
+          <input type="number" id="a11" step="any" placeholder="a">
+          <input type="number" id="a12" step="any" placeholder="b">
+          <input type="number" id="a13" step="any" placeholder="c">
+        </div>
+      </div>
+      <div class="field">
+        <label>row 2</label>
+        <div class="row">
+          <input type="number" id="a21" step="any" placeholder="d">
+          <input type="number" id="a22" step="any" placeholder="e">
+          <input type="number" id="a23" step="any" placeholder="f">
+        </div>
+      </div>
+      <div class="field">
+        <label>row 3 (for 3x3)</label>
+        <div class="row">
+          <input type="number" id="a31" step="any" placeholder="g">
+          <input type="number" id="a32" step="any" placeholder="h">
+          <input type="number" id="a33" step="any" placeholder="i">
+        </div>
+      </div>
+      <div class="field">
+        <label>vector b</label>
+        <div class="row">
+          <input type="number" id="b1" step="any" placeholder="b1">
+          <input type="number" id="b2" step="any" placeholder="b2">
+          <input type="number" id="b3" step="any" placeholder="b3">
+        </div>
+      </div>
+
+      <button onclick="solve_ls()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_ls() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const size = parseInt(document.getElementById("size").value) || 2;
+      const m = [], b = [];
+      if (size === 2) {
+        m.push([val("a11"), val("a12")], [val("a21"), val("a22")]);
+        b.push(val("b1"), val("b2"));
+      } else {
+        m.push([val("a11"), val("a12"), val("a13")],
+               [val("a21"), val("a22"), val("a23")],
+               [val("a31"), val("a32"), val("a33")]);
+        b.push(val("b1"), val("b2"), val("b3"));
+      }
+      for (const row of m) for (const x of row) if (x === null) { err.textContent = "fill every A entry"; return; }
+      for (const x of b) if (x === null) { err.textContent = "fill every b entry"; return; }
+
+      const x = gauss_solve(m, b);
+      if (x === null) { err.textContent = "singular system, no unique solution"; return; }
+
+      const lines = [];
+      for (let i = 0; i < x.length; i++) lines.push(["x" + (i + 1), fmt(x[i], 6)]);
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

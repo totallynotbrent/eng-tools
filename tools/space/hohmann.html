@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>hohmann transfer</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>hohmann transfer</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">two-burn transfer between coplanar circular orbits. enter the two radii, order does not matter.</p>
+
+      <div class="field">
+        <label>first orbit radius r1</label>
+        <input type="number" id="r1" step="any" placeholder="m">
+      </div>
+      <div class="field">
+        <label>second orbit radius r2</label>
+        <input type="number" id="r2" step="any" placeholder="m">
+      </div>
+      <div class="field">
+        <label>gravitational parameter &mu; (optional)</label>
+        <input type="number" id="mu" step="any" placeholder="3.986e14">
+      </div>
+
+      <button onclick="solve_hohmann()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_hohmann() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      let r1 = val("r1"), r2 = val("r2"), mu = val("mu") || 3.986e14;
+      if (r1 === null || r2 === null) { err.textContent = "fill both radii"; return; }
+      if (r1 <= 0 || r2 <= 0 || mu <= 0) { err.textContent = "radii and mu must be positive"; return; }
+      if (r1 === r2) { err.textContent = "orbits are the same radius"; return; }
+      if (r1 > r2) { const tmp = r1; r1 = r2; r2 = tmp; }
+
+      const at = (r1 + r2) / 2;
+      const vc1 = Math.sqrt(mu / r1);
+      const vc2 = Math.sqrt(mu / r2);
+      const vp1 = Math.sqrt(mu * (2 / r1 - 1 / at));
+      const va2 = Math.sqrt(mu * (2 / r2 - 1 / at));
+      const dv1 = vp1 - vc1;
+      const dv2 = vc2 - va2;
+      const ttrans = Math.PI * Math.sqrt(at * at * at / mu);
+
+      render_lines("lines", [
+        ["transfer semi-major axis", fmt(at, 6) + " m"],
+        ["burn 1 &Delta;v", fmt(dv1, 4) + " m/s"],
+        ["burn 2 &Delta;v", fmt(dv2, 4) + " m/s"],
+        ["total &Delta;v", fmt(dv1 + dv2, 4) + " m/s"],
+        ["transfer time", fmt(ttrans, 4) + " s (" + fmt(ttrans / 3600, 4) + " h)"]
+      ]);
+    }
+  </script>
+</body>
+</html>

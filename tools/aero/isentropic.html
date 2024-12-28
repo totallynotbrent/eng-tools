@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>isentropic flow</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>isentropic flow</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">stagnation and static ratios at a mach number, plus the area ratio A/A*.</p>
+
+      <div class="field">
+        <label>mach number M</label>
+        <input type="number" id="mach" step="any" placeholder="M">
+      </div>
+      <div class="field">
+        <label>ratio of specific heats &gamma; (optional)</label>
+        <input type="number" id="gamma" step="any" placeholder="1.4">
+      </div>
+
+      <button onclick="solve_isen()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">T0/T = 1 + (&gamma;&minus;1)/2 &middot; M&sup2;</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_isen() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const m = val("mach"), g = val("gamma") || 1.4;
+      if (m === null) { err.textContent = "enter a mach number"; return; }
+      if (m < 0) { err.textContent = "mach must be non-negative"; return; }
+      if (g <= 1) { err.textContent = "gamma must be greater than 1"; return; }
+
+      const t0t = 1 + (g - 1) / 2 * m * m;
+      const p0p = Math.pow(t0t, g / (g - 1));
+      const r0r = Math.pow(t0t, 1 / (g - 1));
+      const aa = (1 / m) * Math.pow((2 / (g + 1)) * (1 + (g - 1) / 2 * m * m), (g + 1) / (2 * (g - 1)));
+
+      render_lines("lines", [
+        ["T / T0", fmt(1 / t0t, 6)],
+        ["P / P0", fmt(1 / p0p, 6)],
+        ["&rho; / &rho;0", fmt(1 / r0r, 6)],
+        ["A / A*", fmt(aa, 6)]
+      ]);
+    }
+  </script>
+</body>
+</html>

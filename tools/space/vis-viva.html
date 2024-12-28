@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>vis-viva</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>vis-viva</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">orbital speed at a given radius on an orbit of semi-major axis a. v = &radic;(&mu;(2/r &minus; 1/a)).</p>
+
+      <div class="field">
+        <label>radius r</label>
+        <input type="number" id="r" step="any" placeholder="m">
+      </div>
+      <div class="field">
+        <label>semi-major axis a</label>
+        <input type="number" id="a" step="any" placeholder="m">
+      </div>
+      <div class="field">
+        <label>gravitational parameter &mu; (optional)</label>
+        <input type="number" id="mu" step="any" placeholder="3.986e14">
+      </div>
+
+      <button onclick="solve_visviva()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_visviva() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const r = val("r"), a = val("a"), mu = val("mu") || 3.986e14;
+      if (r === null || a === null) { err.textContent = "fill r and a"; return; }
+      if (r <= 0 || a <= 0 || mu <= 0) { err.textContent = "r, a, and mu must be positive"; return; }
+
+      const inside = 2 / r - 1 / a;
+      if (inside < 0) { err.textContent = "no real speed: 2/r must be at least 1/a"; return; }
+
+      render_lines("lines", [
+        ["speed v", fmt(Math.sqrt(mu * inside), 6) + " m/s"],
+        ["circular speed at r (a = r)", fmt(Math.sqrt(mu / r), 6) + " m/s"]
+      ]);
+    }
+  </script>
+</body>
+</html>

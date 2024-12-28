@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>reynolds number</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>reynolds number</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">Re = &rho;VL/&mu; from fluid properties and a characteristic length. dynamic viscosity &mu; is default air.</p>
+
+      <div class="field">
+        <label>density &rho;</label>
+        <input type="number" id="rho" step="any" placeholder="kg/m&sup3;" value="1.225">
+      </div>
+      <div class="field">
+        <label>velocity V</label>
+        <input type="number" id="vel" step="any" placeholder="m/s">
+      </div>
+      <div class="field">
+        <label>characteristic length L</label>
+        <input type="number" id="len" step="any" placeholder="m">
+      </div>
+      <div class="field">
+        <label>dynamic viscosity &mu; (optional)</label>
+        <input type="number" id="mu" step="any" placeholder="1.789e-5">
+      </div>
+
+      <button onclick="solve_re()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script>
+    function solve_re() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const rho = val("rho"), v = val("vel"), l = val("len"), mu = val("mu") || 1.789e-5;
+      if (rho === null || v === null || l === null) { err.textContent = "fill rho, V, and L"; return; }
+      if (mu <= 0 || l <= 0) { err.textContent = "mu and L must be positive"; return; }
+
+      const re = rho * v * l / mu;
+      let regime = "laminar-leaning";
+      if (re > 4000) regime = "turbulent-leaning";
+      else if (re >= 2300) regime = "transitional";
+
+      render_lines("lines", [
+        ["reynolds number Re", fmt(re, 6)],
+        ["regime (pipe)", regime]
+      ]);
+    }
+  </script>
+</body>
+</html>

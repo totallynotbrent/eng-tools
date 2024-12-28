@@ -306,5 +306,87 @@ function check(name, cond, extra) {
   check("ode euler 2.5937", has_num(nums, 2.5937, 0.01), nums.join(","));
 }
 
+// --- space mechanics ---
+{
+  const { ctx, doc } = load_page("tools/space/orbital-elements.html");
+  set(doc, "r", 6.678e6); set(doc, "v", 7726); set(doc, "gamma", 0);
+  ctx.solve_elements();
+  const nums = numbers_from(doc, "lines");
+  check("orbital a ~6.678e6", has_num(nums, 6.678e6, 0.005), nums.join(","));
+  check("orbital period ~5431", has_num(nums, 5431, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/space/vis-viva.html");
+  set(doc, "r", 6.678e6); set(doc, "a", 6.678e6);
+  ctx.solve_visviva();
+  check("vis-viva circular v 7726", has_num(numbers_from(doc, "lines"), 7726, 0.005));
+}
+{
+  const { ctx, doc } = load_page("tools/space/hohmann.html");
+  set(doc, "r1", 6.678e6); set(doc, "r2", 42.164e6);
+  ctx.solve_hohmann();
+  const nums = numbers_from(doc, "lines");
+  check("hohmann total dv ~3892", has_num(nums, 3892, 0.01), nums.join(","));
+  check("hohmann time ~5.3h", has_num(nums, 5.275, 0.02), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/space/kepler.html");
+  set(doc, "a", 6.678e6); set(doc, "t", "");
+  ctx.solve_kepler();
+  check("kepler T ~5431", has_num(numbers_from(doc, "lines"), 5431, 0.01));
+}
+
+// --- compressible aero ---
+{
+  const { ctx, doc } = load_page("tools/aero/isentropic.html");
+  set(doc, "mach", 2);
+  ctx.solve_isen();
+  const nums = numbers_from(doc, "lines");
+  check("isen T/T0 0.5556", has_num(nums, 0.5556, 0.01), nums.join(","));
+  check("isen P/P0 0.1278", has_num(nums, 0.1278, 0.01), nums.join(","));
+  check("isen A/A* 1.6875", has_num(nums, 1.6875, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/aero/normal-shock.html");
+  set(doc, "m1", 2);
+  ctx.solve_shock();
+  const nums = numbers_from(doc, "lines");
+  check("shock M2 0.5774", has_num(nums, 0.5774, 0.01), nums.join(","));
+  check("shock P2/P1 4.5", has_num(nums, 4.5, 0.01), nums.join(","));
+  check("shock rho2/rho1 2.667", has_num(nums, 2.667, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/aero/reynolds.html");
+  set(doc, "rho", 1.225); set(doc, "vel", 50); set(doc, "len", 1);
+  ctx.solve_re();
+  check("reynolds 3.424e6", has_num(numbers_from(doc, "lines"), 3.424e6, 0.005));
+}
+
+// --- linear algebra ---
+{
+  const { ctx, doc } = load_page("tools/linalg/matrix.html");
+  set(doc, "size", "2"); set(doc, "a11", 1); set(doc, "a12", 2); set(doc, "a21", 3); set(doc, "a22", 4);
+  ctx.solve_mat();
+  const nums = numbers_from(doc, "lines");
+  check("matrix det -2", has_num(nums, -2, 0.01), nums.join(","));
+  check("matrix inverse 1.5", has_num(nums, 1.5, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/linalg/eigenvalues.html");
+  set(doc, "a11", 2); set(doc, "a12", 1); set(doc, "a21", 1); set(doc, "a22", 2);
+  ctx.solve_eig();
+  const nums = numbers_from(doc, "lines");
+  check("eig lambda 3 and 1", has_num(nums, 3, 0.01) && has_num(nums, 1, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/linalg/linear-solver.html");
+  set(doc, "size", "2");
+  set(doc, "a11", 2); set(doc, "a12", 1); set(doc, "a21", 1); set(doc, "a22", 3);
+  set(doc, "b1", 5); set(doc, "b2", 10);
+  ctx.solve_ls();
+  const nums = numbers_from(doc, "lines");
+  check("solver x = 1, 3", has_num(nums, 1, 0.01) && has_num(nums, 3, 0.01), nums.join(","));
+}
+
 console.log(fails === 0 ? "\nALL PASS" : "\n" + fails + " FAILURES");
 process.exit(fails === 0 ? 0 : 1);

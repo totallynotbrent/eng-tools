@@ -176,3 +176,45 @@ button:hover { border-color: var(--accent); color: var(--accent); }
 }
 
 .note { color: var(--muted); font-size: 0.85rem; margin-top: 0.6rem; }
+
+body.with-sidebar { padding-left: 236px; }
+
+.side-nav {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 236px;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  padding: 1.1rem 1.1rem 2rem;
+  overflow-y: auto;
+  z-index: 50;
+}
+
+.nav-home {
+  display: block;
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+.nav-home:hover { text-decoration: none; color: var(--accent); }
+
+.side-nav a {
+  display: block;
+  padding: 0.2rem 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.side-nav a:hover { color: var(--accent); text-decoration: none; }
+.side-nav a.active { color: var(--accent); }
+
+.nav-group {
+  margin: 0.65rem 0 0.1rem;
+  font-size: 0.74rem;
+  color: var(--muted);
+  opacity: 0.7;
+}

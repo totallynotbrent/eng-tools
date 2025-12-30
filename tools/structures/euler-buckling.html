@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>euler buckling</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>euler buckling</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">critical buckling load for a slender column from its end conditions.</p>
+
+      <div class="field">
+        <label>young's modulus E</label>
+        <input type="number" id="e_mod" step="any" placeholder="Pa">
+      </div>
+      <div class="field">
+        <label>area moment of inertia I (about the buckling axis)</label>
+        <input type="number" id="inertia" step="any" placeholder="m&#8308;">
+      </div>
+      <div class="field">
+        <label>length L</label>
+        <input type="number" id="len" step="any" placeholder="m">
+      </div>
+      <div class="field">
+        <label>end condition</label>
+        <select id="ends">
+          <option value="1">both pinned (K=1)</option>
+          <option value="0.7">fixed-pinned (K=0.7)</option>
+          <option value="0.5">both fixed (K=0.5)</option>
+          <option value="2">fixed-free / cantilever (K=2)</option>
+        </select>
+      </div>
+
+      <button onclick="solve_buckling()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">P_cr = &pi;&sup2;EI / (KL)&sup2;</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function solve_buckling() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const e = val("e_mod"), i = val("inertia"), l = val("len");
+      if (e === null || i === null || l === null) { err.textContent = "fill E, I, and L"; return; }
+      if (e <= 0 || i <= 0 || l <= 0) { err.textContent = "E, I, and L must be positive"; return; }
+
+      const k = parseFloat(document.getElementById("ends").value);
+      const pcr = Math.PI * Math.PI * e * i / Math.pow(k * l, 2);
+
+      render_lines("lines", [
+        ["critical load P_cr", fmt(pcr, 6) + " N"],
+        ["effective length KL", fmt(k * l, 6) + " m"]
+      ]);
+    }
+  </script>
+</body>
+</html>

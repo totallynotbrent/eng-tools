@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>beam shear and moment</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>beam shear and moment</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">reaction forces, internal shear, and bending moment for a simply supported beam with point and distributed loads.</p>
+
+      <div class="field">
+        <label>span L</label>
+        <input type="number" id="len" step="any" placeholder="m">
+      </div>
+      <div class="field">
+        <label>point loads (magnitude, distance; one per line)</label>
+        <textarea id="point" rows="3" placeholder="1000 2&#10;500 4"></textarea>
+      </div>
+      <div class="field">
+        <label>uniform load w over the full span (optional)</label>
+        <input type="number" id="udl" step="any" placeholder="N/m">
+      </div>
+      <div class="field">
+        <label>positions to evaluate (comma separated, optional)</label>
+        <input type="text" id="xs" placeholder="0, 1, 2, 3, 4">
+      </div>
+
+      <button onclick="solve_beam()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function solve_beam() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const L = val("len");
+      if (L === null || L <= 0) { err.textContent = "enter a positive span"; return; }
+
+      const loads = [];
+      let total = 0, sum_m = 0;
+      for (const raw of document.getElementById("point").value.split("\n")) {
+        const t = raw.trim();
+        if (!t) continue;
+        const parts = t.split(/[\s,]+/).filter(function (x) { return x !== ""; });
+        if (parts.length !== 2) { err.textContent = "each point load needs magnitude and distance"; return; }
+        const p = parseFloat(parts[0]), x = parseFloat(parts[1]);
+        if (!isFinite(p) || !isFinite(x)) { err.textContent = "bad point load line: " + t; return; }
+        if (x < 0 || x > L) { err.textContent = "load at " + x + " sits off the beam"; return; }
+        loads.push([p, x]);
+        total += p; sum_m += p * x;
+      }
+
+      const w = val("udl");
+      if (w !== null) { total += w * L; sum_m += w * L * L / 2; }
+
+      const rb = sum_m / L;
+      const ra = total - rb;
+
+      const lines = [
+        ["reaction at A (Ra)", fmt(ra, 6) + " N"],
+        ["reaction at B (Rb)", fmt(rb, 6) + " N"]
+      ];
+
+      // evaluate shear and moment at requested positions
+      const xs_raw = document.getElementById("xs").value.trim();
+      if (xs_raw) {
+        for (const tok of xs_raw.split(",")) {
+          const x = parseFloat(tok);
+          if (!isFinite(x) || x < 0 || x > L) continue;
+          let v = ra;
+          let m = ra * x;
+          for (const ld of loads) {
+            if (x >= ld[1]) { v -= ld[0]; m -= ld[0] * (x - ld[1]); }
+          }
+          if (w !== null) { v -= w * x; m -= w * x * x / 2; }
+          lines.push(["x = " + fmt(x, 4), "V = " + fmt(v, 4) + " N,  M = " + fmt(m, 4) + " N&middot;m"]);
+        }
+      }
+
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

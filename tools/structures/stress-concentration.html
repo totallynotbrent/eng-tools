@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>stress concentration</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>stress concentration</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">peak stress at a hole or fillet from the nominal stress and a stress concentration factor.</p>
+
+      <div class="field">
+        <label>nominal stress &sigma;_nom</label>
+        <input type="number" id="snom" step="any" placeholder="Pa">
+      </div>
+      <div class="field">
+        <label>stress concentration factor Kt (enter, or estimate below)</label>
+        <input type="number" id="kt" step="any" placeholder="dimensionless">
+      </div>
+
+      <div class="field">
+        <label>for a circular hole: hole diameter d and plate width w (estimates Kt)</label>
+        <div class="row">
+          <input type="number" id="d" step="any" placeholder="d">
+          <input type="number" id="w" step="any" placeholder="w">
+        </div>
+      </div>
+
+      <button onclick="solve_kt()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">&sigma;_max = Kt &middot; &sigma;_nom</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function solve_kt() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const snom = val("snom");
+      let kt = val("kt");
+
+      const d = val("d"), w = val("w");
+      if (d !== null && w !== null) {
+        if (w <= 0 || d <= 0 || d >= w) { err.textContent = "need 0 < d < w"; return; }
+        const r = d / w;
+        // peterson's fit for a circular hole in an infinite-width plate, widened for finite width
+        kt = 3 - 3.13 * r + 3.66 * r * r - 1.53 * r * r * r;
+      }
+
+      if (snom === null) { err.textContent = "enter the nominal stress"; return; }
+      if (kt === null) { err.textContent = "give Kt directly or both d and w for the hole"; return; }
+      if (kt < 1) { err.textContent = "Kt must be at least 1"; return; }
+
+      render_lines("lines", [
+        ["stress concentration Kt", fmt(kt, 6)],
+        ["peak stress &sigma;_max", fmt(kt * snom, 6) + " Pa"]
+      ]);
+    }
+  </script>
+</body>
+</html>

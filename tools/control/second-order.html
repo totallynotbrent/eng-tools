@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>second order response</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>second order response</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">percent overshoot and settling time from a damping ratio and natural frequency.</p>
+
+      <div class="field">
+        <label>damping ratio &zeta;</label>
+        <input type="number" id="zeta" step="any" placeholder="dimensionless">
+      </div>
+      <div class="field">
+        <label>natural frequency &omega;n</label>
+        <input type="number" id="wn" step="any" placeholder="rad/s">
+      </div>
+
+      <button onclick="solve_second()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">%OS = exp(&minus;&pi;&zeta;/&radic;(1&minus;&zeta;&sup2;)) &times; 100</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function solve_second() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const zeta = val("zeta"), wn = val("wn");
+      if (zeta === null || wn === null) { err.textContent = "fill zeta and wn"; return; }
+      if (wn <= 0) { err.textContent = "wn must be positive"; return; }
+      if (zeta >= 1) {
+        render_lines("lines", [
+          ["damping", "overdamped, no overshoot"],
+          ["settling time (2%)", fmt(4 / (zeta * wn), 4) + " s"]
+        ]);
+        return;
+      }
+
+      const os = Math.exp(-Math.PI * zeta / Math.sqrt(1 - zeta * zeta)) * 100;
+      const ts = 4 / (zeta * wn);
+
+      render_lines("lines", [
+        ["percent overshoot", fmt(os, 6) + " %"],
+        ["settling time (2%)", fmt(ts, 4) + " s"]
+      ]);
+    }
+  </script>
+</body>
+</html>

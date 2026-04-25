@@ -9,11 +9,18 @@
       ["normal shock", "tools/aero/normal-shock.html"],
       ["reynolds number", "tools/aero/reynolds.html"]
     ]},
+    { name: "control systems", items: [
+      ["pid tuning", "tools/control/pid.html"],
+      ["second order response", "tools/control/second-order.html"]
+    ]},
     { name: "dynamics", items: [
       ["projectile motion", "tools/dynamics/projectile.html"],
       ["rotational motion", "tools/dynamics/rotation.html"],
       ["impulse and momentum", "tools/dynamics/impulse-momentum.html"],
       ["relative velocity", "tools/dynamics/relative-velocity.html"]
+    ]},
+    { name: "instrumentation", items: [
+      ["strain gauge", "tools/instr/strain-gauge.html"]
     ]},
     { name: "linear algebra", items: [
       ["matrix operations", "tools/linalg/matrix.html"],
@@ -27,7 +34,8 @@
     { name: "physics", items: [
       ["resistors and capacitors", "tools/physics/resistors.html"],
       ["ohm's law and power", "tools/physics/ohms-law.html"],
-      ["rc time constant", "tools/physics/rc.html"]
+      ["rc time constant", "tools/physics/rc.html"],
+      ["kirchhoff solver", "tools/physics/kirchhoff.html"]
     ]},
     { name: "solid mechanics", items: [
       ["stress and strain", "tools/solids/stress-strain.html"],
@@ -39,7 +47,13 @@
       ["orbital elements", "tools/space/orbital-elements.html"],
       ["vis-viva", "tools/space/vis-viva.html"],
       ["hohmann transfer", "tools/space/hohmann.html"],
-      ["kepler's third law", "tools/space/kepler.html"]
+      ["kepler's third law", "tools/space/kepler.html"],
+      ["solar array budget", "tools/space/solar-array.html"],
+      ["link budget", "tools/space/link-budget.html"],
+      ["rocket equation", "tools/space/rocket-equation.html"],
+      ["nozzle flow", "tools/space/nozzle.html"],
+      ["attitude conversions", "tools/space/quaternion.html"],
+      ["inertia tensor", "tools/space/inertia.html"]
     ]},
     { name: "statics", items: [
       ["reaction forces", "tools/statics/reaction-forces.html"],

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>nozzle flow</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>nozzle flow</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">area ratio and exit mach number for a given chamber and exit pressure.</p>
+
+      <div class="field">
+        <label>chamber pressure pc and exit pressure pe</label>
+        <div class="row">
+          <input type="number" id="pc" step="any" placeholder="pc">
+          <input type="number" id="pe" step="any" placeholder="pe">
+        </div>
+      </div>
+      <div class="field">
+        <label>ratio of specific heats &gamma; (optional)</label>
+        <input type="number" id="gamma" step="any" placeholder="1.2">
+      </div>
+
+      <button onclick="solve_nozzle()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function solve_nozzle() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const pc = val("pc"), pe = val("pe"), g = val("gamma") || 1.2;
+      if (pc === null || pe === null) { err.textContent = "fill pc and pe"; return; }
+      if (pc <= 0 || pe <= 0 || pc <= pe) { err.textContent = "need pc > pe > 0"; return; }
+      if (g <= 1) { err.textContent = "gamma must be greater than 1"; return; }
+
+      const pr = pc / pe;
+      const me = Math.sqrt((2 / (g - 1)) * (Math.pow(pr, (g - 1) / g) - 1));
+      const term = (2 / (g + 1)) * (1 + (g - 1) / 2 * me * me);
+      const aa = (1 / me) * Math.pow(term, (g + 1) / (2 * (g - 1)));
+
+      render_lines("lines", [
+        ["pressure ratio pc/pe", fmt(pr, 6)],
+        ["exit mach Me", fmt(me, 6)],
+        ["area ratio Ae/A*", fmt(aa, 6)]
+      ]);
+    }
+  </script>
+</body>
+</html>

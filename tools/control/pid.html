@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pid tuning</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>pid tuning</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">ziegler-nichols gains from ultimate gain and ultimate period.</p>
+
+      <div class="field">
+        <label>ultimate gain Ku</label>
+        <input type="number" id="ku" step="any" placeholder="Ku">
+      </div>
+      <div class="field">
+        <label>ultimate period Tu</label>
+        <input type="number" id="tu" step="any" placeholder="s">
+      </div>
+
+      <button onclick="solve_pid()">solve</button>
+      <div class="note">classic ziegler-nichols closed-loop method.</div>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function solve_pid() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const ku = val("ku"), tu = val("tu");
+      if (ku === null || tu === null) { err.textContent = "fill Ku and Tu"; return; }
+      if (ku <= 0 || tu <= 0) { err.textContent = "Ku and Tu must be positive"; return; }
+
+      const lines = [];
+      const p = 0.6 * ku, pi_kp = 0.45 * ku, pi_ti = tu / 1.2;
+      const pid_kp = 0.6 * ku, pid_ti = tu / 2, pid_td = tu / 8;
+
+      lines.push(["P only  Kp", fmt(p, 6)]);
+      lines.push(["PI      Kp", fmt(pi_kp, 4) + ",  Ti " + fmt(pi_ti, 4)]);
+      lines.push(["PID     Kp", fmt(pid_kp, 4) + ",  Ti " + fmt(pid_ti, 4) + ",  Td " + fmt(pid_td, 4)]);
+
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

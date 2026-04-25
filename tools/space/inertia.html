@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>inertia tensor</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>inertia tensor</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">principal moments and axes of a symmetric 3x3 inertia tensor.</p>
+
+      <div class="field">
+        <label>row 1 (Ixx, Ixy, Ixz)</label>
+        <div class="row">
+          <input type="number" id="i11" step="any" placeholder="Ixx">
+          <input type="number" id="i12" step="any" placeholder="Ixy">
+          <input type="number" id="i13" step="any" placeholder="Ixz">
+        </div>
+      </div>
+      <div class="field">
+        <label>row 2 (Ixy, Iyy, Iyz)</label>
+        <div class="row">
+          <input type="number" id="i21" step="any" placeholder="Ixy">
+          <input type="number" id="i22" step="any" placeholder="Iyy">
+          <input type="number" id="i23" step="any" placeholder="Iyz">
+        </div>
+      </div>
+      <div class="field">
+        <label>row 3 (Ixz, Iyz, Izz)</label>
+        <div class="row">
+          <input type="number" id="i31" step="any" placeholder="Ixz">
+          <input type="number" id="i32" step="any" placeholder="Iyz">
+          <input type="number" id="i33" step="any" placeholder="Izz">
+        </div>
+      </div>
+
+      <button onclick="solve_inertia()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function mat_vec(m, v) {
+      return [
+        m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2],
+        m[1][0] * v[0] + m[1][1] * v[1] + m[1][2] * v[2],
+        m[2][0] * v[0] + m[2][1] * v[1] + m[2][2] * v[2]
+      ];
+    }
+
+    function solve_inertia() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const m = [
+        [val("i11"), val("i12"), val("i13")],
+        [val("i21"), val("i22"), val("i23")],
+        [val("i31"), val("i32"), val("i33")]
+      ];
+      for (const row of m) for (const x of row) if (x === null) { err.textContent = "fill all nine entries"; return; }
+
+      // principal moments via the 3x3 eigenvalue polynomial (symmetric real matrix),
+      // solved iteratively with jacobi rotations for the numerically robust path
+      const a = m.map(function (r) { return r.slice(); });
+      const n = 3;
+      const v = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+
+      for (let it = 0; it < 100; it++) {
+        let off = Math.abs(a[0][1]) + Math.abs(a[0][2]) + Math.abs(a[1][2]);
+        if (off < 1e-12) break;
+        let p = 0, q = 1;
+        let maxv = Math.abs(a[0][1]);
+        if (Math.abs(a[0][2]) > maxv) { maxv = Math.abs(a[0][2]); p = 0; q = 2; }
+        if (Math.abs(a[1][2]) > maxv) { p = 1; q = 2; }
+
+        const app = a[p][p], aqq = a[q][q], apq = a[p][q];
+        const tau = (aqq - app) / (2 * apq);
+        const t = Math.sign(tau) / (Math.abs(tau) + Math.sqrt(1 + tau * tau));
+        const c = 1 / Math.sqrt(1 + t * t);
+        const s = t * c;
+
+        for (let k = 0; k < n; k++) {
+          const akp = a[k][p], akq = a[k][q];
+          a[k][p] = c * akp - s * akq;
+          a[k][q] = s * akp + c * akq;
+        }
+        for (let k = 0; k < n; k++) {
+          const apk = a[p][k], aqk = a[q][k];
+          a[p][k] = c * apk - s * aqk;
+          a[q][k] = s * apk + c * aqk;
+        }
+        for (let k = 0; k < n; k++) {
+          const vkp = v[k][p], vkq = v[k][q];
+          v[k][p] = c * vkp - s * vkq;
+          v[k][q] = s * vkp + c * vkq;
+        }
+        a[p][q] = a[q][p] = 0;
+      }
+
+      const evals = [a[0][0], a[1][1], a[2][2]];
+      const order = [0, 1, 2].sort(function (i, j) { return evals[i] - evals[j]; });
+
+      const lines = [];
+      order.forEach(function (idx, k) {
+        lines.push(["I" + (k + 1), fmt(evals[idx], 6)]);
+        const axis = [v[0][idx], v[1][idx], v[2][idx]];
+        const mag = Math.hypot(axis[0], axis[1], axis[2]) || 1;
+        lines.push(["axis " + (k + 1), "(" + axis.map(function (x) { return fmt(x / mag, 4); }).join(", ") + ")"]);
+      });
+
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

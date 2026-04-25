@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>rocket equation</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>rocket equation</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">ideal delta-v from exhaust velocity and mass ratio. &Delta;v = ve &middot; ln(m0/mf).</p>
+
+      <div class="field">
+        <label>exhaust velocity ve (or Isp &middot; g)</label>
+        <input type="number" id="ve" step="any" placeholder="m/s">
+      </div>
+      <div class="field">
+        <label>initial mass m0</label>
+        <input type="number" id="m0" step="any" placeholder="kg">
+      </div>
+      <div class="field">
+        <label>final mass mf</label>
+        <input type="number" id="mf" step="any" placeholder="kg">
+      </div>
+
+      <button onclick="solve_rocket()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function solve_rocket() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const ve = val("ve"), m0 = val("m0"), mf = val("mf");
+      if (ve === null || m0 === null || mf === null) { err.textContent = "fill ve, m0, and mf"; return; }
+      if (ve <= 0 || m0 <= 0 || mf <= 0 || mf > m0) { err.textContent = "need ve > 0 and 0 < mf <= m0"; return; }
+
+      const mr = m0 / mf;
+      const dv = ve * Math.log(mr);
+      const prop = m0 - mf;
+
+      render_lines("lines", [
+        ["mass ratio m0/mf", fmt(mr, 6)],
+        ["propellant mass", fmt(prop, 4) + " kg"],
+        ["ideal &Delta;v", fmt(dv, 6) + " m/s"]
+      ]);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>kirchhoff solver</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>kirchhoff solver</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">resistive circuit by node voltage. give nodes, resistors (node to node), and one ground (node 0).</p>
+
+      <div class="field">
+        <label>nodes (one per line: node id, marker optional)</label>
+        <textarea id="nodes" rows="4">1
+2</textarea>
+      </div>
+      <div class="field">
+        <label>resistors (nodeA nodeB resistance)</label>
+        <textarea id="resistors" rows="4">1 2 10</textarea>
+      </div>
+      <div class="field">
+        <label>voltage sources (fromNode toNode volts)</label>
+        <textarea id="sources" rows="2"></textarea>
+      </div>
+      <div class="field">
+        <label>ground node id (default 0)</label>
+        <input type="number" id="ground" step="any" value="0">
+      </div>
+
+      <button onclick="solve_kirchhoff()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function parse_lines(text) {
+      const out = [];
+      for (let raw of text.split("\n")) {
+        raw = raw.trim();
+        if (!raw || raw[0] === "#") continue;
+        const tok = raw.split(/[\s,]+/).filter(function (t) { return t; });
+        if (tok.length) out.push(tok);
+      }
+      return out;
+    }
+
+    function solve_kirchhoff() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const node_lines = parse_lines(document.getElementById("nodes").value);
+      const res_lines = parse_lines(document.getElementById("resistors").value);
+      const src_lines = parse_lines(document.getElementById("sources").value);
+      const gnd = parseInt(document.getElementById("ground").value) || 0;
+
+      const ids = [];
+      for (const t of node_lines) ids.push(parseInt(t[0]));
+      ids.push(gnd);
+      const uniq = Array.from(new Set(ids));
+      const idx = {};
+      uniq.forEach(function (id, i) { idx[id] = i; });
+      const n = uniq.length;
+      const gnd_index = idx[gnd];
+
+      const g = [];
+      const currents = [];
+      for (let i = 0; i < n; i++) { g.push(new Array(n).fill(0)); currents.push(0); }
+
+      for (let i = 0; i < res_lines.length; i++) {
+        const t = res_lines[i];
+        const a = parseInt(t[0]), b = parseInt(t[1]), r = parseFloat(t[2]);
+        if (!(a in idx) || !(b in idx)) { err.textContent = "resistor " + (i + 1) + " references an unknown node"; return; }
+        if (r <= 0 || !isFinite(r)) { err.textContent = "resistor " + (i + 1) + " needs a positive resistance"; return; }
+        const ia = idx[a], ib = idx[b], c = 1 / r;
+        g[ia][ia] += c; g[ib][ib] += c;
+        g[ia][ib] -= c; g[ib][ia] -= c;
+      }
+
+      for (let i = 0; i < src_lines.length; i++) {
+        const t = src_lines[i];
+        const a = parseInt(t[0]), b = parseInt(t[1]), v = parseFloat(t[2]);
+        if (!(a in idx) || !(b in idx)) { err.textContent = "source " + (i + 1) + " references an unknown node"; return; }
+        // pin the from-node of each source as a fixed-voltage reference:
+        // not implemented yet, so reject sources for now (resistive nets only)
+        err.textContent = "voltage sources need a modified nodal analysis, not supported here yet";
+        return;
+      }
+
+      // remove the ground row/col by pinning it, then solve the rest
+      const keep = [];
+      for (let i = 0; i < n; i++) if (i !== gnd_index) keep.push(i);
+      const k = keep.length;
+      const A = [], bvec = [];
+      for (let i = 0; i < k; i++) {
+        A.push(keep.map(function (j) { return g[keep[i]][j]; }));
+        bvec.push(0);
+      }
+
+      const vnode = gauss_solve(A, bvec);
+      if (vnode === null) { err.textContent = "singular conductance matrix, check the circuit"; return; }
+
+      const lines = [];
+      for (let i = 0; i < k; i++) lines.push(["node " + uniq[keep[i]], fmt(vnode[i], 6) + " V"]);
+      if (!lines.length) { err.textContent = "no nodes to solve"; return; }
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

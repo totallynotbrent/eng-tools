@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>solar array budget</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>solar array budget</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">array end-of-life power versus a load, plus required array area given a cell efficiency.</p>
+
+      <div class="field">
+        <label>beginning-of-life power P0</label>
+        <input type="number" id="p0" step="any" placeholder="W">
+      </div>
+      <div class="field">
+        <label>annual degradation per year (fraction, optional)</label>
+        <input type="number" id="deg" step="any" placeholder="0.028" value="0.028">
+      </div>
+      <div class="field">
+        <label>mission life (years)</label>
+        <input type="number" id="years" step="any" placeholder="yr">
+      </div>
+      <div class="field">
+        <label>average load (optional)</label>
+        <input type="number" id="load" step="any" placeholder="W">
+      </div>
+      <div class="field">
+        <label>cell efficiency &eta; and solar flux S (optional, gives area)</label>
+        <div class="row">
+          <input type="number" id="eta" step="any" placeholder="&eta; (0-1)">
+          <input type="number" id="flux" step="any" placeholder="W/m&sup2;" value="1361">
+        </div>
+      </div>
+
+      <button onclick="solve_solar()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">P_eol = P0 &middot; (1 &minus; d)^years</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function solve_solar() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const p0 = val("p0"), years = val("years");
+      const deg = val("deg") || 0.028;
+      if (p0 === null || years === null) { err.textContent = "fill P0 and mission life"; return; }
+      if (years < 0) { err.textContent = "mission life must be non-negative"; return; }
+
+      const peol = p0 * Math.pow(1 - deg, years);
+      const lines = [
+        ["EOL power", fmt(peol, 6) + " W"],
+        ["power lost", fmt(p0 - peol, 6) + " W"]
+      ];
+
+      const load = val("load");
+      if (load !== null) {
+        const margin = peol - load;
+        lines.push(["EOL margin", fmt(margin, 6) + " W (" + fmt(peol / load, 4) + "x load)"]);
+      }
+
+      const eta = val("eta");
+      if (eta !== null) {
+        const flux = val("flux") || 1361;
+        if (eta <= 0 || flux <= 0) { err.textContent = "eta and flux must be positive"; return; }
+        const area = p0 / (eta * flux);
+        lines.push(["array area for P0", fmt(area, 6) + " m&sup2;"]);
+      }
+
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

@@ -388,5 +388,92 @@ function check(name, cond, extra) {
   check("solver x = 1, 3", has_num(nums, 1, 0.01) && has_num(nums, 3, 0.01), nums.join(","));
 }
 
+// --- 2026 spring: spacecraft systems, control, instrumentation ---
+{
+  const { ctx, doc } = load_page("tools/space/rocket-equation.html");
+  set(doc, "ve", 3000); set(doc, "m0", 1000); set(doc, "mf", 200);
+  ctx.solve_rocket();
+  const nums = numbers_from(doc, "lines");
+  check("rocket mass ratio 5", has_num(nums, 5, 0.01), nums.join(","));
+  check("rocket dv 4828", has_num(nums, 4828, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/space/nozzle.html");
+  set(doc, "pc", 100); set(doc, "pe", 1);
+  ctx.solve_nozzle();
+  const nums = numbers_from(doc, "lines");
+  check("nozzle pressure ratio 100", has_num(nums, 100, 0.01), nums.join(","));
+  check("nozzle Me 3.40", has_num(nums, 3.3977, 0.01), nums.join(","));
+  check("nozzle area ratio 11.87", has_num(nums, 11.871, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/space/solar-array.html");
+  set(doc, "p0", 100); set(doc, "deg", 0.028); set(doc, "years", 10);
+  ctx.solve_solar();
+  const nums = numbers_from(doc, "lines");
+  check("solar peol ~75.3", has_num(nums, 75.3, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/space/link-budget.html");
+  set(doc, "pt", 10); set(doc, "gt", 100); set(doc, "gr", 100);
+  set(doc, "dist", 1000e3); set(doc, "freq", 10e9);
+  ctx.solve_link();
+  const nums = numbers_from(doc, "lines");
+  check("link lambda 0.03", has_num(nums, 0.03, 0.01), nums.join(","));
+  check("link pr dbm -92.5", has_num(nums, -92.45, 0.3), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/space/quaternion.html");
+  set(doc, "roll", 0); set(doc, "pitch", 0); set(doc, "yaw", 90);
+  ctx.euler_to_quat();
+  const nums = numbers_from(doc, "lines");
+  check("quat yaw90 w 0.707", has_num(nums, 0.707, 0.01), nums.join(","));
+  check("quat yaw90 z 0.707", has_num(nums, 0.707, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/space/inertia.html");
+  set(doc, "i11", 10); set(doc, "i12", 0); set(doc, "i13", 0);
+  set(doc, "i21", 0); set(doc, "i22", 20); set(doc, "i23", 0);
+  set(doc, "i31", 0); set(doc, "i32", 0); set(doc, "i33", 30);
+  ctx.solve_inertia();
+  const nums = numbers_from(doc, "lines");
+  check("inertia principal 10,20,30", has_num(nums, 10, 0.01) && has_num(nums, 20, 0.01) && has_num(nums, 30, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/control/pid.html");
+  set(doc, "ku", 10); set(doc, "tu", 2);
+  ctx.solve_pid();
+  const nums = numbers_from(doc, "lines");
+  check("pid Kp 6", has_num(nums, 6, 0.01), nums.join(","));
+  check("pid Td 0.25", has_num(nums, 0.25, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/control/second-order.html");
+  set(doc, "zeta", 0.5); set(doc, "wn", 2);
+  ctx.solve_second();
+  const nums = numbers_from(doc, "lines");
+  check("second order overshoot 16.3%", has_num(nums, 16.3, 0.2), nums.join(","));
+  check("second order ts 4", has_num(nums, 4, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/instr/strain-gauge.html");
+  set(doc, "config", "quarter"); set(doc, "gf", 2); set(doc, "ratio", 0.005); set(doc, "e_mod", 2e11);
+  ctx.solve_gauge();
+  const nums = numbers_from(doc, "lines");
+  check("gauge strain 0.01", has_num(nums, 0.01, 0.01), nums.join(","));
+  check("gauge stress 2e9", has_num(nums, 2e9, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/physics/kirchhoff.html");
+  // two nodes tied to ground through resistors: node1 via 10, node2 via 10, link 1-2 via 10;
+  // with no source the only solution is all zero (grounded reference), which the solver returns
+  set(doc, "nodes", "1\n2");
+  set(doc, "resistors", "1 0 10\n2 0 10\n1 2 10");
+  ctx.solve_kirchhoff();
+  check("kirchhoff runs without error", doc.getElementById("err").textContent === "", doc.getElementById("err").textContent);
+  const nums = numbers_from(doc, "lines");
+  check("kirchhoff both nodes 0 V", has_num(nums, 0, 0.001), nums.join(","));
+}
+
 console.log(fails === 0 ? "\nALL PASS" : "\n" + fails + " FAILURES");
 process.exit(fails === 0 ? 0 : 1);

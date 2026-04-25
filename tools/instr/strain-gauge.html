@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>strain gauge</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>strain gauge</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">stress from a measured strain in a quarter, half, or full wheatstone bridge.</p>
+
+      <div class="field">
+        <label>bridge configuration</label>
+        <select id="config">
+          <option value="quarter">quarter bridge</option>
+          <option value="half">half bridge</option>
+          <option value="full">full bridge</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>gauge factor GF</label>
+        <input type="number" id="gf" step="any" placeholder="dimensionless" value="2">
+      </div>
+      <div class="field">
+        <label>output to excitation ratio Vout/Vex</label>
+        <input type="number" id="ratio" step="any" placeholder="V/V">
+      </div>
+      <div class="field">
+        <label>young's modulus E (optional)</label>
+        <input type="number" id="e_mod" step="any" placeholder="Pa">
+      </div>
+
+      <button onclick="solve_gauge()">solve</button>
+      <div class="note">quarter: Vout/Vex = GF&middot;&epsilon;/4. half and full scale it by 2 and 4.</div>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function solve_gauge() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const config = document.getElementById("config").value;
+      const gf = val("gf"), ratio = val("ratio");
+      if (gf === null || ratio === null) { err.textContent = "fill GF and Vout/Vex"; return; }
+      if (gf <= 0) { err.textContent = "GF must be positive"; return; }
+
+      const arms = config === "quarter" ? 1 : config === "half" ? 2 : 4;
+      const strain = 4 * ratio / (gf * arms);
+      const lines = [["strain &epsilon;", fmt(strain, 6)]];
+
+      const e = val("e_mod");
+      if (e !== null) lines.push(["stress &sigma;", fmt(e * strain, 6) + " Pa"]);
+
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

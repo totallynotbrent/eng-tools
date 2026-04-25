@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>link budget</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>link budget</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <div class="section">
+      <p class="muted">carrier to noise ratio for a radio link from power, gain, distance, and frequency.</p>
+
+      <div class="field">
+        <label>transmit power Pt</label>
+        <input type="number" id="pt" step="any" placeholder="W">
+      </div>
+      <div class="field">
+        <label>transmit and receive gain Gt, Gr (linear)</label>
+        <div class="row">
+          <input type="number" id="gt" step="any" placeholder="Gt">
+          <input type="number" id="gr" step="any" placeholder="Gr">
+        </div>
+      </div>
+      <div class="field">
+        <label>distance d</label>
+        <input type="number" id="dist" step="any" placeholder="m">
+      </div>
+      <div class="field">
+        <label>frequency f</label>
+        <input type="number" id="freq" step="any" placeholder="Hz">
+      </div>
+      <div class="field">
+        <label>system noise temperature Tsys (optional)</label>
+        <input type="number" id="tsys" step="any" placeholder="K" value="290">
+      </div>
+      <div class="field">
+        <label>bandwidth B (optional)</label>
+        <input type="number" id="bw" step="any" placeholder="Hz">
+      </div>
+
+      <button onclick="solve_link()">solve</button>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+      <div class="formula">Pr = Pt&middot;Gt&middot;Gr&middot;(c/4&pi;df)&sup2;</div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    const C_SPEED = 299792458, KB = 1.380649e-23;
+
+    function solve_link() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const pt = val("pt"), gt = val("gt"), gr = val("gr"), d = val("dist"), f = val("freq");
+      if (pt === null || gt === null || gr === null || d === null || f === null) {
+        err.textContent = "fill Pt, Gt, Gr, d, and f";
+        return;
+      }
+      if (d <= 0 || f <= 0 || pt <= 0) { err.textContent = "d, f, and Pt must be positive"; return; }
+
+      const lam = C_SPEED / f;
+      const fspl = Math.pow(lam / (4 * Math.PI * d), 2);
+      const pr = pt * gt * gr * fspl;
+      const pr_dbm = 10 * Math.log10(pr * 1000);
+
+      const lines = [
+        ["wavelength &lambda;", fmt(lam, 6) + " m"],
+        ["free-space loss", fmt(fspl, 6)],
+        ["path loss", fmt(-10 * Math.log10(fspl), 4) + " dB"],
+        ["received power Pr", fmt(pr, 6) + " W (" + fmt(pr_dbm, 4) + " dBm)"]
+      ];
+
+      const tsys = val("tsys"), bw = val("bw");
+      if (tsys !== null && bw !== null) {
+        if (tsys <= 0 || bw <= 0) { err.textContent = "Tsys and B must be positive"; return; }
+        const cn = pr / (KB * tsys * bw);
+        lines.push(["C/N0", fmt(pr / (KB * tsys), 4) + " dB-Hz"]);
+        lines.push(["carrier to noise C/N", fmt(cn, 4) + " (" + fmt(10 * Math.log10(cn), 4) + " dB)"]);
+      }
+
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

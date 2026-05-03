@@ -7,6 +7,8 @@
       ["range and endurance", "tools/aero/range-endurance.html"],
       ["isentropic flow", "tools/aero/isentropic.html"],
       ["normal shock", "tools/aero/normal-shock.html"],
+      ["oblique shock", "tools/aero/oblique-shock.html"],
+      ["prandtl-meyer expansion", "tools/aero/prandtl-meyer.html"],
       ["reynolds number", "tools/aero/reynolds.html"]
     ]},
     { name: "control systems", items: [
@@ -52,6 +54,7 @@
       ["link budget", "tools/space/link-budget.html"],
       ["rocket equation", "tools/space/rocket-equation.html"],
       ["nozzle flow", "tools/space/nozzle.html"],
+      ["thrust coefficient and c*", "tools/space/thrust-coefficient.html"],
       ["attitude conversions", "tools/space/quaternion.html"],
       ["inertia tensor", "tools/space/inertia.html"]
     ]},
@@ -59,6 +62,11 @@
       ["reaction forces", "tools/statics/reaction-forces.html"],
       ["truss solver", "tools/statics/truss.html"],
       ["centroid and moment of inertia", "tools/statics/centroid.html"]
+    ]},
+    { name: "structures", items: [
+      ["stress concentration", "tools/structures/stress-concentration.html"],
+      ["euler buckling", "tools/structures/euler-buckling.html"],
+      ["beam shear and moment", "tools/structures/beam-shear-moment.html"]
     ]},
     { name: "thermodynamics", items: [
       ["ideal gas solver", "tools/thermo/ideal-gas.html"],

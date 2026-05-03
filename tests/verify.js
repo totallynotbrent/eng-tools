@@ -475,5 +475,57 @@ function check(name, cond, extra) {
   check("kirchhoff both nodes 0 V", has_num(nums, 0, 0.001), nums.join(","));
 }
 
+// --- 2024 fall compressible aero (oblique shock + prandtl-meyer) ---
+{
+  const { ctx, doc } = load_page("tools/aero/oblique-shock.html");
+  set(doc, "m1", 2.5); set(doc, "theta", 15);
+  ctx.solve_oblique();
+  const nums = numbers_from(doc, "lines");
+  // obl shock M1=2.5 theta=15 -> beta ~36.95, M2 ~1.87, p2/p1 ~1.86
+  check("obliq beta ~37", has_num(nums, 37, 0.03), nums.join(","));
+  check("obliq M2 ~1.87", has_num(nums, 1.87, 0.02), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/aero/prandtl-meyer.html");
+  set(doc, "m1", 2); set(doc, "theta", 10);
+  ctx.solve_pm();
+  const nums = numbers_from(doc, "lines");
+  check("pm nu1 26.38", has_num(nums, 26.38, 0.05), nums.join(","));
+  check("pm M2 ~2.38", has_num(nums, 2.38, 0.02), nums.join(","));
+}
+
+// --- 2025 fall structures ---
+{
+  const { ctx, doc } = load_page("tools/structures/stress-concentration.html");
+  set(doc, "snom", 100e6); set(doc, "kt", 2.5);
+  ctx.solve_kt();
+  check("kt sigma max 250e6", has_num(numbers_from(doc, "lines"), 2.5e8, 0.001));
+}
+{
+  const { ctx, doc } = load_page("tools/structures/euler-buckling.html");
+  set(doc, "e_mod", 2e11); set(doc, "inertia", 1e-6); set(doc, "len", 2); set(doc, "ends", "1");
+  ctx.solve_buckling();
+  check("buckling pcr 493480", has_num(numbers_from(doc, "lines"), 493480, 0.01));
+}
+{
+  const { ctx, doc } = load_page("tools/structures/beam-shear-moment.html");
+  set(doc, "len", 10); set(doc, "point", "20 5"); set(doc, "xs", "5");
+  ctx.solve_beam();
+  const nums = numbers_from(doc, "lines");
+  check("beam reactions Ra=Rb=10", has_num(nums, 10, 0.01), nums.join(","));
+  check("beam M at center 50", has_num(nums, 50, 0.01), nums.join(","));
+}
+
+// --- 2026 spring thrust coefficient ---
+{
+  const { ctx, doc } = load_page("tools/space/thrust-coefficient.html");
+  set(doc, "pc", 100); set(doc, "pe", 1); set(doc, "pa", 0);
+  set(doc, "t0", 3500); set(doc, "rg", 375); set(doc, "gamma", 1.2);
+  ctx.solve_cf();
+  const nums = numbers_from(doc, "lines");
+  check("cf ~1.76", has_num(nums, 1.763, 0.01), nums.join(","));
+  check("cstar ~1935", has_num(nums, 1935, 0.05), nums.join(","));
+}
+
 console.log(fails === 0 ? "\nALL PASS" : "\n" + fails + " FAILURES");
 process.exit(fails === 0 ? 0 : 1);

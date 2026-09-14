@@ -204,6 +204,33 @@ body.with-sidebar .wrap {
   padding-bottom: 2rem;
 }
 
+/* narrow screens: collapse the sidebar behind a toggle button */
+.nav-toggle {
+  display: none;
+  position: fixed;
+  top: 0.8rem;
+  left: 0.8rem;
+  z-index: 60;
+  background: var(--field);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-size: 0.9rem;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+}
+.nav-toggle:hover { border-color: var(--accent); }
+
+@media (max-width: 720px) {
+  body.with-sidebar { padding-left: 0; }
+  .side-nav {
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+  }
+  body.nav-open .side-nav { transform: translateX(0); }
+  .nav-toggle { display: block; }
+  body.nav-open .nav-toggle { left: 244px; }
+}
+
 .side-nav {
   position: fixed;
   left: 0;

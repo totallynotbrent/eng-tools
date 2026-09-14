@@ -94,4 +94,18 @@
   aside.innerHTML = html;
   document.body.appendChild(aside);
   document.body.classList.add("with-sidebar");
+
+  // toggle button to open/close the sidebar on narrow screens
+  const toggle = document.createElement("button");
+  toggle.className = "nav-toggle";
+  toggle.type = "button";
+  toggle.title = "toggle tools";
+  toggle.textContent = "tools";
+  document.body.appendChild(toggle);
+  toggle.addEventListener("click", function () {
+    document.body.classList.toggle("nav-open");
+  });
+  aside.addEventListener("click", function () {
+    if (window.innerWidth <= 720) document.body.classList.remove("nav-open");
+  });
 })();

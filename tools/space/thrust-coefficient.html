@@ -16,6 +16,9 @@
     <div class="section">
       <p class="muted">characteristic velocity c* and nozzle thrust coefficient Cf from chamber conditions and the pressure ratio.</p>
 
+      <div class="eq">c^* = \frac{\sqrt{\gamma R T_0}}{\Gamma}</div>
+      <div class="eq">C_F = \sqrt{\frac{2\gamma^2}{\gamma-1}\left(\frac{2}{\gamma+1}\right)^{(\gamma+1)/(\gamma-1)}\left[1 - \left(\frac{p_e}{p_c}\right)^{(\gamma-1)/\gamma}\right]} + \frac{(p_e - p_a)\, A_e}{p_c A_t}</div>
+
       <div class="field">
         <label>chamber pressure pc and exit pressure pe</label>
         <div class="row">
@@ -47,7 +50,6 @@
     <div class="results" id="results" style="display:none">
       <h3>results</h3>
       <div id="lines"></div>
-      <div class="formula">c* = &radic;(γRT₀) / Γ,  Cf = F/(pc&middot;At) = &radic;(2γ²/(γ−1))(2/(γ+1))^{(γ+1)/(γ−1)}[1−(pe/pc)^{(γ−1)/γ}] + (pe−pa)Ae/(pc&middot;At)</div>
     </div>
   </div>
 

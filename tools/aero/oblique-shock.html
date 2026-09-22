@@ -16,6 +16,8 @@
     <div class="section">
       <p class="muted">oblique shock relations from upstream mach and deflection angle. use the strong-solution toggle if the flow stays subsonic after the shock.</p>
 
+      <div class="eq">\tan\theta = \frac{2\cot\beta\left(M_1^2\sin^2\beta - 1\right)}{M_1^2\left(\gamma + \cos 2\beta\right) + 2}</div>
+
       <div class="field">
         <label>upstream mach M1</label>
         <input type="number" id="m1" step="any" placeholder="M1">
@@ -44,7 +46,6 @@
     <div class="results" id="results" style="display:none">
       <h3>results</h3>
       <div id="lines"></div>
-      <div class="formula">tan θ = 2 cot β (M₁² sin²β − 1) / (M₁²(γ + cos 2β) + 2)</div>
     </div>
   </div>
 

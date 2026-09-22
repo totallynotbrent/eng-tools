@@ -13,6 +13,14 @@
       <a class="back" href="../../index.html">&larr; all tools</a>
     </header>
 
+    <div class="eq">\begin{aligned}
+\text{carnot:}&amp;&amp; \eta &amp;= 1 - T_L/T_H \\
+\text{otto:}&amp;&amp; \eta &amp;= 1 - r^{1-k} \\
+\text{diesel:}&amp;&amp; \eta &amp;= 1 - \frac{1}{r^{k-1}}\frac{r_c^k - 1}{k(r_c - 1)} \\
+\text{brayton:}&amp;&amp; \eta &amp;= 1 - r_p^{(1-k)/k} \\
+\text{rankine:}&amp;&amp; \eta &amp;= \frac{(h_1 - h_2) - (h_4 - h_3)}{h_1 - h_4}
+\end{aligned}</div>
+
     <div class="tabs" id="tabs">
       <span class="tab active" data-mode="carnot">carnot</span>
       <span class="tab" data-mode="otto">otto</span>
@@ -35,7 +43,6 @@
         </div>
       </div>
       <button onclick="solve_carnot()">solve</button>
-      <div class="formula">&eta; = 1 &minus; TL/TH</div>
     </div>
 
     <div class="section" id="panel_otto" style="display:none">
@@ -49,7 +56,6 @@
         <input type="number" id="ok" value="1.4" step="any">
       </div>
       <button onclick="solve_otto()">solve</button>
-      <div class="formula">&eta; = 1 &minus; 1/r<sup>k&minus;1</sup></div>
     </div>
 
     <div class="section" id="panel_diesel" style="display:none">
@@ -67,7 +73,6 @@
         <input type="number" id="dk" value="1.4" step="any">
       </div>
       <button onclick="solve_diesel()">solve</button>
-      <div class="formula">&eta; = 1 &minus; (rc<sup>k</sup> &minus; 1) / (r<sup>k&minus;1</sup> &middot; k &middot; (rc &minus; 1))</div>
     </div>
 
     <div class="section" id="panel_brayton" style="display:none">
@@ -81,7 +86,6 @@
         <input type="number" id="bk" value="1.4" step="any">
       </div>
       <button onclick="solve_brayton()">solve</button>
-      <div class="formula">&eta; = 1 &minus; 1/rp<sup>(k&minus;1)/k</sup></div>
     </div>
 
     <div class="section" id="panel_rankine" style="display:none">
@@ -103,7 +107,6 @@
         <input type="number" id="rh4" placeholder="kJ/kg" step="any">
       </div>
       <button onclick="solve_rankine()">solve</button>
-      <div class="formula">&eta; = (wt &minus; wp) / qin, wt = h1 &minus; h2, wp = h4 &minus; h3, qin = h1 &minus; h4</div>
     </div>
 
     <div id="err" class="error"></div>

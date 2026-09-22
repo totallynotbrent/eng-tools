@@ -16,6 +16,8 @@
     <div class="section">
       <p class="muted">array end-of-life power versus a load, plus required array area given a cell efficiency.</p>
 
+      <div class="eq">P_{\mathrm{eol}} = P_0 (1 - d)^n</div>
+
       <div class="field">
         <label>beginning-of-life power P0</label>
         <input type="number" id="p0" step="any" placeholder="W">
@@ -48,7 +50,6 @@
     <div class="results" id="results" style="display:none">
       <h3>results</h3>
       <div id="lines"></div>
-      <div class="formula">P_eol = P0 &middot; (1 &minus; d)^years</div>
     </div>
   </div>
 

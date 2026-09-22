@@ -16,6 +16,8 @@
     <div class="section">
       <p class="muted">composite area. give each shape its size and its own centroid position, empty rows are skipped.</p>
 
+      <div class="eq">\bar{x} = \frac{\sum A_i \bar{x}_i}{\sum A_i}, \qquad I = \sum \left(I_i + A_i d_i^2\right)</div>
+
       <div class="field">
         <label>shape 1</label>
         <select id="type1"><option value="rect">rectangle</option><option value="circle">circle</option><option value="tri">triangle</option></select>
@@ -76,7 +78,6 @@
     <div class="results" id="results" style="display:none">
       <h3>results</h3>
       <div id="lines"></div>
-      <div class="formula">parallel axis: I = &Sigma;(I<sub>self</sub> + A&middot;d&sup2;)</div>
     </div>
   </div>
 

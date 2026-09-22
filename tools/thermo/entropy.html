@@ -13,6 +13,8 @@
       <a class="back" href="../../index.html">&larr; all tools</a>
     </header>
 
+    <div class="eq">\Delta s = c_p \ln\frac{T_2}{T_1} - R \ln\frac{p_2}{p_1}</div>
+
     <div class="tabs" id="tabs">
       <span class="tab active" data-mode="ds">ideal gas &Delta;s</span>
       <span class="tab" data-mode="isen">isentropic relation</span>
@@ -48,7 +50,6 @@
       </div>
       <div class="note">pressures are ratio-only, so any consistent unit works</div>
       <button onclick="solve_ds()">solve</button>
-      <div class="formula">&Delta;s = cp&middot;ln(T2/T1) &minus; R&middot;ln(p2/p1)</div>
     </div>
 
     <div class="section" id="panel_isen" style="display:none">
@@ -76,7 +77,6 @@
         </div>
       </div>
       <button onclick="solve_isen()">solve</button>
-      <div class="formula">T2/T1 = (p2/p1)<sup>(k&minus;1)/k</sup></div>
     </div>
 
     <div id="err" class="error"></div>

@@ -16,6 +16,8 @@
     <div class="section">
       <p class="muted">percent overshoot and settling time from a damping ratio and natural frequency.</p>
 
+      <div class="eq">\%OS = e^{-\pi\zeta/\sqrt{1-\zeta^2}} \times 100</div>
+
       <div class="field">
         <label>damping ratio &zeta;</label>
         <input type="number" id="zeta" step="any" placeholder="dimensionless">
@@ -33,7 +35,6 @@
     <div class="results" id="results" style="display:none">
       <h3>results</h3>
       <div id="lines"></div>
-      <div class="formula">%OS = exp(&minus;&pi;&zeta;/&radic;(1&minus;&zeta;&sup2;)) &times; 100</div>
     </div>
   </div>
 

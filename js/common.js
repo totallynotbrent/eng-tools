@@ -1,5 +1,26 @@
 // shared helpers for all the tool pages
 
+// typeset all .eq blocks with katex once it loads from the cdn
+(function () {
+  if (!document.createElement || !document.head || !document.body) return;
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css";
+  document.head.appendChild(link);
+  const s = document.createElement("script");
+  s.src = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js";
+  s.defer = true;
+  s.onload = function () {
+    document.querySelectorAll(".eq").forEach(function (el) {
+      const src = el.textContent;
+      el.textContent = "";
+      katex.render(src, el, { displayMode: true, throwOnError: false });
+    });
+  };
+  s.onerror = function () { document.querySelectorAll(".eq").forEach(function (el) { el.classList.add("eq-raw"); }); };
+  document.body.appendChild(s);
+})();
+
 function val(id) {
   const el = document.getElementById(id);
   const s = el.value.trim();

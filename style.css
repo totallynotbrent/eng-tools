@@ -193,6 +193,20 @@ button:hover { border-color: var(--accent); color: var(--accent); }
 
 .note { color: var(--muted); font-size: 0.85rem; margin-top: 0.6rem; }
 
+/* governing equation block, typeset by katex */
+.eq {
+  font-size: 1.05rem;
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--field);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+}
+.eq + .eq { margin-top: -0.6rem; border-top: none; }
+
+/* fallback when the katex cdn fails: show the raw latex, monospace */
+.eq-raw, .eq-raw .katex { font-family: var(--mono); color: var(--muted); }
+
 body.with-sidebar { padding-left: 236px; }
 
 body.with-sidebar .wrap {

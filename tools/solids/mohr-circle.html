@@ -16,6 +16,8 @@
     <div class="section">
       <p class="muted">principal stresses and max shear from a plane stress state. &tau;xy positive in the sign convention where tension is positive.</p>
 
+      <div class="eq">R = \sqrt{\left(\frac{\sigma_x - \sigma_y}{2}\right)^2 + \tau_{xy}^2}</div>
+
       <div class="field">
         <label>normal stress &sigma;x</label>
         <input type="number" id="sx" step="any" placeholder="Pa">
@@ -37,7 +39,6 @@
     <div class="results" id="results" style="display:none">
       <h3>results</h3>
       <div id="lines"></div>
-      <div class="formula">R = &radic;(((&sigma;x &minus; &sigma;y)/2)&sup2; + &tau;xy&sup2;)</div>
     </div>
   </div>
 

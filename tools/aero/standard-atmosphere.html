@@ -16,6 +16,8 @@
     <div class="section">
       <p class="muted">ISA temperature, pressure, density, and speed of sound by altitude, up to 20 km.</p>
 
+      <div class="eq">T = T_0 - L h, \qquad p = p_0 \left(\frac{T}{T_0}\right)^{g/(RL)}</div>
+
       <div class="field">
         <label>altitude h</label>
         <input type="number" id="alt" step="any" placeholder="m">
@@ -29,7 +31,6 @@
     <div class="results" id="results" style="display:none">
       <h3>results</h3>
       <div id="lines"></div>
-      <div class="formula">troposphere and lower stratosphere piecewise, &gamma; = 1.4, R = 287.05 J/kgK</div>
     </div>
   </div>
 

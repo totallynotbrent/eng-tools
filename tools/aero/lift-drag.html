@@ -16,6 +16,8 @@
     <div class="section">
       <p class="muted">dynamic pressure, lift, and drag. enter a drag coefficient directly, or leave it blank and give a polar CD0 + k&middot;CL&sup2;.</p>
 
+      <div class="eq">q = \tfrac{1}{2}\rho V^2, \qquad L = q\,S\,C_L, \qquad D = q\,S\,C_D</div>
+
       <div class="field">
         <label>density &rho;</label>
         <input type="number" id="rho" step="any" placeholder="kg/m&sup3;" value="1.225">
@@ -52,7 +54,6 @@
     <div class="results" id="results" style="display:none">
       <h3>results</h3>
       <div id="lines"></div>
-      <div class="formula">q = &frac12;&rho;V&sup2;, L = q&middot;S&middot;CL, D = q&middot;S&middot;CD</div>
     </div>
   </div>
 

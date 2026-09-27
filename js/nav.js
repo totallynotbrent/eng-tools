@@ -9,11 +9,14 @@
       ["normal shock", "tools/aero/normal-shock.html"],
       ["oblique shock", "tools/aero/oblique-shock.html"],
       ["prandtl-meyer expansion", "tools/aero/prandtl-meyer.html"],
+      ["ramjet cycle", "tools/aero/ramjet.html"],
       ["reynolds number", "tools/aero/reynolds.html"]
     ]},
     { name: "control systems", items: [
       ["pid tuning", "tools/control/pid.html"],
-      ["second order response", "tools/control/second-order.html"]
+      ["second order response", "tools/control/second-order.html"],
+      ["transfer function response", "tools/control/tf-response.html"],
+      ["servo controller design", "tools/control/servo-design.html"]
     ]},
     { name: "dynamics", items: [
       ["projectile motion", "tools/dynamics/projectile.html"],
@@ -55,6 +58,8 @@
       ["rocket equation", "tools/space/rocket-equation.html"],
       ["nozzle flow", "tools/space/nozzle.html"],
       ["thrust coefficient and c*", "tools/space/thrust-coefficient.html"],
+      ["turbopump power balance", "tools/space/turbopump.html"],
+      ["inducer design", "tools/space/inducer.html"],
       ["attitude conversions", "tools/space/quaternion.html"],
       ["inertia tensor", "tools/space/inertia.html"]
     ]},
@@ -66,7 +71,8 @@
     { name: "structures", items: [
       ["stress concentration", "tools/structures/stress-concentration.html"],
       ["euler buckling", "tools/structures/euler-buckling.html"],
-      ["beam shear and moment", "tools/structures/beam-shear-moment.html"]
+      ["beam shear and moment", "tools/structures/beam-shear-moment.html"],
+      ["launch vehicle loads", "tools/structures/launch-loads.html"]
     ]},
     { name: "thermodynamics", items: [
       ["ideal gas solver", "tools/thermo/ideal-gas.html"],

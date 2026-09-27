@@ -527,5 +527,111 @@ function check(name, cond, extra) {
   check("cstar ~1935", has_num(nums, 1935, 0.05), nums.join(","));
 }
 
+// --- 2026 fall jet propulsion, controls, and rocket design ---
+{
+  const { ctx, doc } = load_page("tools/aero/ramjet.html");
+  set(doc, "m0", 3); set(doc, "t0", 228.78); set(doc, "p0", 30.16); set(doc, "a2", 0.015);
+  set(doc, "turns", "8, 10, 15");
+  set(doc, "gc", 1.4); set(doc, "cpc", 1004); set(doc, "gh", 1.33); set(doc, "cph", 1152);
+  set(doc, "dif_loss", 0.10); set(doc, "m3", 0.1001);
+  set(doc, "tt4", 2200); set(doc, "etab", 0.95); set(doc, "lhv", 42000); set(doc, "burn_loss", 0.03);
+  set(doc, "m4", 0.4003); set(doc, "dtt", -125); set(doc, "duct_loss", 0.02);
+  set(doc, "cd", 0.95); set(doc, "cv", 0.97);
+  ctx.solve_ramjet();
+  const nums = numbers_from(doc, "lines");
+  check("ramjet inlet recovery 0.807", has_num(nums, 0.807, 0.002), nums.join(","));
+  check("ramjet captured flow 19.13", has_num(nums, 19.13, 0.005), nums.join(","));
+  check("ramjet fuel-air ratio 0.0506", has_num(nums, 0.0506, 0.005), nums.join(","));
+  check("ramjet nozzle mach 0.396", has_num(nums, 0.396, 0.005), nums.join(","));
+  check("ramjet throat area 0.0317", has_num(nums, 0.0317, 0.005), nums.join(","));
+  check("ramjet exit area 0.1091", has_num(nums, 0.1091, 0.005), nums.join(","));
+  check("ramjet net thrust 14.26", has_num(nums, 14.26, 0.005), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/control/tf-response.html");
+  set(doc, "num", "16"); set(doc, "den", "1, 4, 16");
+  ctx.solve_tf();
+  const nums = numbers_from(doc, "lines");
+  check("tf dc gain 1", has_num(nums, 1, 0.001), nums.join(","));
+  check("tf poles real -2", has_num(nums, -2, 0.01), nums.join(","));
+  check("tf poles imag 3.464", has_num(nums, 3.464, 0.01), nums.join(","));
+  check("tf ramp ess 0.25", has_num(nums, 0.25, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/control/tf-response.html");
+  set(doc, "num", "5, 3"); set(doc, "den", "1, 4, 7, 2");
+  ctx.solve_tf();
+  const nums = numbers_from(doc, "lines");
+  check("tf cubic dc gain 1.5", has_num(nums, 1.5, 0.001), nums.join(","));
+  check("tf cubic real pole -0.3494", has_num(nums, -0.3494, 0.01), nums.join(","));
+  check("tf cubic complex re -1.825", has_num(nums, -1.825, 0.01), nums.join(","));
+  check("tf cubic complex im 1.547", has_num(nums, 1.547, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/control/tf-response.html");
+  set(doc, "num", "3"); set(doc, "den", "2, 5");
+  ctx.solve_tf();
+  const nums = numbers_from(doc, "lines");
+  check("tf first order K 0.6", has_num(nums, 0.6, 0.001), nums.join(","));
+  check("tf first order tau 0.4", has_num(nums, 0.4, 0.01), nums.join(","));
+  check("tf first order ts5 1.198", has_num(nums, 1.198, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/control/servo-design.html");
+  set(doc, "k_plant", 1.53); set(doc, "tau", 1); set(doc, "po", 16.3); set(doc, "tp", 0.907);
+  set(doc, "amp", "q3");
+  ctx.solve_servo();
+  const nums = numbers_from(doc, "lines");
+  check("servo zeta 0.5", has_num(nums, 0.5, 0.01), nums.join(","));
+  check("servo wn 4", has_num(nums, 4, 0.01), nums.join(","));
+  check("servo kp 10.46", has_num(nums, 10.46, 0.01), nums.join(","));
+  check("servo kv 2.614", has_num(nums, 2.614, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/space/turbopump.html");
+  // lox side of the raptor cycle study: 510.7 kg/s at 760 k, cp 1.0864, gamma 1.3225, 611 bar to 430 bar
+  set(doc, "p_mdot", 536); set(doc, "p_rho", 1141); set(doc, "p_out", 43); set(doc, "p_in", 0.2);
+  set(doc, "t_mdot", 510.7); set(doc, "t_temp", 760); set(doc, "t_cp", 1.0864); set(doc, "t_gam", 1.3225);
+  set(doc, "t_pin", 61.1); set(doc, "t_pout", 43); set(doc, "t_meas", 31.0);
+  ctx.solve_tp();
+  const nums = numbers_from(doc, "lines");
+  check("turbopump lox turbine power 34.57", has_num(nums, 34.57, 0.01), nums.join(","));
+  check("turbopump lox pump power 20.11", has_num(nums, 20.11, 0.01), nums.join(","));
+  check("turbopump lox turbine efficiency 0.897", has_num(nums, 0.897, 0.02), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/space/inducer.html");
+  set(doc, "mdot", 3); set(doc, "rho", 71.265); set(doc, "pv", 90.717); set(doc, "ptank", 0.20);
+  set(doc, "dpf", 35); set(doc, "z", 2); set(doc, "marg", 0.20); set(doc, "dht", 0.30);
+  set(doc, "phi", 0.20); set(doc, "nss", 5000); set(doc, "inc", 5); set(doc, "eta", 0.8); set(doc, "acoeff", 1);
+  ctx.solve_inducer();
+  const nums = numbers_from(doc, "lines");
+  check("inducer flow 667 gpm", has_num(nums, 667.24, 0.005), nums.join(","));
+  check("inducer npsh 108.29", has_num(nums, 108.29, 0.005), nums.join(","));
+  check("inducer tip 37.42 mm", has_num(nums, 37.42, 0.005), nums.join(","));
+  check("inducer speed 107370 rpm", has_num(nums, 107370, 0.005), nums.join(","));
+  check("inducer nss 38858", has_num(nums, 38858, 0.01), nums.join(","));
+  check("inducer head rise 1280.9", has_num(nums, 1280.9, 0.005), nums.join(","));
+  check("inducer psi 0.284", has_num(nums, 0.284, 0.01), nums.join(","));
+  check("inducer beta1t 16.31", has_num(nums, 16.31, 0.01), nums.join(","));
+  check("inducer beta2t 17.22", has_num(nums, 17.22, 0.01), nums.join(","));
+}
+{
+  const { ctx, doc } = load_page("tools/structures/launch-loads.html");
+  set(doc, "segs", "145000 4 4 12 72500\n2100 4 3 3\n56500 3 3 8\n994 3 2 2\n16200 2 2 6\n798 2 0 4");
+  set(doc, "q", 40530); set(doc, "alpha", 9.34882); set(doc, "ax_lo", 2); set(doc, "ax_mq", 2);
+  set(doc, "coefs", "0 0.7\n1.4 0.036111\n0 0.7\n1.45 0.09375\n0 0.7\n2.7463 0.14375");
+  set(doc, "g_rho", 1.208); set(doc, "g_gust", 2.85);
+  ctx.solve_loads();
+  const nums = numbers_from(doc, "lines");
+  check("loads base shear ground 88.42", has_num(nums, 88.42, 0.01), nums.join(","));
+  check("loads base moment ground 1453.2", has_num(nums, 1453.2, 0.01), nums.join(","));
+  check("loads base axial liftoff 4346.2", has_num(nums, 4346.2, 0.01), nums.join(","));
+  check("loads base axial max-q 5368", has_num(nums, 5368, 0.01), nums.join(","));
+  check("loads s3nc shear 68.18", has_num(nums, 68.18, 0.01), nums.join(","));
+  check("loads s3nc moment 90.91", has_num(nums, 90.91, 0.01), nums.join(","));
+  check("loads ps1s2 moment 517.21", has_num(nums, 517.21, 0.02), nums.join(","));
+}
+
 console.log(fails === 0 ? "\nALL PASS" : "\n" + fails + " FAILURES");
 process.exit(fails === 0 ? 0 : 1);

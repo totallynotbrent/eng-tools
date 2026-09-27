@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>transfer function response</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>transfer function response</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <p class="muted">poles, dc gain, and steady-state errors of a transfer function given as coefficient lists.</p>
+
+    <div class="eq">\begin{aligned}
+y(\infty) &= \lim_{s\to 0} s\,Y(s) = G(0) \\\\
+e_{ss} &= \lim_{s\to 0} \frac{1 - G(s)}{s} \quad \text{(unit ramp, unity feedback)}
+\end{aligned}</div>
+
+    <div class="section">
+      <div class="field">
+        <label>numerator coefficients, highest power first</label>
+        <input type="text" id="num" placeholder="e.g. 16 or 5, 3">
+      </div>
+      <div class="field">
+        <label>denominator coefficients, highest power first</label>
+        <input type="text" id="den" placeholder="e.g. 1, 4, 16">
+      </div>
+      <div class="field">
+        <label>time t (optional, first order only)</label>
+        <input type="number" id="tt" step="any" placeholder="s">
+      </div>
+      <button onclick="solve_tf()">solve</button>
+      <div class="note">errors assume G is the closed-loop transfer of a unity-feedback system.</div>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    // evaluate a polynomial with descending coefficients at a complex point
+    function poly_eval_c(p, re, im) {
+      let ar = 0, ai = 0;
+      for (let i = 0; i < p.length; i++) {
+        const nr = ar * re - ai * im + p[i], ni = ar * im + ai * re;
+        ar = nr; ai = ni;
+      }
+      return [ar, ai];
+    }
+
+    // durand-kerner root finder for real coefficient polynomials
+    function poly_roots(coeffs) {
+      const n = coeffs.length - 1;
+      const a = coeffs.map(function (c) { return c / coeffs[0]; });
+      if (n === 1) return [[-a[1], 0]];
+      let roots = [[1, 0]];
+      for (let k = 1; k < n; k++) roots.push([0.4 * roots[k - 1][0] - 0.9 * roots[k - 1][1], 0.9 * roots[k - 1][0] + 0.4 * roots[k - 1][1]]);
+      for (let it = 0; it < 500; it++) {
+        let delta = 0;
+        for (let k = 0; k < n; k++) {
+          const z = roots[k];
+          const num = poly_eval_c(a, z[0], z[1]);
+          let dr = 1, di = 0;
+          for (let j = 0; j < n; j++) {
+            if (j === k) continue;
+            const wr = z[0] - roots[j][0], wi = z[1] - roots[j][1];
+            const nr = dr * wr - di * wi, ni = dr * wi + di * wr;
+            dr = nr; di = ni;
+          }
+          const den = dr * dr + di * di;
+          const qr = (num[0] * dr + num[1] * di) / den, qi = (num[1] * dr - num[0] * di) / den;
+          const nz = [z[0] - qr, z[1] - qi];
+          delta = Math.max(delta, Math.hypot(nz[0] - z[0], nz[1] - z[1]));
+          roots[k] = nz;
+        }
+        if (delta < 1e-12) break;
+      }
+      return roots;
+    }
+
+    function parse_coeffs(id) {
+      const toks = document.getElementById(id).value.split(/[\s,]+/).filter(function (x) { return x !== ""; });
+      if (!toks.length) return null;
+      const out = [];
+      for (const t of toks) {
+        const n = parseFloat(t);
+        if (!isFinite(n)) return null;
+        out.push(n);
+      }
+      return out;
+    }
+
+    function solve_tf() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const num = parse_coeffs("num"), den = parse_coeffs("den");
+      if (num === null || den === null) { err.textContent = "enter both coefficient lists"; return; }
+      if (den.length < 2) { err.textContent = "denominator needs at least one s term"; return; }
+      if (den[0] === 0) { err.textContent = "leading denominator coefficient cannot be zero"; return; }
+      if (den.length - 1 > 6) { err.textContent = "keep the denominator at sixth order or below"; return; }
+
+      const n = den.length - 1;
+      const g0 = num[num.length - 1] / den[den.length - 1];
+      const roots = poly_roots(den);
+      const stable = roots.every(function (r) { return r[0] < 0; });
+
+      const lines = [
+        ["dc gain G(0)", fmt(g0, 6)],
+        ["system order", String(n)],
+        ["stable", stable ? "yes, all poles in the left half plane" : "no"]
+      ];
+
+      // pair complex conjugates and list each pole once
+      const listed = [];
+      for (const r of roots) {
+        if (r[1] < -1e-9) continue;
+        listed.push(r);
+      }
+      const letters = ["a", "b", "c", "d", "e", "f"];
+      for (let i = 0; i < listed.length; i++) {
+        const r = listed[i];
+        const im = Math.abs(r[1]) < 1e-9 ? "" : (r[1] > 0 ? " + " + fmt(r[1], 6) + " j" : " - " + fmt(-r[1], 6) + " j");
+        lines.push(["pole " + letters[i] + " (re, im)", fmt(r[0], 6) + im]);
+      }
+
+      if (stable) {
+        lines.push(["unit step final value", fmt(g0, 6)]);
+        lines.push(["steady-state error, unit step", fmt(1 - g0, 6)]);
+        if (Math.abs(g0 - 1) < 1e-9) {
+          // ess = -G'(0) with G(0) = 1, from the quotient rule on the coefficient lists
+          const dn = den[den.length - 1];
+          const dnum = num.length > 1 ? num[num.length - 2] : 0;
+          const dden = den.length > 1 ? den[den.length - 2] : 0;
+          lines.push(["steady-state error, unit ramp", fmt((dn * dnum - num[num.length - 1] * dden) / (dn * dn) * -1, 6)]);
+        } else {
+          lines.push(["steady-state error, unit ramp", "infinite, the output cannot track a ramp"]);
+        }
+      } else {
+        lines.push(["final values", "none, unstable systems reach no steady state"]);
+      }
+
+      if (n === 1) {
+        const b1 = den[den.length - 2], b0 = den[den.length - 1];
+        const a0 = num[num.length - 1];
+        const tau = b1 / b0, k = a0 / b0;
+        lines.push(["first order K and tau", fmt(k, 6) + ", " + fmt(tau, 6) + " s"]);
+        lines.push(["settling time (five percent)", fmt(-tau * Math.log(0.05), 6) + " s"]);
+        lines.push(["settling time (two percent)", fmt(4 * tau, 6) + " s"]);
+        const t = val("tt");
+        if (t !== null) {
+          lines.push(["unit step output at t", fmt(k * (1 - Math.exp(-t / tau)), 6)]);
+        }
+      }
+
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

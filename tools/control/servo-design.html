@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>servo controller design</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>servo controller design</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <p class="muted">proportional-velocity and proportional-integral gains from overshoot and peak-time specs.</p>
+
+    <div class="eq">\begin{aligned}
+\zeta &= \frac{-\ln(\mathrm{OS}/100)}{\sqrt{\pi^2 + \ln^2(\mathrm{OS}/100)}} \\\\
+\omega_n &= \frac{\pi}{t_p\sqrt{1-\zeta^2}} \\\\
+K_p &= \frac{\omega_n^2}{K}, \quad K_v = \frac{2\zeta\omega_n}{K}
+\end{aligned}</div>
+
+    <div class="section">
+      <div class="field">
+        <label>plant steady-state gain K</label>
+        <input type="number" id="k_plant" step="any" placeholder="rad/s per V">
+      </div>
+      <div class="field">
+        <label>plant time constant &tau;</label>
+        <input type="number" id="tau" step="any" placeholder="s">
+      </div>
+      <div class="field">
+        <label>percent overshoot spec</label>
+        <input type="number" id="po" step="any" placeholder="%">
+      </div>
+      <div class="field">
+        <label>peak time spec tp</label>
+        <input type="number" id="tp" step="any" placeholder="s">
+      </div>
+      <div class="field">
+        <label>amplifier type</label>
+        <select id="amp" style="width: 90px">
+          <option value="q3">current (Q3)</option>
+          <option value="volt">voltage</option>
+        </select>
+      </div>
+      <button onclick="solve_servo()">solve</button>
+      <div class="note">Q3 amps drive current: PV uses kp = wn&sup2;/K, kv = 2&zeta;&omega;n/K. voltage amps fold the plant pole in.</div>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function solve_servo() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const k_plant = val("k_plant"), tau = val("tau"), po = val("po"), tp = val("tp");
+      if (k_plant === null || tau === null || po === null || tp === null) { err.textContent = "fill K, tau, overshoot, and peak time"; return; }
+      if (k_plant <= 0 || tau <= 0 || tp <= 0) { err.textContent = "K, tau, and tp must be positive"; return; }
+      if (po <= 0 || po >= 100) { err.textContent = "overshoot must be between 0 and 100 percent"; return; }
+
+      const ln_os = Math.log(po / 100);
+      const zeta = -ln_os / Math.sqrt(Math.PI * Math.PI + ln_os * ln_os);
+      const wn = Math.PI / (tp * Math.sqrt(1 - zeta * zeta));
+      const amp = document.getElementById("amp").value;
+
+      let kp, kv, ki;
+      if (amp === "q3") {
+        kp = wn * wn / k_plant;
+        kv = 2 * zeta * wn / k_plant;
+        ki = null;
+      } else {
+        kp = wn * wn / k_plant * tau;
+        kv = (-1 + 2 * zeta * wn * tau) / k_plant;
+        ki = wn * wn * tau / k_plant;
+      }
+
+      const lines = [
+        ["damping ratio zeta", fmt(zeta, 6)],
+        ["natural frequency wn", fmt(wn, 6) + " rad/s"],
+        ["damped frequency wd", fmt(wn * Math.sqrt(1 - zeta * zeta), 6) + " rad/s"],
+        ["proportional gain kp", fmt(kp, 6) + (amp === "q3" ? " V/rad" : " V&middot;s/rad")]
+      ];
+      if (amp === "q3") {
+        lines.push(["velocity gain kv", fmt(kv, 6) + " V&middot;s/rad"]);
+      } else {
+        lines.push(["integral gain ki", fmt(ki, 6) + " V/rad"]);
+      }
+      lines.push(["closed-loop overshoot check", fmt(Math.exp(-Math.PI * zeta / Math.sqrt(1 - zeta * zeta)) * 100, 4) + " %"]);
+      lines.push(["settling time (two percent)", fmt(4 / (zeta * wn), 6) + " s"]);
+
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

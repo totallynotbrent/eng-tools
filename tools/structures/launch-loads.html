@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>launch vehicle loads</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>launch vehicle loads</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <p class="muted">shear, bending moment, and axial load at each segment interface from ground wind or max-q aerodynamics.</p>
+
+    <div class="eq">\begin{aligned}
+F_{y,i} &= F_{N,i}\cos\alpha - F_{D,i}\sin\alpha \\\\
+V_j &= \textstyle\sum_{i\ \mathrm{above}\ j} F_{net,i}, \quad
+M_j = \textstyle\sum_{i\ \mathrm{above}\ j} F_{y,i}(x_{AC,i} - x_j) - F_{IR,i}(x_{GC,i} - x_j) \\\\
+N_j &= a_x \textstyle\sum_{i\ \mathrm{above}\ j} m_i + \textstyle\sum_{i\ \mathrm{above}\ j} F_{x,i}
+\end{aligned}</div>
+
+    <div class="section">
+      <h2>vehicle (base to nose)</h2>
+      <div class="field">
+        <label>segments: mass kg, base diameter m, tip diameter m, length m, max-q mass kg (optional)</label>
+        <textarea id="segs" rows="6" placeholder="145000 4 4 12 72500&#10;2100 4 3 3&#10;56500 3 3 8"></textarea>
+      </div>
+      <div class="field">
+        <label>dynamic pressure q (blank skips flight loads)</label>
+        <input type="number" id="q" step="any" placeholder="Pa">
+      </div>
+      <div class="field">
+        <label>angle of attack alpha</label>
+        <input type="number" id="alpha" step="any" placeholder="deg">
+      </div>
+      <div class="field">
+        <label>axial acceleration at liftoff and max-q, in g</label>
+        <div class="row">
+          <input type="number" id="ax_lo" step="any" placeholder="e.g. 2">
+          <input type="number" id="ax_mq" step="any" placeholder="e.g. 2">
+        </div>
+      </div>
+      <div class="field">
+        <label>aero coefficients: CN-alpha per radian, CD (blank = cylinder drag 0.7)</label>
+        <textarea id="coefs" rows="6" placeholder="0 0.7&#10;1.4 0.036&#10;0 0.7"></textarea>
+      </div>
+      <div class="field">
+        <label>ground wind: air density and gust factor</label>
+        <div class="row">
+          <input type="number" id="g_rho" step="any" placeholder="e.g. 1.208">
+          <input type="number" id="g_gust" step="any" placeholder="e.g. 2.85">
+        </div>
+      </div>
+      <button onclick="solve_loads()">solve</button>
+      <div class="note">normal force uses CN-alpha times alpha in radians; ground wind follows the edberg and costa profile with v = 9.5 h^0.2. a segment flown at reduced mass (burnout, halved propellant) uses the fifth column.</div>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function parse_rows(id, n) {
+      const out = [];
+      for (const raw of document.getElementById(id).value.split("\n")) {
+        const t = raw.trim();
+        if (!t) continue;
+        const parts = t.split(/[\s,]+/).map(parseFloat);
+        if (parts.length < n || parts.some(function (x) { return !isFinite(x); })) return null;
+        out.push(parts);
+      }
+      return out;
+    }
+
+    function solve_loads() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const seg_rows = parse_rows("segs", 4);
+      if (!seg_rows || seg_rows.length < 2) { err.textContent = "each segment line needs mass, base diameter, tip diameter, and length"; return; }
+      const coefs = parse_rows("coefs", 2);
+      const q = val("q"), alpha_deg = val("alpha");
+      const ax_lo = val("ax_lo"), ax_mq = val("ax_mq");
+      const g_rho = val("g_rho"), g_gust = val("g_gust");
+      const g = 9.80665;
+
+      if (ax_lo === null || ax_mq === null) { err.textContent = "enter both axial accelerations"; return; }
+
+      const flight = q !== null && alpha_deg !== null;
+      const alpha = alpha_deg === null ? 0 : alpha_deg * Math.PI / 180;
+      const has_coefs = coefs !== null && coefs.length === seg_rows.length;
+
+      // stations measured from the vehicle base; mq mass defaults to the liftoff mass
+      const segs = [];
+      let xbase = 0;
+      for (let i = 0; i < seg_rows.length; i++) {
+        const m = seg_rows[i][0], db = seg_rows[i][1], dt_d = seg_rows[i][2], len = seg_rows[i][3];
+        const m_mq = seg_rows[i].length > 4 ? seg_rows[i][4] : m;
+        if (m <= 0 || m_mq <= 0 || len <= 0 || db <= 0 || dt_d < 0) { err.textContent = "segment " + (i + 1) + " has bad geometry or mass"; return; }
+        const a_ref = (db + dt_d) * len / 2;
+        const hc = len * (db + 2 * dt_d) / (3 * (db + dt_d));
+        segs.push({ m: m, m_mq: m_mq, a_ref: a_ref, x_ac: xbase + hc, xbase: xbase, cd: has_coefs ? coefs[i][1] : 0.7, cna: has_coefs ? coefs[i][0] : 0 });
+        xbase += len;
+      }
+
+      const m_lo = segs.reduce(function (s, r) { return s + r.m; }, 0);
+      const m_mq_tot = segs.reduce(function (s, r) { return s + r.m_mq; }, 0);
+      const x_cg = segs.reduce(function (s, r) { return s + r.m_mq * r.x_ac; }, 0) / m_mq_tot;
+
+      // ground wind loads
+      const g_ok = g_rho !== null && g_gust !== null;
+      const dg = segs.map(function (s) {
+        if (!g_ok) return 0;
+        const vss = 9.5 * Math.pow(s.x_ac, 0.2);
+        const vr = g_gust * vss;
+        return 0.7 * 0.5 * g_rho * vr * vr * s.a_ref;
+      });
+
+      // flight loads
+      let nz = 0;
+      if (flight) {
+        const fy = segs.map(function (s) {
+          const fn = q * s.cna * alpha * s.a_ref;
+          const fd = q * s.cd * s.a_ref;
+          return fn * Math.cos(alpha) - fd * Math.sin(alpha);
+        });
+        const fx = segs.map(function (s) {
+          const fn = q * s.cna * alpha * s.a_ref;
+          const fd = q * s.cd * s.a_ref;
+          return fn * Math.sin(alpha) + fd * Math.cos(alpha);
+        });
+        // trim thrust at the base balances the pitching moment about the cg
+        const ma_cg = fy.reduce(function (s, f, i) { return s + f * (segs[i].x_ac - x_cg); }, 0);
+        const ft_y = -ma_cg / (0 - x_cg);
+        nz = (fy.reduce(function (s, f) { return s + f; }, 0) + ft_y) / m_mq_tot;
+        segs.forEach(function (s, i) {
+          s.fy = fy[i];
+          s.fx = fx[i];
+          s.fnet = fy[i] - s.m_mq * nz;
+        });
+      }
+
+      const lines = [
+        ["vehicle length", fmt(xbase, 6) + " m"],
+        ["mass centroid xCG", fmt(x_cg, 6) + " m"]
+      ];
+      if (flight) {
+        const ma_cg = segs.reduce(function (s, r) { return s + r.fy * (r.x_ac - x_cg); }, 0);
+        lines.push(["trim thrust FY", fmt(-ma_cg / (0 - x_cg) / 1e3, 6) + " kN"]);
+        lines.push(["lateral acceleration nz", fmt(nz, 6) + " m/s&sup2;"]);
+      }
+
+      // interface stations: vehicle base, each segment joint, and the nose tip plane
+      const stations = [];
+      for (let j = 0; j < segs.length; j++) stations.push([segs[j].xbase, j]);
+      stations.push([xbase, segs.length]);
+
+      for (const st of stations) {
+        const xj = st[0];
+        const idx = st[1];  // segments with index >= idx sit above this station
+        let vg = 0, mg = 0, vf = 0, mf = 0, m_above = 0, mq_above = 0, fx_sum = 0;
+        for (let i = idx; i < segs.length; i++) {
+          const s = segs[i];
+          m_above += s.m;
+          mq_above += s.m_mq;
+          vg += dg[i];
+          mg += dg[i] * (s.x_ac - xj);
+          if (flight) {
+            vf += s.fnet;
+            mf += s.fy * (s.x_ac - xj) - s.m_mq * nz * (s.x_ac - xj);
+            fx_sum += s.fx;
+          }
+        }
+        const name = "station x = " + fmt(xj, 4) + " m";
+        if (g_ok) lines.push([name + " (ground)", "V = " + fmt(vg / 1e3, 6) + " kN,  M = " + fmt(mg / 1e3, 6) + " kN&middot;m"]);
+        if (flight) {
+          lines.push([name + " (flight)", "V = " + fmt(vf / 1e3, 6) + " kN,  M = " + fmt(mf / 1e3, 6) + " kN&middot;m"]);
+          lines.push([name + " (axial, max-q)", "N = " + fmt((ax_mq * g * mq_above + fx_sum) / 1e3, 6) + " kN"]);
+        }
+        lines.push([name + " (axial, liftoff)", "N = " + fmt(ax_lo * g * m_above / 1e3, 6) + " kN"]);
+      }
+
+      render_lines("lines", lines);
+    }
+  </script>
+</body>
+</html>

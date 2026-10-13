@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>block diagram reduction</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>block diagram reduction</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <p class="muted">reduce series, parallel, and unity-feedback structures to one transfer function.</p>
+
+    <div class="eq">G_{series} = G_1 G_2, \quad G_{par} = G_1 + G_2, \quad G_{cl} = \frac{G}{1+G}</div>
+
+    <div class="section">
+      <div class="field">
+        <label>structure</label>
+        <select id="struct">
+          <option value="series">series: G1 then G2</option>
+          <option value="parallel">parallel: G1 + G2</option>
+          <option value="feedback">unity feedback around G1</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>G1 numerator, highest power first</label>
+        <input type="text" id="g1n" placeholder="e.g. 4, 1">
+      </div>
+      <div class="field">
+        <label>G1 denominator, highest power first</label>
+        <input type="text" id="g1d" placeholder="e.g. 1, 0, 4">
+      </div>
+      <div class="field">
+        <label>G2 numerator, highest power first</label>
+        <input type="text" id="g2n" placeholder="e.g. 2">
+      </div>
+      <div class="field">
+        <label>G2 denominator, highest power first</label>
+        <input type="text" id="g2d" placeholder="e.g. 1, 3">
+      </div>
+      <button onclick="solve_block()">reduce</button>
+      <div class="note">feedback mode ignores G2 and closes a unity negative loop around G1.</div>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    // parse a comma or space separated coefficient list, highest power first
+    function parse_coeffs(t) {
+      const parts = t.split(/[\s,]+/).filter(Boolean).map(parseFloat);
+      if (!parts.length || parts.some(isNaN)) return null;
+      return parts;
+    }
+
+    function solve_block() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const mode = document.getElementById("struct").value;
+      const g1n = parse_coeffs(document.getElementById("g1n").value);
+      const g1d = parse_coeffs(document.getElementById("g1d").value);
+      const g2n = parse_coeffs(document.getElementById("g2n").value);
+      const g2d = parse_coeffs(document.getElementById("g2d").value);
+      if (!g1n || !g1d) { err.textContent = "enter G1 as coefficient lists"; return; }
+      if (mode !== "feedback" && (!g2n || !g2d)) { err.textContent = "enter G2 as coefficient lists"; return; }
+
+      let num, den;
+      if (mode === "series") {
+        num = polymul(g1n, g2n);
+        den = polymul(g1d, g2d);
+      } else if (mode === "parallel") {
+        num = polyadd(polymul(g1n, g2d), polymul(g2n, g1d));
+        den = polymul(g1d, g2d);
+      } else {
+        // unity negative feedback: G/(1+G)
+        num = g1n;
+        den = polyadd(g1d, g1n);
+      }
+
+      // cancel the greatest common polynomial factor via matched roots
+      const nr = polyroots(num).map(function (r) { return [r[0], r[1]]; });
+      const dr = polyroots(den).map(function (r) { return [r[0], r[1]]; });
+      const keep_n = [];
+      let cancelled = 0;
+      for (const r of nr) {
+        let hit = -1;
+        for (let i = 0; i < dr.length; i++) {
+          if (Math.abs(dr[i][0] - r[0]) < 1e-6 && Math.abs(dr[i][1] - r[1]) < 1e-6) { hit = i; break; }
+        }
+        if (hit >= 0) { dr.splice(hit, 1); cancelled++; } else keep_n.push(r);
+      }
+
+      // dc gain: num(0)/den(0)
+      const dc = den[den.length - 1] === 0 ? Infinity : num[num.length - 1] / den[den.length - 1];
+
+      const lines = [];
+      lines.push(["reduced numerator", poly_str(num)]);
+      lines.push(["reduced denominator", poly_str(den)]);
+      if (cancelled > 0) lines.push(["cancelled factors", String(cancelled)]);
+      lines.push(["dc gain", isFinite(dc) ? fmt(dc, 5) : "infinite"]);
+      lines.push(["poles", dr.map(function (r) {
+        if (Math.abs(r[1]) < 1e-8) return fmt(r[0], 4);
+        return fmt(r[0], 4) + (r[1] >= 0 ? " + " : " &minus; ") + fmt(Math.abs(r[1]), 4) + "j";
+      }).join(", ")]);
+
+      render_lines("lines", lines);
+      document.getElementById("results").style.display = "";
+    }
+  </script>
+</body>
+</html>

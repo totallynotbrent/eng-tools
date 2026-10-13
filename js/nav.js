@@ -15,6 +15,8 @@
     ]},
     { name: "propulsion", items: [
       ["ramjet cycle", "tools/aero/ramjet.html"],
+      ["turbojet cycle", "tools/aero/turbojet.html"],
+      ["compressor and turbine efficiency", "tools/aero/component-efficiency.html"],
       ["nozzle flow", "tools/space/nozzle.html"],
       ["thrust coefficient and c*", "tools/space/thrust-coefficient.html"],
       ["turbopump power balance", "tools/space/turbopump.html"],
@@ -24,7 +26,10 @@
       ["pid tuning", "tools/control/pid.html"],
       ["second order response", "tools/control/second-order.html"],
       ["transfer function response", "tools/control/tf-response.html"],
-      ["servo controller design", "tools/control/servo-design.html"]
+      ["servo controller design", "tools/control/servo-design.html"],
+      ["block diagram reduction", "tools/control/block-reduction.html"],
+      ["state space analysis", "tools/control/state-space.html"],
+      ["pole placement", "tools/control/pole-placement.html"]
     ]},
     { name: "dynamics", items: [
       ["projectile motion", "tools/dynamics/projectile.html"],

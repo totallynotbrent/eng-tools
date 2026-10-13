@@ -106,3 +106,137 @@ function gauss_solve(a, b) {
   }
   return m.map(function (row) { return row[n]; });
 }
+
+// polynomial helpers, coefficients ordered highest power first
+function polymul(a, b) {
+  const out = new Array(a.length + b.length - 1).fill(0);
+  for (let i = 0; i < a.length; i++)
+    for (let j = 0; j < b.length; j++)
+      out[i + j] += a[i] * b[j];
+  return out;
+}
+
+function polyadd(a, b) {
+  const n = Math.max(a.length, b.length);
+  const out = new Array(n).fill(0);
+  for (let i = 0; i < a.length; i++) out[i + n - a.length] += a[i];
+  for (let i = 0; i < b.length; i++) out[i + n - b.length] += b[i];
+  return out;
+}
+
+// tiny complex helpers, a complex value is [re, im]
+function cx_add(a, b) { return [a[0] + b[0], a[1] + b[1]]; }
+function cx_sub(a, b) { return [a[0] - b[0], a[1] - b[1]]; }
+function cx_mul(a, b) { return [a[0] * b[0] - a[1] * b[1], a[0] * b[1] + a[1] * b[0]]; }
+function cx_div(a, b) {
+  const d = b[0] * b[0] + b[1] * b[1];
+  return [(a[0] * b[0] + a[1] * b[1]) / d, (a[1] * b[0] - a[0] * b[1]) / d];
+}
+
+// durand-kerner root finder for real-coefficient polynomials, returns [re, im] pairs
+function polyroots(coeffs) {
+  let c = coeffs.slice();
+  while (c.length > 1 && Math.abs(c[0]) < 1e-14) c = c.slice(1);
+  const n = c.length - 1;
+  if (n < 1) return [];
+  c = c.map(function (v) { return v / c[0]; });
+  if (n === 1) return [[-c[1], 0]];
+  const evalp = function (z) {
+    let r = [1, 0];
+    for (let k = 1; k <= n; k++) r = cx_add(cx_mul(r, z), [c[k], 0]);
+    return r;
+  };
+  let z = [];
+  let cur = [1, 0];
+  const step = [0.4, 0.9];
+  for (let k = 0; k < n; k++) { z.push(cur.slice()); cur = cx_mul(cur, step); }
+  for (let it = 0; it < 1000; it++) {
+    let moved = 0;
+    for (let i = 0; i < n; i++) {
+      let den = [1, 0];
+      for (let j = 0; j < n; j++) if (j !== i) den = cx_mul(den, cx_sub(z[i], z[j]));
+      const dz = cx_div(evalp(z[i]), den);
+      z[i] = cx_sub(z[i], dz);
+      moved = Math.max(moved, Math.hypot(dz[0], dz[1]));
+    }
+    if (moved < 1e-12) break;
+  }
+  return z.map(function (w) { return [w[0], Math.abs(w[1]) < 1e-8 ? 0 : w[1]]; });
+}
+
+// format a polynomial with descending powers for display
+function poly_str(coeffs) {
+  const n = coeffs.length - 1;
+  let out = "";
+  for (let i = 0; i <= n; i++) {
+    const p = n - i;
+    const v = coeffs[i];
+    if (Math.abs(v) < 1e-12) continue;
+    const av = Math.abs(v);
+    const body = (av === 1 && p > 0 ? "" : fmt(av, 4)) + (p === 0 ? "" : (p === 1 ? "s" : "s<sup>" + p + "</sup>"));
+    if (!out) out += (v < 0 ? "&minus;" : "") + body;
+    else out += (v < 0 ? " &minus; " : " + ") + body;
+  }
+  return out || "0";
+}
+
+// matrix helpers for square systems
+function matmul(a, b) {
+  const n = a.length, m = b[0].length, k = b.length;
+  const out = Array.from({ length: n }, function () { return new Array(m).fill(0); });
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < m; j++)
+      for (let t = 0; t < k; t++)
+        out[i][j] += a[i][t] * b[t][j];
+  return out;
+}
+
+function matvec(a, v) {
+  return a.map(function (row) { return row.reduce(function (s, x, i) { return s + x * v[i]; }, 0); });
+}
+
+function matid(n) {
+  return Array.from({ length: n }, function (_, i) {
+    return Array.from({ length: n }, function (_, j) { return i === j ? 1 : 0; });
+  });
+}
+
+function matpow(a, p) {
+  let out = matid(a.length);
+  for (let k = 0; k < p; k++) out = matmul(out, a);
+  return out;
+}
+
+function matrank(m) {
+  const a = m.map(function (r) { return r.slice(); });
+  const rows = a.length, cols = a[0].length;
+  let rank = 0, r = 0;
+  for (let c = 0; c < cols && r < rows; c++) {
+    let piv = r;
+    for (let i = r; i < rows; i++) if (Math.abs(a[i][c]) > Math.abs(a[piv][c])) piv = i;
+    if (Math.abs(a[piv][c]) < 1e-10) continue;
+    const tmp = a[r]; a[r] = a[piv]; a[piv] = tmp;
+    for (let i = 0; i < rows; i++) {
+      if (i === r) continue;
+      const f = a[i][c] / a[r][c];
+      for (let j = c; j < cols; j++) a[i][j] -= f * a[r][j];
+    }
+    r++; rank++;
+  }
+  return rank;
+}
+
+// characteristic polynomial of a square matrix via faddeev-leverrier
+function charpoly(a) {
+  const n = a.length;
+  let m = matid(n);
+  const coeff = [1];
+  for (let k = 1; k <= n; k++) {
+    const am = matmul(a, m);
+    const tr = am.reduce(function (s, row, i) { return s + row[i]; }, 0);
+    const c = -tr / k;
+    coeff.push(c);
+    m = am.map(function (row, i) { return row.map(function (v, j) { return v + (i === j ? c : 0); }); });
+  }
+  return coeff;
+}

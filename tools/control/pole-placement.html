@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pole placement</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>pole placement</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <p class="muted">state feedback gain K placing the closed-loop eigenvalues at requested locations, by ackermann's formula.</p>
+
+    <div class="eq">u = -Kx, \qquad K = e_n^T \mathcal{C}^{-1} \phi(A)</div>
+
+    <div class="section">
+      <div class="field">
+        <label>matrix size n (2 or 3)</label>
+        <input type="number" id="n" step="1" min="2" max="3" placeholder="2 or 3">
+      </div>
+      <div class="field">
+        <label>A rows, semicolon separated</label>
+        <input type="text" id="a_mat" placeholder="e.g. 0 1; -2 -3">
+      </div>
+      <div class="field">
+        <label>B rows, semicolon separated</label>
+        <input type="text" id="b_mat" placeholder="e.g. 0; 1">
+      </div>
+      <div class="field">
+        <label>desired real parts of the poles</label>
+        <input type="text" id="poles" placeholder="e.g. -1 -1 or -1 -2 -3">
+      </div>
+      <button onclick="solve_pp()">solve</button>
+      <div class="note">real poles only; repeated roots allowed. pair with the state space tool for verification.</div>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    // parse "a b; c d" into a matrix
+    function parse_matrix(t) {
+      const rows = t.split(";").map(function (r) {
+        return r.trim().split(/[\s,]+/).filter(Boolean).map(parseFloat);
+      });
+      if (rows.some(function (r) { return r.some(isNaN); })) return null;
+      return rows;
+    }
+
+    function solve_pp() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const n = parseInt(document.getElementById("n").value, 10);
+      const a = parse_matrix(document.getElementById("a_mat").value);
+      const b = parse_matrix(document.getElementById("b_mat").value);
+      const poles = document.getElementById("poles").value.trim().split(/[\s,]+/).filter(Boolean).map(parseFloat);
+      if (n !== 2 && n !== 3) { err.textContent = "n must be 2 or 3"; return; }
+      if (!a || a.length !== n || a.some(function (r) { return r.length !== n; })) { err.textContent = "A must be " + n + "x" + n; return; }
+      if (!b || b.length !== n || b.some(function (r) { return r.length !== 1; })) { err.textContent = "B must be " + n + "x1"; return; }
+      if (poles.length !== n || poles.some(isNaN)) { err.textContent = "enter exactly " + n + " real pole locations"; return; }
+
+      // controllability matrix
+      const cols = [];
+      let v = b.map(function (r) { return r[0]; });
+      for (let k = 0; k < n; k++) {
+        cols.push(v.slice());
+        v = matvec(a, v);
+      }
+      const ctrb = [];
+      for (let i = 0; i < n; i++) {
+        ctrb.push([]);
+        for (let j = 0; j < n; j++) ctrb[i].push(cols[j][i]);
+      }
+      if (matrank(ctrb) !== n) { err.textContent = "system is not controllable, poles cannot be placed"; return; }
+
+      // desired characteristic polynomial from the requested poles
+      let phi = [1];
+      for (const p of poles) phi = polymul(phi, [1, -p]);
+
+      // phi(A) = A^n + c1 A^(n-1) + ... + cn I, descending coefficients
+      let sum = null;
+      for (let k = 0; k <= n; k++) {
+        const term = matpow(a, n - k);
+        const c = phi[k];
+        const scaled = term.map(function (row) { return row.map(function (x) { return x * c; }); });
+        sum = sum ? sum.map(function (row, i) { return row.map(function (x, j) { return x + scaled[i][j]; }); }) : scaled;
+      }
+
+      // K = last row of C^-1 * phi(A)
+      const e_last = new Array(n).fill(0); e_last[n - 1] = 1;
+      // solve x^T C = e_last^T  =>  C^T x = e_last
+      const ct = [];
+      for (let i = 0; i < n; i++) {
+        ct.push([]);
+        for (let j = 0; j < n; j++) ct[i].push(ctrb[j][i]);
+      }
+      const x = gauss_solve(ct, e_last);
+      if (!x) { err.textContent = "controllability matrix is singular"; return; }
+      // K = x^T phi(A), a row-vector product: kx[j] = sum_i x[i] * phi(A)[i][j]
+      const kx = sum[0].map(function (_, j) {
+        return x.reduce(function (s, xi, i) { return s + xi * sum[i][j]; }, 0);
+      });
+
+      // closed-loop verification
+      const acl = a.map(function (row, i) {
+        return row.map(function (v2, j) { return v2 - b[i][0] * kx[j]; });
+      });
+      const cp_closed = charpoly(acl);
+      const eig_closed = polyroots(cp_closed);
+      const max_err = Math.max.apply(null, eig_closed.map(function (r, i) {
+        return Math.abs(r[0] - poles[i]);
+      }));
+
+      const lines = [];
+      lines.push(["gain K", kx.map(function (k) { return fmt(k, 5); }).join(", ")]);
+      lines.push(["closed-loop char poly", poly_str(cp_closed)]);
+      lines.push(["closed-loop eigs", eig_closed.map(function (r) {
+        if (Math.abs(r[1]) < 1e-8) return fmt(r[0], 4);
+        return fmt(r[0], 4) + (r[1] >= 0 ? " + " : " &minus; ") + fmt(Math.abs(r[1]), 4) + "j";
+      }).join(", ")]);
+      lines.push(["max placement error", fmt(max_err, 5)]);
+
+      render_lines("lines", lines);
+      document.getElementById("results").style.display = "";
+    }
+  </script>
+</body>
+</html>

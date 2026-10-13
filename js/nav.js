@@ -5,12 +5,20 @@
       ["standard atmosphere", "tools/aero/standard-atmosphere.html"],
       ["lift and drag", "tools/aero/lift-drag.html"],
       ["range and endurance", "tools/aero/range-endurance.html"],
+      ["reynolds number", "tools/aero/reynolds.html"]
+    ]},
+    { name: "compressible flow", items: [
       ["isentropic flow", "tools/aero/isentropic.html"],
       ["normal shock", "tools/aero/normal-shock.html"],
       ["oblique shock", "tools/aero/oblique-shock.html"],
-      ["prandtl-meyer expansion", "tools/aero/prandtl-meyer.html"],
+      ["prandtl-meyer expansion", "tools/aero/prandtl-meyer.html"]
+    ]},
+    { name: "propulsion", items: [
       ["ramjet cycle", "tools/aero/ramjet.html"],
-      ["reynolds number", "tools/aero/reynolds.html"]
+      ["nozzle flow", "tools/space/nozzle.html"],
+      ["thrust coefficient and c*", "tools/space/thrust-coefficient.html"],
+      ["turbopump power balance", "tools/space/turbopump.html"],
+      ["inducer design", "tools/space/inducer.html"]
     ]},
     { name: "control systems", items: [
       ["pid tuning", "tools/control/pid.html"],
@@ -53,15 +61,13 @@
       ["vis-viva", "tools/space/vis-viva.html"],
       ["hohmann transfer", "tools/space/hohmann.html"],
       ["kepler's third law", "tools/space/kepler.html"],
-      ["solar array budget", "tools/space/solar-array.html"],
-      ["link budget", "tools/space/link-budget.html"],
       ["rocket equation", "tools/space/rocket-equation.html"],
-      ["nozzle flow", "tools/space/nozzle.html"],
-      ["thrust coefficient and c*", "tools/space/thrust-coefficient.html"],
-      ["turbopump power balance", "tools/space/turbopump.html"],
-      ["inducer design", "tools/space/inducer.html"],
       ["attitude conversions", "tools/space/quaternion.html"],
       ["inertia tensor", "tools/space/inertia.html"]
+    ]},
+    { name: "spacecraft systems", items: [
+      ["solar array budget", "tools/space/solar-array.html"],
+      ["link budget", "tools/space/link-budget.html"]
     ]},
     { name: "statics", items: [
       ["reaction forces", "tools/statics/reaction-forces.html"],

@@ -1,2 +1,5 @@
 # reference sheet for the tools, not part of the project
 GITIGNOREthis.txt
+
+# local solver checks, not part of the published site
+tests/

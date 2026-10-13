@@ -34,11 +34,7 @@ Serve the folder and open it:
 python3 -m http.server 8090
 ```
 
-Then point a browser at localhost:8090. A node harness lives in `tests/` and runs every tool's solver against known answers:
-
-```
-node tests/verify.js
-```
+Then point a browser at localhost:8090 and try the tools: every calculator was checked against hand-worked homework answers, so plug in a known case and compare the result.
 
 ## Contributing
 

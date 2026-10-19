@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>turbofan cycle</title>
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>turbofan cycle</h1>
+      <a class="back" href="../../index.html">&larr; all tools</a>
+    </header>
+
+    <p class="muted">separate-flow turbofan with both nozzles choked: two-stream thrust, fan ratios, and the effective-velocity efficiency split.</p>
+
+    <div class="eq">\begin{aligned}
+F_N &= F_{G,18} + F_{G,8} - \dot{m}_0 V_0 \\\\
+F_{G} &= \dot{m} V + (p - p_0)A \\\\
+\eta_{prop} &= \frac{F_N V_0}{\Delta \dot{E}_k}, \qquad \eta_{th} = \frac{\Delta \dot{E}_k}{\dot{m}_f Q_B}
+\end{aligned}</div>
+
+    <div class="section">
+      <h2>freestream</h2>
+      <div class="field">
+        <label>flight mach M0</label>
+        <input type="number" id="m0" step="any" placeholder="e.g. 0.8">
+      </div>
+      <div class="field">
+        <label>static temperature T0 and pressure p0</label>
+        <div class="row">
+          <input type="number" id="t0" step="any" placeholder="K">
+          <input type="number" id="p0" step="any" placeholder="kPa">
+        </div>
+      </div>
+      <div class="field">
+        <label>cold values &gamma;c, cp,c</label>
+        <div class="row">
+          <input type="number" id="gc" step="any" placeholder="e.g. 1.4">
+          <input type="number" id="cpc" step="any" placeholder="J/(kg&middot;K)">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>mass flows</h2>
+      <div class="field">
+        <label>fan (bypass) mass flow mdot18</label>
+        <input type="number" id="md18" step="any" placeholder="kg/s">
+      </div>
+      <div class="field">
+        <label>core mass flow (before fuel) mdot core</label>
+        <input type="number" id="mdc" step="any" placeholder="kg/s">
+      </div>
+      <div class="field">
+        <label>fuel mass flow mdotf</label>
+        <input type="number" id="mdf" step="any" placeholder="kg/s">
+      </div>
+      <div class="field">
+        <label>burner heat release QB</label>
+        <input type="number" id="qb" step="any" placeholder="kJ/kg">
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>bypass nozzle (station 18)</h2>
+      <div class="field">
+        <label>exit static p18, T18, M18</label>
+        <div class="row">
+          <input type="number" id="p18" step="any" placeholder="kPa">
+          <input type="number" id="t18" step="any" placeholder="K">
+          <input type="number" id="m18" step="any" placeholder="e.g. 1">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>core nozzle (station 8)</h2>
+      <div class="field">
+        <label>exit static p8, T8, M8</label>
+        <div class="row">
+          <input type="number" id="p8" step="any" placeholder="kPa">
+          <input type="number" id="t8" step="any" placeholder="K">
+          <input type="number" id="m8" step="any" placeholder="e.g. 1">
+        </div>
+      </div>
+      <div class="field">
+        <label>hot values &gamma;h, cp,h</label>
+        <div class="row">
+          <input type="number" id="gh" step="any" placeholder="e.g. 1.33">
+          <input type="number" id="cph" step="any" placeholder="J/(kg&middot;K)">
+        </div>
+      </div>
+      <button onclick="solve_tf()">solve</button>
+      <div class="note">choked convergent nozzles; areas by continuity at M = 1; effective velocities carry the pressure thrust into the efficiency split.</div>
+    </div>
+
+    <div id="err" class="error"></div>
+
+    <div class="results" id="results" style="display:none">
+      <h3>results</h3>
+      <div id="lines"></div>
+    </div>
+  </div>
+
+  <script src="../../js/common.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script>
+    function solve_tf() {
+      const err = document.getElementById("err");
+      err.textContent = "";
+      document.getElementById("results").style.display = "none";
+
+      const m0 = val("m0"), t0 = val("t0"), p0 = val("p0");
+      const gc = val("gc"), cpc = val("cpc"), gh = val("gh"), cph = val("cph");
+      const md18 = val("md18"), mdc = val("mdc"), mdf = val("mdf"), qb = val("qb");
+      const p18 = val("p18"), t18 = val("t18"), m18 = val("m18");
+      const p8 = val("p8"), t8 = val("t8"), m8 = val("m8");
+      if (m0 === null || t0 === null || p0 === null || gc === null || cpc === null ||
+          gh === null || cph === null || md18 === null || mdc === null || mdf === null || qb === null ||
+          p18 === null || t18 === null || m18 === null || p8 === null || t8 === null || m8 === null) {
+        err.textContent = "fill every field"; return;
+      }
+      if (t0 <= 0 || p0 <= 0 || md18 <= 0 || mdc <= 0 || mdf < 0 || qb <= 0) { err.textContent = "flows and state must be positive"; return; }
+      if (m18 <= 0 || m8 <= 0 || t18 <= 0 || t8 <= 0 || p18 <= 0 || p8 <= 0) { err.textContent = "nozzle exit states must be positive"; return; }
+
+      const rc = cpc * (gc - 1) / gc;
+      const rh = cph * (gh - 1) / gh;
+
+      // freestream
+      const v0 = m0 * Math.sqrt(gc * rc * t0);
+      const md0 = md18 + mdc;
+      const bpr = md18 / mdc;
+      const fram = md0 * v0 / 1000;
+
+      // nozzle exit velocity from statics (both streams)
+      const v18 = m18 * Math.sqrt(gc * rc * t18);
+      const rho18 = (p18 * 1000) / (rc * t18);
+      const a18 = md18 / (rho18 * v18);
+      const fg18 = (md18 * v18 + (p18 * 1000 - p0 * 1000) * a18) / 1000;
+
+      const v8 = m8 * Math.sqrt(gh * rh * t8);
+      const rho8 = (p8 * 1000) / (rh * t8);
+      const md8 = mdc + mdf;
+      const a8 = md8 / (rho8 * v8);
+      const fg8 = (md8 * v8 + (p8 * 1000 - p0 * 1000) * a8) / 1000;
+
+      const fn = fg18 + fg8 - fram;
+      if (fn <= 0) { err.textContent = "no net thrust at these settings"; return; }
+      const tsfc = mdf / fn * 1000; // g/(s*kN): kg/s / kN * 1000
+
+      // fan ratios from the bypass nozzle totals (adiabatic nozzle: Tt18 = Tt13)
+      const tt18 = t18 * (1 + (gc - 1) / 2 * m18 * m18);
+      const pt18 = p18 * 1000 * Math.pow(1 + (gc - 1) / 2 * m18 * m18, gc / (gc - 1));
+      // flight totals feed both streams; fan input = freestream totals
+      const tt0 = t0 * (1 + (gc - 1) / 2 * m0 * m0);
+      const pt0 = p0 * 1000 * Math.pow(1 + (gc - 1) / 2 * m0 * m0, gc / (gc - 1));
+      const tau_f = tt18 / tt0;
+      const pi_f = pt18 / pt0;
+
+      // effective velocities: Veff = V + (p - p0)A / mdot (class convention, CP pp. 13-15)
+      const v18eff = v18 + (p18 * 1000 - p0 * 1000) * a18 / md18;
+      const v8eff = v8 + (p8 * 1000 - p0 * 1000) * a8 / md8;
+      const dek = 0.5 * (md18 * v18eff * v18eff + md8 * v8eff * v8eff - md0 * v0 * v0) / 1e6; // MW
+      const eta_prop = fn * 1000 * v0 / (dek * 1e6);
+      const eta_th = dek * 1e6 / (mdf * qb * 1000);
+      const eta_ov = eta_th * eta_prop;
+
+      render_lines("lines", [
+        ["bypass ratio", fmt(bpr, 4)],
+        ["flight speed V0", fmt(v0, 4) + " m/s"],
+        ["ram drag mdot0 V0", fmt(fram, 4) + " kN"],
+        ["bypass exit V18, A18", fmt(v18, 4) + " m/s, " + fmt(a18, 4) + " m&sup2;"],
+        ["bypass gross thrust FG18", fmt(fg18, 4) + " kN"],
+        ["core exit V8, A8", fmt(v8, 4) + " m/s, " + fmt(a8, 4) + " m&sup2;"],
+        ["core gross thrust FG8", fmt(fg8, 4) + " kN"],
+        ["net thrust FN", fmt(fn, 4) + " kN"],
+        ["TSFC", fmt(tsfc, 4) + " g/(s&middot;kN)"],
+        ["fan temperature ratio tau_f", fmt(tau_f, 4)],
+        ["fan pressure ratio pi_f", fmt(pi_f, 4)],
+        ["effective velocities V18eff, V8eff", fmt(v18eff, 4) + ", " + fmt(v8eff, 4) + " m/s"],
+        ["kinetic energy rate dEk", fmt(dek, 4) + " MW"],
+        ["propulsive efficiency", fmt(eta_prop * 100, 4) + "%"],
+        ["thermal efficiency", fmt(eta_th * 100, 4) + "%"],
+        ["overall efficiency", fmt(eta_ov * 100, 4) + "%"]
+      ]);
+      document.getElementById("results").style.display = "";
+    }
+  </script>
+</body>
+</html>

@@ -38,6 +38,10 @@
         <label>fuel heating value hPR, J/kg</label>
         <input type="number" id="hpr" step="any" placeholder="e.g. 43000000">
       </div>
+      <div class="field">
+        <label>inlet mass flow mdot0, kg/s (optional)</label>
+        <input type="number" id="mdot" step="any" placeholder="e.g. 20">
+      </div>
       <button onclick="solve_tj()">solve</button>
       <div class="note">diffuser, compressor, burner, turbine, and nozzle all ideal; the nozzle expands fully to ambient.</div>
     </div>
@@ -59,7 +63,9 @@
       document.getElementById("results").style.display = "none";
 
       const alt = val("alt"), mach = val("mach"), prc = val("prc"), tt4 = val("tt4"), hpr = val("hpr");
+      const mdot_in = val("mdot");
       if (alt === null || mach === null || prc === null || tt4 === null || hpr === null) { err.textContent = "fill every field"; return; }
+      if (mdot_in !== null && mdot_in <= 0) { err.textContent = "mass flow must be positive"; return; }
       if (alt < 0 || alt > 47000) { err.textContent = "altitude 0 - 47 km"; return; }
       if (mach < 0 || prc < 1) { err.textContent = "M0 >= 0 and compressor ratio >= 1"; return; }
       if (tt4 < 300 || hpr <= 0) { err.textContent = "Tt4 >= 300 K and hPR > 0"; return; }
@@ -110,6 +116,16 @@
       lines.push(["nozzle exit velocity V9", fmt(v9, 5) + " m/s"]);
       lines.push(["specific thrust F/mdot", fmt(sp_thrust, 5) + " N/(kg/s)"]);
       lines.push(["thrust specific fuel consumption", fmt(tsfc, 5) + " kg/(N*h)"]);
+      if (mdot_in !== null) {
+        const gross = mdot_in * (1 + f) * v9 / 1000;
+        const ram = mdot_in * v0 / 1000;
+        const net = mdot_in * sp_thrust / 1000;
+        const fuel = f * mdot_in;
+        lines.push(["gross thrust Fmdot9 V9", fmt(gross, 4) + " kN"]);
+        lines.push(["ram drag mdot0 V0", fmt(ram, 4) + " kN"]);
+        lines.push(["net thrust FN", fmt(net, 4) + " kN"]);
+        lines.push(["fuel flow mdotf", fmt(fuel, 5) + " kg/s"]);
+      }
 
       render_lines("lines", lines);
       document.getElementById("results").style.display = "";

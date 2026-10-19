@@ -62,8 +62,19 @@ F_N &= \dot{m}_9 V_9 - \dot{m}_a V_0 + (p_9 - p_0)A_9
     <div class="section">
       <h2>combustor</h2>
       <div class="field">
+        <label>burner mode</label>
+        <select id="bmode">
+          <option value="tet">given Tt4, solve fuel-air ratio</option>
+          <option value="far">given fuel-air ratio, solve Tt4</option>
+        </select>
+      </div>
+      <div class="field">
         <label>burner exit total temperature Tt4</label>
-        <input type="number" id="tt4" step="any" placeholder="K">
+        <input type="number" id="tt4" step="any" placeholder="K (tet mode)">
+      </div>
+      <div class="field">
+        <label>fuel-air ratio f</label>
+        <input type="number" id="far" step="any" placeholder="dimensionless (far mode)">
       </div>
       <div class="field">
         <label>hot values &gamma;h, cp,h</label>
@@ -153,16 +164,20 @@ F_N &= \dot{m}_9 V_9 - \dot{m}_a V_0 + (p_9 - p_0)A_9
 
       const m0 = val("m0"), t0 = val("t0"), p0 = val("p0"), a2 = val("a2");
       const gc = val("gc"), cpc = val("cpc"), gh = val("gh"), cph = val("cph");
-      const m3 = val("m3"), m4 = val("m4"), tt4 = val("tt4");
+      const m3 = val("m3"), m4 = val("m4");
+      const bmode = document.getElementById("bmode").value || "tet";
+      const tt4_in = val("tt4"), far_in = val("far");
       const etab = val("etab"), lhv = val("lhv");
       const dtt = val("dtt"), cd = val("cd"), cv = val("cv");
       const dif_loss = val("dif_loss"), burn_loss = val("burn_loss"), duct_loss = val("duct_loss");
       if (m0 === null || t0 === null || p0 === null || a2 === null || gc === null || cpc === null ||
-          gh === null || cph === null || m3 === null || m4 === null || tt4 === null ||
+          gh === null || cph === null || m3 === null || m4 === null ||
           etab === null || lhv === null || dtt === null || cd === null || cv === null ||
           dif_loss === null || burn_loss === null || duct_loss === null) {
         err.textContent = "fill every field (losses and coefficients included)"; return;
       }
+      if (bmode === "tet" && tt4_in === null) { err.textContent = "enter Tt4 in tet mode"; return; }
+      if (bmode === "far" && (far_in === null || far_in <= 0)) { err.textContent = "enter a positive fuel-air ratio in far mode"; return; }
       if (m0 <= 1 || t0 <= 0 || p0 <= 0 || a2 <= 0) { err.textContent = "M0 must be supersonic and the state positive"; return; }
 
       const turns = document.getElementById("turns").value.split(/[\s,]+/).filter(function (x) { return x !== ""; }).map(parseFloat).filter(isFinite);
@@ -205,10 +220,20 @@ F_N &= \dot{m}_9 V_9 - \dot{m}_a V_0 + (p_9 - p_0)A_9
       const a3 = mdot / (p3 / (rc * t3) * v3);
       const ht3 = cpc * tt3 / 1000;
 
-      // combustor: energy balance gives f, pressure loss and area follow
-      const ht4 = cph * tt4 / 1000;
-      const f = (ht4 - ht3) / (etab * lhv - ht4);
-      if (f <= 0) { err.textContent = "burner exit enthalpy is outside the energy balance for this LHV"; return; }
+      // combustor: forward mode solves f from Tt4, inverted mode solves Tt4 from f
+      // burner energy balance: f = (ht4 - ht3) / (etab*LHV - ht4), both directions
+      let tt4, f;
+      if (bmode === "tet") {
+        tt4 = tt4_in;
+        const ht4 = cph * tt4 / 1000;
+        f = (ht4 - ht3) / (etab * lhv - ht4);
+        if (f <= 0) { err.textContent = "burner exit enthalpy is outside the energy balance for this LHV"; return; }
+      } else {
+        f = far_in;
+        // invert: ht4 = (ht3 + f*etab*LHV) / (1 + f), per ICP 1
+        const ht4 = (ht3 + f * etab * lhv) / (1 + f);
+        tt4 = ht4 / (cph / 1000);
+      }
       const mdot4 = (1 + f) * mdot;
       const pt4 = (1 - burn_loss) * pt3;
       const t4 = tt4 / (1 + (gh - 1) / 2 * m4 * m4);
@@ -247,6 +272,7 @@ F_N &= \dot{m}_9 V_9 - \dot{m}_a V_0 + (p_9 - p_0)A_9
         ["combustor inlet area A3", fmt(a3, 4) + " m&sup2;"],
         ["combustor inlet total enthalpy ht3", fmt(ht3, 4) + " kJ/kg"],
         ["fuel-air ratio f", fmt(f, 4)],
+        ["burner exit total temp Tt4", fmt(tt4, 4) + " K"],
         ["burner exit area A4", fmt(a4, 4) + " m&sup2;"],
         ["duct exit state Tt7, pt7", fmt(tt7, 4) + " K, " + fmt(pt7 / 1000, 4) + " kPa"],
         ["nozzle inlet mach M7", fmt(m7, 4)],

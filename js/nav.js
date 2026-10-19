@@ -16,6 +16,7 @@
     { name: "propulsion", items: [
       ["ramjet cycle", "tools/aero/ramjet.html"],
       ["turbojet cycle", "tools/aero/turbojet.html"],
+      ["turbofan cycle", "tools/aero/turbofan.html"],
       ["compressor and turbine efficiency", "tools/aero/component-efficiency.html"],
       ["nozzle flow", "tools/space/nozzle.html"],
       ["thrust coefficient and c*", "tools/space/thrust-coefficient.html"],

@@ -33,18 +33,18 @@
       <h2>ideal gas entropy change (constant cp)</h2>
       <div class="field">
         <label>cp</label>
-        <input type="number" id="cp" step="any" value="1.005">
+        <input type="number" id="cp" step="any" value="1.005" data-solver="solve_ds" class="default-value" data-default="1.005">
       </div>
       <div class="field">
         <label>R</label>
-        <input type="number" id="rg" step="any" value="0.287">
+        <input type="number" id="rg" step="any" value="0.287" data-solver="solve_ds" class="default-value" data-default="0.287">
       </div>
       <div class="field">
         <label>T1, T2</label>
         <div class="row">
-          <input type="number" id="t1" step="any" value="300">
-          <input type="number" id="t2" step="any" value="600">
-          <select id="t_unit" style="width: 90px">
+          <input type="number" id="t1" step="any" value="300" data-solver="solve_ds" class="default-value" data-default="300">
+          <input type="number" id="t2" step="any" value="600" data-solver="solve_ds" class="default-value" data-default="600">
+          <select id="t_unit" style="width: 90px" data-solver="solve_ds">
             <option value="k">K</option>
             <option value="c">°C</option>
           </select>
@@ -53,24 +53,23 @@
       <div class="field">
         <label>p1, p2</label>
         <div class="row">
-          <input type="number" id="p1" step="any" value="100">
-          <input type="number" id="p2" step="any" value="200">
+          <input type="number" id="p1" step="any" value="100" data-solver="solve_ds" class="default-value" data-default="100">
+          <input type="number" id="p2" step="any" value="200" data-solver="solve_ds" class="default-value" data-default="200">
         </div>
       </div>
-      <button class="btn-primary" onclick="solve_ds()">solve</button>
-    </div>
+      </div>
 <div class="section calc-section" id="panel_isen" style="display:none">
       <h2>isentropic relation (s1 = s2)</h2>
       <div class="field">
         <label>k (specific heat ratio)</label>
-        <input type="number" id="k" placeholder="1.4" step="any" value="1.4">
+        <input type="number" id="k" placeholder="1.4" step="any" value="1.4" data-solver="solve_isen" class="default-value" data-default="1.4">
       </div>
       <div class="field">
         <label>T1, T2</label>
         <div class="row">
-          <input type="number" id="it1" step="any" value="300">
-          <input type="number" id="it2" step="any">
-          <select id="it_unit" style="width: 90px">
+          <input type="number" id="it1" step="any" value="300" data-solver="solve_isen" class="default-value" data-default="300">
+          <input type="number" id="it2" step="any" data-solver="solve_isen">
+          <select id="it_unit" style="width: 90px" data-solver="solve_isen">
             <option value="k">K</option>
             <option value="c">°C</option>
           </select>
@@ -79,12 +78,11 @@
       <div class="field">
         <label>p1, p2</label>
         <div class="row">
-          <input type="number" id="ip1" step="any" value="100">
-          <input type="number" id="ip2" step="any" value="500">
+          <input type="number" id="ip1" step="any" value="100" data-solver="solve_isen" class="default-value" data-default="100">
+          <input type="number" id="ip2" step="any" value="500" data-solver="solve_isen" class="default-value" data-default="500">
         </div>
       </div>
-      <button class="btn-primary" onclick="solve_isen()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -103,6 +101,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="entropy.js"></script>
 </body>
 </html>

@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">u(t) = K_p e(t) + K_i \int_0^t e(\tau)\,d\tau + K_d \frac{de}{dt}</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-pid"></div>
       </section>
@@ -25,19 +27,16 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">u(t) = K_p e(t) + K_i \int_0^t e(\tau)\,d\tau + K_d \frac{de}{dt}</div>
-
       <div class="field">
         <label>ultimate gain Ku</label>
-        <input type="number" id="ku" step="any" value="10">
+        <input type="number" id="ku" step="any" value="10" data-solver="solve_pid" class="default-value" data-default="10">
       </div>
       <div class="field">
         <label>ultimate period Tu (s)</label>
-        <input type="number" id="tu" step="any" value="2">
+        <input type="number" id="tu" step="any" value="2" data-solver="solve_pid" class="default-value" data-default="2">
       </div>
 
-      <button class="btn-primary" onclick="solve_pid()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -58,6 +57,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="pid.js"></script>
 </body>
 </html>

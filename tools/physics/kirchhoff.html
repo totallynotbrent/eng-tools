@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">\sum I_{\mathrm{in}} = \sum I_{\mathrm{out}}, \qquad \sum V = 0</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-kirchhoff"></div>
       </section>
@@ -25,30 +27,27 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">\sum I_{\mathrm{in}} = \sum I_{\mathrm{out}}, \qquad \sum V = 0</div>
-
       <div class="field">
         <label>nodes (one per line: node id, marker optional)</label>
-        <textarea id="nodes" rows="4">1
+        <textarea id="nodes" rows="4" data-solver="solve_kirchhoff">1
 2</textarea>
       </div>
       <div class="field">
         <label>resistors (nodeA nodeB resistance)</label>
-        <textarea id="resistors" rows="4">1 0 10
+        <textarea id="resistors" rows="4" data-solver="solve_kirchhoff">1 0 10
 2 0 10
 1 2 10</textarea>
       </div>
       <div class="field">
         <label>voltage sources (fromNode toNode volts)</label>
-        <textarea id="sources" rows="2"></textarea>
+        <textarea id="sources" rows="2" data-solver="solve_kirchhoff"></textarea>
       </div>
       <div class="field">
         <label>ground node id (default 0)</label>
-        <input type="number" id="ground" step="any" value="0">
+        <input type="number" id="ground" step="any" value="0" data-solver="solve_kirchhoff" class="default-value" data-default="0">
       </div>
 
-      <button class="btn-primary" onclick="solve_kirchhoff()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -67,6 +66,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="kirchhoff.js"></script>
 </body>
 </html>

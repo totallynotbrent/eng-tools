@@ -26,8 +26,6 @@
 const el = document.getElementById("fig-normalshock");
 const note = document.getElementById("fig-normalshock-note");
 if (!el || !window.fig) return;
-const seed = function (id, v) { const e = document.getElementById(id); if (e && e.value.trim() === "") e.value = v; };
-seed("m1", 2);
 const scratch = document.createElement("div");
 scratch.id = "fig-normalshock-scratch";
 const out = fig.sweep(scratch, {

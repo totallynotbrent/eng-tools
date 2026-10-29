@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">\delta = \frac{F L}{A E} + \alpha L \Delta T</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-axial"></div>
       </section>
@@ -25,35 +27,32 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">\delta = \frac{F L}{A E} + \alpha L \Delta T</div>
-
       <div class="field">
         <label>axial load P (N)</label>
-        <input type="number" id="load" step="any" value="10000">
+        <input type="number" id="load" step="any" value="10000" data-solver="solve_axial" class="default-value" data-default="10000">
       </div>
       <div class="field">
         <label>length L (m)</label>
-        <input type="number" id="length" step="any" value="2">
+        <input type="number" id="length" step="any" value="2" data-solver="solve_axial" class="default-value" data-default="2">
       </div>
       <div class="field">
         <label>area A (m²)</label>
-        <input type="number" id="area" step="any" value="0.001">
+        <input type="number" id="area" step="any" value="0.001" data-solver="solve_axial" class="default-value" data-default="0.001">
       </div>
       <div class="field">
         <label>young's modulus E (Pa)</label>
-        <input type="number" id="modulus" step="any" value="200000000000">
+        <input type="number" id="modulus" step="any" value="200000000000" data-solver="solve_axial" class="default-value" data-default="200000000000">
       </div>
       <div class="field">
         <label>coefficient of thermal expansion α</label>
-        <input type="number" id="alpha" step="any" value="0">
+        <input type="number" id="alpha" step="any" value="0" data-solver="solve_axial" class="default-value" data-default="0">
       </div>
       <div class="field">
         <label>temperature change ΔT (°C)</label>
-        <input type="number" id="dt" step="any" value="0">
+        <input type="number" id="dt" step="any" value="0" data-solver="solve_axial" class="default-value" data-default="0">
       </div>
 
-      <button class="btn-primary" onclick="solve_axial()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -75,6 +74,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="axial-thermal.js"></script>
 </body>
 </html>

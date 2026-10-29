@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout">
+    <div class="calc-equation"><div class="eq">\vec{H} = [I]\,\vec{\omega}</div>
+
+      </div><div class="cols calc-layout">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-principal"></div>
       </section>
@@ -25,35 +27,32 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">\vec{H} = [I]\,\vec{\omega}</div>
-
       <div class="field">
         <label>row 1 (Ixx, Ixy, Ixz)</label>
         <div class="row">
-          <input type="number" id="i11" step="any" value="10">
-          <input type="number" id="i12" step="any" value="0">
-          <input type="number" id="i13" step="any" value="0">
+          <input type="number" id="i11" step="any" value="10" data-solver="solve_inertia" class="default-value" data-default="10">
+          <input type="number" id="i12" step="any" value="0" data-solver="solve_inertia" class="default-value" data-default="0">
+          <input type="number" id="i13" step="any" value="0" data-solver="solve_inertia" class="default-value" data-default="0">
         </div>
       </div>
       <div class="field">
         <label>row 2 (Ixy, Iyy, Iyz)</label>
         <div class="row">
-          <input type="number" id="i21" step="any" value="0">
-          <input type="number" id="i22" step="any" value="20">
-          <input type="number" id="i23" step="any" value="0">
+          <input type="number" id="i21" step="any" value="0" data-solver="solve_inertia" class="default-value" data-default="0">
+          <input type="number" id="i22" step="any" value="20" data-solver="solve_inertia" class="default-value" data-default="20">
+          <input type="number" id="i23" step="any" value="0" data-solver="solve_inertia" class="default-value" data-default="0">
         </div>
       </div>
       <div class="field">
         <label>row 3 (Ixz, Iyz, Izz)</label>
         <div class="row">
-          <input type="number" id="i31" step="any" value="0">
-          <input type="number" id="i32" step="any" value="0">
-          <input type="number" id="i33" step="any" value="30">
+          <input type="number" id="i31" step="any" value="0" data-solver="solve_inertia" class="default-value" data-default="0">
+          <input type="number" id="i32" step="any" value="0" data-solver="solve_inertia" class="default-value" data-default="0">
+          <input type="number" id="i33" step="any" value="30" data-solver="solve_inertia" class="default-value" data-default="30">
         </div>
       </div>
 
-      <button class="btn-primary" onclick="solve_inertia()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -77,6 +76,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="inertia.js"></script>
 </body>
 </html>

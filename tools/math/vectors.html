@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">\vec{a}\cdot\vec{b} = ab\cos\theta</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-vec"></div>
       </section>
@@ -25,28 +27,25 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">\vec{a}\cdot\vec{b} = ab\cos\theta</div>
-
       <div class="field">
         <label>vector a (ax, ay, az)</label>
         <div class="row">
-          <input type="number" id="ax" step="any" value="2">
-          <input type="number" id="ay" step="any" value="-1">
-          <input type="number" id="az" step="any" value="3">
+          <input type="number" id="ax" step="any" value="2" data-solver="solve_vec" class="default-value" data-default="2">
+          <input type="number" id="ay" step="any" value="-1" data-solver="solve_vec" class="default-value" data-default="-1">
+          <input type="number" id="az" step="any" value="3" data-solver="solve_vec" class="default-value" data-default="3">
         </div>
       </div>
 
       <div class="field">
         <label>vector b (bx, by, bz)</label>
         <div class="row">
-          <input type="number" id="bx" step="any" value="1">
-          <input type="number" id="by" step="any" value="4">
-          <input type="number" id="bz" step="any" value="-2">
+          <input type="number" id="bx" step="any" value="1" data-solver="solve_vec" class="default-value" data-default="1">
+          <input type="number" id="by" step="any" value="4" data-solver="solve_vec" class="default-value" data-default="4">
+          <input type="number" id="bz" step="any" value="-2" data-solver="solve_vec" class="default-value" data-default="-2">
         </div>
       </div>
 
-      <button class="btn-primary" onclick="solve_vec()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -71,6 +70,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="vectors.js"></script>
 </body>
 </html>

@@ -43,76 +43,71 @@
       <div class="field">
         <label>TH, TL</label>
         <div class="row">
-          <input type="number" id="th" step="any" value="500">
-          <input type="number" id="tl" step="any" value="300">
-          <select id="ct_unit" style="width: 90px">
+          <input type="number" id="th" step="any" value="500" data-solver="solve_carnot" class="default-value" data-default="500">
+          <input type="number" id="tl" step="any" value="300" data-solver="solve_carnot" class="default-value" data-default="300">
+          <select id="ct_unit" style="width: 90px" data-solver="solve_carnot">
             <option value="k">K</option>
             <option value="c">°C</option>
           </select>
         </div>
       </div>
-      <button class="btn-primary" onclick="solve_carnot()">solve</button>
-    </div>
+      </div>
 <div class="section calc-section" id="panel_otto" style="display:none">
       <h2>otto</h2>
       <div class="field">
         <label>compression ratio r</label>
-        <input type="number" id="or" step="any" value="8">
+        <input type="number" id="or" step="any" value="8" data-solver="solve_otto" class="default-value" data-default="8">
       </div>
       <div class="field">
         <label>k</label>
-        <input type="number" id="ok" value="1.4" step="any">
+        <input type="number" id="ok" value="1.4" step="any" data-solver="solve_otto" class="default-value" data-default="1.4">
       </div>
-      <button class="btn-primary" onclick="solve_otto()">solve</button>
-    </div>
+      </div>
 <div class="section calc-section" id="panel_diesel" style="display:none">
       <h2>diesel</h2>
       <div class="field">
         <label>compression ratio r</label>
-        <input type="number" id="dr" step="any" value="18">
+        <input type="number" id="dr" step="any" value="18" data-solver="solve_diesel" class="default-value" data-default="18">
       </div>
       <div class="field">
         <label>cutoff ratio rc</label>
-        <input type="number" id="drc" step="any" value="2">
+        <input type="number" id="drc" step="any" value="2" data-solver="solve_diesel" class="default-value" data-default="2">
       </div>
       <div class="field">
         <label>k</label>
-        <input type="number" id="dk" value="1.4" step="any">
+        <input type="number" id="dk" value="1.4" step="any" data-solver="solve_diesel" class="default-value" data-default="1.4">
       </div>
-      <button class="btn-primary" onclick="solve_diesel()">solve</button>
-    </div>
+      </div>
 <div class="section calc-section" id="panel_brayton" style="display:none">
       <h2>brayton</h2>
       <div class="field">
         <label>pressure ratio rp</label>
-        <input type="number" id="brp" step="any" value="8">
+        <input type="number" id="brp" step="any" value="8" data-solver="solve_brayton" class="default-value" data-default="8">
       </div>
       <div class="field">
         <label>k</label>
-        <input type="number" id="bk" value="1.4" step="any">
+        <input type="number" id="bk" value="1.4" step="any" data-solver="solve_brayton" class="default-value" data-default="1.4">
       </div>
-      <button class="btn-primary" onclick="solve_brayton()">solve</button>
-    </div>
+      </div>
 <div class="section calc-section" id="panel_rankine" style="display:none">
       <h2>rankine</h2>
       <div class="field">
         <label>h1 (turbine inlet) (kJ/kg)</label>
-        <input type="number" id="rh1" step="any" value="3000">
+        <input type="number" id="rh1" step="any" value="3000" data-solver="solve_rankine" class="default-value" data-default="3000">
       </div>
       <div class="field">
         <label>h2 (turbine exit) (kJ/kg)</label>
-        <input type="number" id="rh2" step="any" value="2200">
+        <input type="number" id="rh2" step="any" value="2200" data-solver="solve_rankine" class="default-value" data-default="2200">
       </div>
       <div class="field">
         <label>h3 (pump inlet) (kJ/kg)</label>
-        <input type="number" id="rh3" step="any" value="300">
+        <input type="number" id="rh3" step="any" value="300" data-solver="solve_rankine" class="default-value" data-default="300">
       </div>
       <div class="field">
         <label>h4 (pump exit) (kJ/kg)</label>
-        <input type="number" id="rh4" step="any" value="312">
+        <input type="number" id="rh4" step="any" value="312" data-solver="solve_rankine" class="default-value" data-default="312">
       </div>
-      <button class="btn-primary" onclick="solve_rankine()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -136,6 +131,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="cycles.js"></script>
 </body>
 </html>

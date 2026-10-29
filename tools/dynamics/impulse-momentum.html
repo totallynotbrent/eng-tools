@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">\vec{J} = \int \vec{F}\,dt = m\vec{v}_2 - m\vec{v}_1</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-impulse"></div>
       </section>
@@ -25,31 +27,28 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">\vec{J} = \int \vec{F}\,dt = m\vec{v}_2 - m\vec{v}_1</div>
-
       <div class="field">
         <label>mass m (kg)</label>
-        <input type="number" id="mass" step="any" value="2">
+        <input type="number" id="mass" step="any" value="2" data-solver="solve_impulse" class="default-value" data-default="2">
       </div>
       <div class="field">
         <label>initial velocity vi (m/s)</label>
-        <input type="number" id="vi" step="any" value="3">
+        <input type="number" id="vi" step="any" value="3" data-solver="solve_impulse" class="default-value" data-default="3">
       </div>
       <div class="field">
         <label>final velocity vf (m/s)</label>
-        <input type="number" id="vf" step="any" value="7">
+        <input type="number" id="vf" step="any" value="7" data-solver="solve_impulse" class="default-value" data-default="7">
       </div>
 
       <div class="field">
         <label>force F and time Δt (optional, gives J = FΔt)</label>
         <div class="row">
-          <input type="number" id="force" step="any" value="100">
-          <input type="number" id="dt" step="any" value="0.5">
+          <input type="number" id="force" step="any" value="100" data-solver="solve_impulse" class="default-value" data-default="100">
+          <input type="number" id="dt" step="any" value="0.5" data-solver="solve_impulse" class="default-value" data-default="0.5">
         </div>
       </div>
 
-      <button class="btn-primary" onclick="solve_impulse()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -71,6 +70,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="impulse-momentum.js"></script>
 </body>
 </html>

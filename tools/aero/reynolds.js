@@ -22,8 +22,6 @@
 const el = document.getElementById("fig-reynolds");
 const note = document.getElementById("fig-reynolds-note");
 if (!el || !window.fig) return;
-const seed = function (id, v) { const e = document.getElementById(id); if (e && e.value.trim() === "") e.value = v; };
-seed("len", 1); seed("vel", 50);
 const scratch = document.createElement("div");
 scratch.id = "fig-reynolds-scratch";
 const out = fig.sweep(scratch, {

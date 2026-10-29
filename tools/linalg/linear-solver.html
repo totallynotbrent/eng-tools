@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout">
+    <div class="calc-equation"><div class="eq">A\vec{x} = \vec{b}</div>
+
+      </div><div class="cols calc-layout">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-ls"></div>
       </section>
@@ -25,11 +27,9 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">A\vec{x} = \vec{b}</div>
-
       <div class="field">
         <label>size</label>
-        <select id="size">
+        <select id="size" data-solver="solve_ls">
           <option value="2">2x2</option>
           <option value="3">3x3</option>
         </select>
@@ -38,38 +38,37 @@
       <div class="field">
         <label>matrix A (row 1)</label>
         <div class="row">
-          <input type="number" id="a11" step="any" value="2">
-          <input type="number" id="a12" step="any" value="1">
-          <input type="number" id="a13" step="any" value="0">
+          <input type="number" id="a11" step="any" value="2" data-solver="solve_ls" class="default-value" data-default="2">
+          <input type="number" id="a12" step="any" value="1" data-solver="solve_ls" class="default-value" data-default="1">
+          <input type="number" id="a13" step="any" value="0" data-solver="solve_ls" class="default-value" data-default="0">
         </div>
       </div>
       <div class="field">
         <label>row 2</label>
         <div class="row">
-          <input type="number" id="a21" step="any" value="1">
-          <input type="number" id="a22" step="any" placeholder="e" value="3">
-          <input type="number" id="a23" step="any" value="0">
+          <input type="number" id="a21" step="any" value="1" data-solver="solve_ls" class="default-value" data-default="1">
+          <input type="number" id="a22" step="any" placeholder="e" value="3" data-solver="solve_ls" class="default-value" data-default="3">
+          <input type="number" id="a23" step="any" value="0" data-solver="solve_ls" class="default-value" data-default="0">
         </div>
       </div>
       <div class="field">
         <label>row 3 (for 3x3) (g)</label>
         <div class="row">
-          <input type="number" id="a31" step="any" value="0">
-          <input type="number" id="a32" step="any" value="0">
-          <input type="number" id="a33" step="any" value="1">
+          <input type="number" id="a31" step="any" value="0" data-solver="solve_ls" class="default-value" data-default="0">
+          <input type="number" id="a32" step="any" value="0" data-solver="solve_ls" class="default-value" data-default="0">
+          <input type="number" id="a33" step="any" value="1" data-solver="solve_ls" class="default-value" data-default="1">
         </div>
       </div>
       <div class="field">
         <label>vector b</label>
         <div class="row">
-          <input type="number" id="b1" step="any" value="5">
-          <input type="number" id="b2" step="any" value="10">
-          <input type="number" id="b3" step="any" value="0">
+          <input type="number" id="b1" step="any" value="5" data-solver="solve_ls" class="default-value" data-default="5">
+          <input type="number" id="b2" step="any" value="10" data-solver="solve_ls" class="default-value" data-default="10">
+          <input type="number" id="b3" step="any" value="0" data-solver="solve_ls" class="default-value" data-default="0">
         </div>
       </div>
 
-      <button class="btn-primary" onclick="solve_ls()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -90,6 +89,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="linear-solver.js"></script>
 </body>
 </html>

@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">v^2 = \mu\left(\frac{2}{r} - \frac{1}{a}\right)</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-visviva"></div>
       </section>
@@ -25,23 +27,20 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">v^2 = \mu\left(\frac{2}{r} - \frac{1}{a}\right)</div>
-
       <div class="field">
         <label>radius r (m)</label>
-        <input type="number" id="r" step="any" value="6771000">
+        <input type="number" id="r" step="any" value="6771000" data-solver="solve_visviva" class="default-value" data-default="6771000">
       </div>
       <div class="field">
         <label>semi-major axis a (m)</label>
-        <input type="number" id="a" step="any" value="26560000">
+        <input type="number" id="a" step="any" value="26560000" data-solver="solve_visviva" class="default-value" data-default="26560000">
       </div>
       <div class="field">
         <label>gravitational parameter μ (optional)</label>
-        <input type="number" id="mu" step="any" placeholder="3.986e14" value="398600441800000">
+        <input type="number" id="mu" step="any" placeholder="3.986e14" value="398600441800000" data-solver="solve_visviva" class="default-value" data-default="398600441800000">
       </div>
 
-      <button class="btn-primary" onclick="solve_visviva()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -61,6 +60,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="vis-viva.js"></script>
 </body>
 </html>

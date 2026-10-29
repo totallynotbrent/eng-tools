@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">P_{\mathrm{eol}} = P_0 (1 - d)^n</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-solar"></div>
       </section>
@@ -25,34 +27,31 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">P_{\mathrm{eol}} = P_0 (1 - d)^n</div>
-
       <div class="field">
         <label>beginning-of-life power P0 (W)</label>
-        <input type="number" id="p0" step="any" value="100">
+        <input type="number" id="p0" step="any" value="100" data-solver="solve_solar" class="default-value" data-default="100">
       </div>
       <div class="field">
         <label>annual degradation per year (fraction, optional)</label>
-        <input type="number" id="deg" step="any" placeholder="0.028" value="0.028">
+        <input type="number" id="deg" step="any" placeholder="0.028" value="0.028" data-solver="solve_solar" class="default-value" data-default="0.028">
       </div>
       <div class="field">
         <label>mission life (years)</label>
-        <input type="number" id="years" step="any" value="10">
+        <input type="number" id="years" step="any" value="10" data-solver="solve_solar" class="default-value" data-default="10">
       </div>
       <div class="field">
         <label>average load (optional) (W)</label>
-        <input type="number" id="load" step="any" value="800">
+        <input type="number" id="load" step="any" value="800" data-solver="solve_solar" class="default-value" data-default="800">
       </div>
       <div class="field">
         <label>cell efficiency η and solar flux S (optional, gives area)</label>
         <div class="row">
-          <input type="number" id="eta" step="any" value="0.85">
-          <input type="number" id="flux" step="any" value="1361">
+          <input type="number" id="eta" step="any" value="0.85" data-solver="solve_solar" class="default-value" data-default="0.85">
+          <input type="number" id="flux" step="any" value="1361" data-solver="solve_solar" class="default-value" data-default="1361">
         </div>
       </div>
 
-      <button class="btn-primary" onclick="solve_solar()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -74,6 +73,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="solar-array.js"></script>
 </body>
 </html>

@@ -33,9 +33,10 @@ input.default-value {
   color: var(--muted);
 }
 
+/* a shipped default stays dimmed until the value is actually edited */
 input.default-value:hover,
 input.default-value:focus {
-  color: var(--text);
+  color: var(--muted);
 }
 
 input::placeholder {

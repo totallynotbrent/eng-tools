@@ -28,30 +28,29 @@
 <div class="section calc-section">
       <div class="field">
         <label>altitude, m</label>
-        <input type="number" id="alt" step="any" value="10000">
+        <input type="number" id="alt" step="any" value="10000" data-solver="solve_tj" class="default-value" data-default="10000">
       </div>
       <div class="field">
         <label>flight mach M0</label>
-        <input type="number" id="mach" step="any" value="0.85">
+        <input type="number" id="mach" step="any" value="0.85" data-solver="solve_tj" class="default-value" data-default="0.85">
       </div>
       <div class="field">
         <label>compressor pressure ratio</label>
-        <input type="number" id="prc" step="any" value="30">
+        <input type="number" id="prc" step="any" value="30" data-solver="solve_tj" class="default-value" data-default="30">
       </div>
       <div class="field">
         <label>burner exit temperature Tt4, K</label>
-        <input type="number" id="tt4" step="any" value="1600">
+        <input type="number" id="tt4" step="any" value="1600" data-solver="solve_tj" class="default-value" data-default="1600">
       </div>
       <div class="field">
         <label>fuel heating value hPR, J/kg</label>
-        <input type="number" id="hpr" step="any" value="43000000">
+        <input type="number" id="hpr" step="any" value="43000000" data-solver="solve_tj" class="default-value" data-default="43000000">
       </div>
       <div class="field">
         <label>inlet mass flow mdot0, kg/s (optional)</label>
-        <input type="number" id="mdot" step="any" value="20">
+        <input type="number" id="mdot" step="any" value="20" data-solver="solve_tj" class="default-value" data-default="20">
       </div>
-      <button class="btn-primary" onclick="solve_tj()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -82,6 +81,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="turbojet.js"></script>
 </body>
 </html>

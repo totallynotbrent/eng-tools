@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">R_s = R_1 + R_2 + \cdots, \qquad \frac{1}{R_p} = \frac{1}{R_1} + \frac{1}{R_2} + \cdots</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-equivalents"></div>
       </section>
@@ -25,16 +27,14 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">R_s = R_1 + R_2 + \cdots, \qquad \frac{1}{R_p} = \frac{1}{R_1} + \frac{1}{R_2} + \cdots</div>
-
       <div class="field">
         <label>values</label>
-        <input type="text" id="values" value="10, 20, 30">
+        <input type="text" id="values" value="10, 20, 30" data-solver="solve_equiv" class="default-value" data-default="10, 20, 30">
       </div>
 
       <div class="field">
         <label>element</label>
-        <select id="elem">
+        <select id="elem" data-solver="solve_equiv">
           <option value="r">resistor</option>
           <option value="c">capacitor</option>
         </select>
@@ -42,14 +42,13 @@
 
       <div class="field">
         <label>connection</label>
-        <select id="conn">
+        <select id="conn" data-solver="solve_equiv">
           <option value="series">series</option>
           <option value="parallel">parallel</option>
         </select>
       </div>
 
-      <button class="btn-primary" onclick="solve_equiv()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -69,6 +68,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="resistors.js"></script>
 </body>
 </html>

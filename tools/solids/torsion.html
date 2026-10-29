@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">\tau_{\max} = \frac{T r}{J}, \qquad J = \frac{\pi r^4}{2}</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-torsion"></div>
       </section>
@@ -25,27 +27,24 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">\tau_{\max} = \frac{T r}{J}, \qquad J = \frac{\pi r^4}{2}</div>
-
       <div class="field">
         <label>torque T (N·m)</label>
-        <input type="number" id="torque" step="any" value="100">
+        <input type="number" id="torque" step="any" value="100" data-solver="solve_torsion" class="default-value" data-default="100">
       </div>
       <div class="field">
         <label>length L (m)</label>
-        <input type="number" id="length" step="any" value="2">
+        <input type="number" id="length" step="any" value="2" data-solver="solve_torsion" class="default-value" data-default="2">
       </div>
       <div class="field">
         <label>shear modulus G (Pa)</label>
-        <input type="number" id="shear" step="any" value="80000000">
+        <input type="number" id="shear" step="any" value="80000000" data-solver="solve_torsion" class="default-value" data-default="80000000">
       </div>
       <div class="field">
         <label>shaft radius r (m)</label>
-        <input type="number" id="radius" step="any" value="0.05">
+        <input type="number" id="radius" step="any" value="0.05" data-solver="solve_torsion" class="default-value" data-default="0.05">
       </div>
 
-      <button class="btn-primary" onclick="solve_torsion()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -66,6 +65,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="torsion.js"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
   <div class="wrap with-cols">
@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">\sum F_x = 0, \qquad \sum F_y = 0 \quad \text{(each joint)}</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-truss"></div>
       </section>
@@ -25,29 +27,26 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">\sum F_x = 0, \qquad \sum F_y = 0 \quad \text{(each joint)}</div>
-
       <div class="field">
         <label>nodes (one per line: x y, add pin or roller for a support)</label>
-        <textarea id="nodes" rows="5">0 0 pin
+        <textarea id="nodes" rows="5" data-solver="solve_truss">0 0 pin
 4 0 roller
 2 3</textarea>
       </div>
 
       <div class="field">
         <label>members (one per line: nodeA nodeB, 1-based)</label>
-        <textarea id="members" rows="5">1 2
+        <textarea id="members" rows="5" data-solver="solve_truss">1 2
 1 3
 2 3</textarea>
       </div>
 
       <div class="field">
         <label>loads (one per line: node Fx Fy)</label>
-        <textarea id="loads" rows="3">3 0 -10</textarea>
+        <textarea id="loads" rows="3" data-solver="solve_truss">3 0 -10</textarea>
       </div>
 
-      <button class="btn-primary" onclick="solve_truss()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -68,6 +67,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="truss.js"></script>
 </body>
 </html>

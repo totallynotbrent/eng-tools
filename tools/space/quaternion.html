@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">q = \cos\frac{\theta}{2} + \hat{u}\sin\frac{\theta}{2}</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-attitude"></div>
       </section>
@@ -25,31 +27,26 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">q = \cos\frac{\theta}{2} + \hat{u}\sin\frac{\theta}{2}</div>
-
       <div class="field">
         <label>quaternion (w, x, y, z)</label>
         <div class="row">
-          <input type="number" id="qw" step="any" value="1">
-          <input type="number" id="qx" step="any" value="0">
-          <input type="number" id="qy" step="any" value="0">
-          <input type="number" id="qz" step="any" value="0">
+          <input type="number" id="qw" step="any" value="1" data-solver="quat_to_euler" class="default-value" data-default="1">
+          <input type="number" id="qx" step="any" value="0" data-solver="quat_to_euler" class="default-value" data-default="0">
+          <input type="number" id="qy" step="any" value="0" data-solver="quat_to_euler" class="default-value" data-default="0">
+          <input type="number" id="qz" step="any" value="0" data-solver="quat_to_euler" class="default-value" data-default="0">
         </div>
       </div>
-      <button onclick="quat_to_euler()">quaternion → euler</button>
-
       <hr style="border:none;border-top:1px solid var(--border);margin:1.2rem 0">
 
       <div class="field">
         <label>euler angles (roll, pitch, yaw)</label>
         <div class="row">
-          <input type="number" id="roll" step="any" value="0">
-          <input type="number" id="pitch" step="any" value="0">
-          <input type="number" id="yaw" step="any" value="90">
+          <input type="number" id="roll" step="any" value="0" data-solver="euler_to_quat" class="default-value" data-default="0">
+          <input type="number" id="pitch" step="any" value="0" data-solver="euler_to_quat" class="default-value" data-default="0">
+          <input type="number" id="yaw" step="any" value="90" data-solver="euler_to_quat" class="default-value" data-default="90">
         </div>
       </div>
-      <button onclick="euler_to_quat()">euler → quaternion</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -71,6 +68,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="quaternion.js"></script>
 </body>
 </html>

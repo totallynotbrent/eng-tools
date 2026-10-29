@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">A\vec{v} = \lambda\vec{v}</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-eig"></div>
       </section>
@@ -25,22 +27,19 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">A\vec{v} = \lambda\vec{v}</div>
-
       <div class="field">
         <label>matrix entries</label>
         <div class="row">
-          <input type="number" id="a11" step="any" value="2">
-          <input type="number" id="a12" step="any" value="1">
+          <input type="number" id="a11" step="any" value="2" data-solver="solve_eig" class="default-value" data-default="2">
+          <input type="number" id="a12" step="any" value="1" data-solver="solve_eig" class="default-value" data-default="1">
         </div>
         <div class="row" style="margin-top:0.4rem">
-          <input type="number" id="a21" step="any" value="1">
-          <input type="number" id="a22" step="any" value="2">
+          <input type="number" id="a21" step="any" value="1" data-solver="solve_eig" class="default-value" data-default="1">
+          <input type="number" id="a22" step="any" value="2" data-solver="solve_eig" class="default-value" data-default="2">
         </div>
       </div>
 
-      <button class="btn-primary" onclick="solve_eig()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -65,6 +64,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="eigenvalues.js"></script>
 </body>
 </html>

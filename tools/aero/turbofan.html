@@ -33,20 +33,20 @@ F_{G} &amp;= \dot{m} V + (p - p_0)A \\\\
       <h2>freestream</h2>
       <div class="field">
         <label>flight mach M0</label>
-        <input type="number" id="m0" step="any" value="0.8">
+        <input type="number" id="m0" step="any" value="0.8" data-solver="solve_tf" class="default-value" data-default="0.8">
       </div>
       <div class="field">
         <label>static temperature T0 and pressure p0 (K, kPa)</label>
         <div class="row">
-          <input type="number" id="t0" step="any" value="220">
-          <input type="number" id="p0" step="any" value="30">
+          <input type="number" id="t0" step="any" value="220" data-solver="solve_tf" class="default-value" data-default="220">
+          <input type="number" id="p0" step="any" value="30" data-solver="solve_tf" class="default-value" data-default="30">
         </div>
       </div>
       <div class="field">
         <label>cold values γc, cp,c</label>
         <div class="row">
-          <input type="number" id="gc" step="any" value="1.4">
-          <input type="number" id="cpc" step="any" value="1004">
+          <input type="number" id="gc" step="any" value="1.4" data-solver="solve_tf" class="default-value" data-default="1.4">
+          <input type="number" id="cpc" step="any" value="1004" data-solver="solve_tf" class="default-value" data-default="1004">
         </div>
       </div>
     </div>
@@ -54,19 +54,19 @@ F_{G} &amp;= \dot{m} V + (p - p_0)A \\\\
       <h2>mass flows</h2>
       <div class="field">
         <label>fan (bypass) mass flow mdot18 (kg/s)</label>
-        <input type="number" id="md18" step="any" value="100">
+        <input type="number" id="md18" step="any" value="100" data-solver="solve_tf" class="default-value" data-default="100">
       </div>
       <div class="field">
         <label>core mass flow (before fuel) mdot core (kg/s)</label>
-        <input type="number" id="mdc" step="any" value="20">
+        <input type="number" id="mdc" step="any" value="20" data-solver="solve_tf" class="default-value" data-default="20">
       </div>
       <div class="field">
         <label>fuel mass flow mdotf (kg/s)</label>
-        <input type="number" id="mdf" step="any" value="0.368">
+        <input type="number" id="mdf" step="any" value="0.368" data-solver="solve_tf" class="default-value" data-default="0.368">
       </div>
       <div class="field">
         <label>burner heat release QB (kJ/kg)</label>
-        <input type="number" id="qb" step="any" value="42800">
+        <input type="number" id="qb" step="any" value="42800" data-solver="solve_tf" class="default-value" data-default="42800">
       </div>
     </div>
 <div class="section calc-section">
@@ -74,9 +74,9 @@ F_{G} &amp;= \dot{m} V + (p - p_0)A \\\\
       <div class="field">
         <label>exit static p18, T18, M18 (kPa, K)</label>
         <div class="row">
-          <input type="number" id="p18" step="any" value="37.7">
-          <input type="number" id="t18" step="any" value="240">
-          <input type="number" id="m18" step="any" value="1">
+          <input type="number" id="p18" step="any" value="37.7" data-solver="solve_tf" class="default-value" data-default="37.7">
+          <input type="number" id="t18" step="any" value="240" data-solver="solve_tf" class="default-value" data-default="240">
+          <input type="number" id="m18" step="any" value="1" data-solver="solve_tf" class="default-value" data-default="1">
         </div>
       </div>
     </div>
@@ -85,20 +85,19 @@ F_{G} &amp;= \dot{m} V + (p - p_0)A \\\\
       <div class="field">
         <label>exit static p8, T8, M8 (kPa, K)</label>
         <div class="row">
-          <input type="number" id="p8" step="any" value="44.2">
-          <input type="number" id="t8" step="any" value="583">
-          <input type="number" id="m8" step="any" value="1">
+          <input type="number" id="p8" step="any" value="44.2" data-solver="solve_tf" class="default-value" data-default="44.2">
+          <input type="number" id="t8" step="any" value="583" data-solver="solve_tf" class="default-value" data-default="583">
+          <input type="number" id="m8" step="any" value="1" data-solver="solve_tf" class="default-value" data-default="1">
         </div>
       </div>
       <div class="field">
         <label>hot values γh, cp,h</label>
         <div class="row">
-          <input type="number" id="gh" step="any" value="1.33">
-          <input type="number" id="cph" step="any" value="1156">
+          <input type="number" id="gh" step="any" value="1.33" data-solver="solve_tf" class="default-value" data-default="1.33">
+          <input type="number" id="cph" step="any" value="1156" data-solver="solve_tf" class="default-value" data-default="1156">
         </div>
       </div>
-      <button class="btn-primary" onclick="solve_tf()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -132,6 +131,7 @@ F_{G} &amp;= \dot{m} V + (p - p_0)A \\\\
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="turbofan.js"></script>
 </body>
 </html>

@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">\vec{v}_{A/B} = \vec{v}_A - \vec{v}_B</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-relv"></div>
       </section>
@@ -25,26 +27,23 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">\vec{v}_{A/B} = \vec{v}_A - \vec{v}_B</div>
-
       <div class="field">
         <label>velocity of A</label>
         <div class="row">
-          <input type="number" id="va" step="any" value="10">
-          <input type="number" id="aa" step="any" value="0">
+          <input type="number" id="va" step="any" value="10" data-solver="solve_relv" class="default-value" data-default="10">
+          <input type="number" id="aa" step="any" value="0" data-solver="solve_relv" class="default-value" data-default="0">
         </div>
       </div>
 
       <div class="field">
         <label>velocity of B</label>
         <div class="row">
-          <input type="number" id="vb" step="any" value="5">
-          <input type="number" id="ab" step="any" value="180">
+          <input type="number" id="vb" step="any" value="5" data-solver="solve_relv" class="default-value" data-default="5">
+          <input type="number" id="ab" step="any" value="180" data-solver="solve_relv" class="default-value" data-default="180">
         </div>
       </div>
 
-      <button class="btn-primary" onclick="solve_relv()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -66,6 +65,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="relative-velocity.js"></script>
 </body>
 </html>

@@ -28,29 +28,28 @@
 <div class="section calc-section">
       <div class="field">
         <label>mode</label>
-        <select id="mode">
+        <select id="mode" data-solver="solve_eff">
           <option value="c">compressor</option>
           <option value="t">turbine</option>
         </select>
       </div>
       <div class="field">
         <label>gamma</label>
-        <input type="number" id="gamma" step="any" value="1.4">
+        <input type="number" id="gamma" step="any" value="1.4" data-solver="solve_eff" class="default-value" data-default="1.4">
       </div>
       <div class="field">
         <label>inlet total temperature Tt-in, K</label>
-        <input type="number" id="ttin" step="any" value="288">
+        <input type="number" id="ttin" step="any" value="288" data-solver="solve_eff" class="default-value" data-default="288">
       </div>
       <div class="field">
         <label>exit total temperature Tt-out, K</label>
-        <input type="number" id="ttout" step="any" value="700">
+        <input type="number" id="ttout" step="any" value="700" data-solver="solve_eff" class="default-value" data-default="700">
       </div>
       <div class="field">
         <label>total pressure ratio (exit / inlet)</label>
-        <input type="number" id="ratio" step="any" value="10">
+        <input type="number" id="ratio" step="any" value="10" data-solver="solve_eff" class="default-value" data-default="10">
       </div>
-      <button class="btn-primary" onclick="solve_eff()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -70,6 +69,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="component-efficiency.js"></script>
 </body>
 </html>

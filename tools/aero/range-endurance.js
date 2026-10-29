@@ -45,19 +45,24 @@
         if (note) note.textContent = "Fill the aircraft and propulsion values to draw the range trade.";
         return;
       }
-      const factor = (mode === "prop" ? eta : 1) * ld / c;
+      // mirror the solver: a jet trades range with speed, a propeller trades endurance
+      const jet_factor = v * ld / c;
+      const prop_factor = eta * ld / c;
+      const factor = mode === "prop" ? prop_factor : jet_factor;
       const fmin = Math.min(0.35, w1 / w0 * 0.9), fmax = 0.99;
+      // range grows as the remaining weight fraction shrinks, so the axis tops out at fmin
+      const range_max = factor * Math.log(1 / fmin);
       fig.plot(el, {
         width: 560, height: 310,
         x: { label: "remaining weight fraction W1/W0", unit: "", min: fmin, max: fmax },
-        y: { label: "breguet range", unit: "m", min: 0, max: factor * v * Math.log(w0 / (w0 * fmax)) * 1.08 },
+        y: { label: "breguet range", unit: "m", min: 0, max: range_max * 1.05 },
         series: [
-          { fn: function (fraction) { return factor * v * Math.log(1 / fraction); }, xmin: fmin, xmax: fmax, cls: "fig-line", label: "range" }
+          { fn: function (fraction) { return factor * Math.log(1 / fraction); }, xmin: fmin, xmax: fmax, cls: "fig-line", label: "range" }
         ],
-        marker: { x: w1 / w0, y: factor * v * Math.log(w0 / w1), label: "selected" },
+        marker: { x: w1 / w0, y: factor * Math.log(w0 / w1), label: "selected" },
         driver: false
       });
-      if (note) note.textContent = "At W1/W0 = " + fig.num_fmt(w1 / w0) + ", range is " + fig.num_fmt(factor * v * Math.log(w0 / w1)) + " m. Range falls logarithmically as final weight rises.";
+      if (note) note.textContent = "At W1/W0 = " + fig.num_fmt(w1 / w0) + ", range is " + fig.num_fmt(factor * Math.log(w0 / w1)) + " m. Range falls logarithmically as final weight rises.";
     }
 
     fig.auto_draw(function () { draw_fig_range(); });

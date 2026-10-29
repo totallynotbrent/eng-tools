@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">P_r = P_t\, G_t\, G_r \left(\frac{c}{4\pi d f}\right)^2</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-linkbudget"></div>
       </section>
@@ -25,38 +27,35 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">P_r = P_t\, G_t\, G_r \left(\frac{c}{4\pi d f}\right)^2</div>
-
       <div class="field">
         <label>transmit power Pt (W)</label>
-        <input type="number" id="pt" step="any" value="10">
+        <input type="number" id="pt" step="any" value="10" data-solver="solve_link" class="default-value" data-default="10">
       </div>
       <div class="field">
         <label>transmit and receive gain Gt, Gr (linear)</label>
         <div class="row">
-          <input type="number" id="gt" step="any" value="100">
-          <input type="number" id="gr" step="any" value="100">
+          <input type="number" id="gt" step="any" value="100" data-solver="solve_link" class="default-value" data-default="100">
+          <input type="number" id="gr" step="any" value="100" data-solver="solve_link" class="default-value" data-default="100">
         </div>
       </div>
       <div class="field">
         <label>distance d (m)</label>
-        <input type="number" id="dist" step="any" value="1000">
+        <input type="number" id="dist" step="any" value="1000" data-solver="solve_link" class="default-value" data-default="1000">
       </div>
       <div class="field">
         <label>frequency f (Hz)</label>
-        <input type="number" id="freq" step="any" value="2.4e9">
+        <input type="number" id="freq" step="any" value="2.4e9" data-solver="solve_link" class="default-value" data-default="2.4e9">
       </div>
       <div class="field">
         <label>system noise temperature Tsys (optional) (K)</label>
-        <input type="number" id="tsys" step="any" value="290">
+        <input type="number" id="tsys" step="any" value="290" data-solver="solve_link" class="default-value" data-default="290">
       </div>
       <div class="field">
         <label>bandwidth B (optional) (Hz)</label>
-        <input type="number" id="bw" step="any" value="1e6">
+        <input type="number" id="bw" step="any" value="1e6" data-solver="solve_link" class="default-value" data-default="1e6">
       </div>
 
-      <button class="btn-primary" onclick="solve_link()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -80,6 +79,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="link-budget.js"></script>
 </body>
 </html>

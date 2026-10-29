@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">R = \sqrt{\left(\frac{\sigma_x - \sigma_y}{2}\right)^2 + \tau_{xy}^2}</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-mohr"></div>
       </section>
@@ -25,23 +27,20 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">R = \sqrt{\left(\frac{\sigma_x - \sigma_y}{2}\right)^2 + \tau_{xy}^2}</div>
-
       <div class="field">
         <label>normal stress σx (Pa)</label>
-        <input type="number" id="sx" step="any" value="100">
+        <input type="number" id="sx" step="any" value="100" data-solver="solve_mohr" class="default-value" data-default="100">
       </div>
       <div class="field">
         <label>normal stress σy (Pa)</label>
-        <input type="number" id="sy" step="any" value="20">
+        <input type="number" id="sy" step="any" value="20" data-solver="solve_mohr" class="default-value" data-default="20">
       </div>
       <div class="field">
         <label>shear stress τxy (Pa)</label>
-        <input type="number" id="txy" step="any" value="30">
+        <input type="number" id="txy" step="any" value="30" data-solver="solve_mohr" class="default-value" data-default="30">
       </div>
 
-      <button class="btn-primary" onclick="solve_mohr()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -64,6 +63,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="mohr-circle.js"></script>
 </body>
 </html>

@@ -31,57 +31,56 @@ c_m &amp;= \sqrt{\frac{2g\,\mathrm{NPSH}_c}{A}}, \quad \phi = \frac{c_m}{U_t}, \
 <div class="section calc-section">
       <div class="field">
         <label>mass flow mdot (kg/s)</label>
-        <input type="number" id="mdot" step="any" value="3">
+        <input type="number" id="mdot" step="any" value="3" data-solver="solve_inducer" class="default-value" data-default="3">
       </div>
       <div class="field">
         <label>liquid density rho</label>
-        <input type="number" id="rho" step="any" value="71.265">
+        <input type="number" id="rho" step="any" value="71.265" data-solver="solve_inducer" class="default-value" data-default="71.265">
       </div>
       <div class="field">
         <label>vapor pressure Pv (kPa)</label>
-        <input type="number" id="pv" step="any" value="90.717">
+        <input type="number" id="pv" step="any" value="90.717" data-solver="solve_inducer" class="default-value" data-default="90.717">
       </div>
       <div class="field">
         <label>tank pressure Ptank (MPa)</label>
-        <input type="number" id="ptank" step="any" value="0.2">
+        <input type="number" id="ptank" step="any" value="0.2" data-solver="solve_inducer" class="default-value" data-default="0.2">
       </div>
       <div class="field">
         <label>feed line loss and tank height (kPa) (m)</label>
         <div class="row">
-          <input type="number" id="dpf" step="any" value="35">
-          <input type="number" id="z" step="any" value="2">
+          <input type="number" id="dpf" step="any" value="35" data-solver="solve_inducer" class="default-value" data-default="35">
+          <input type="number" id="z" step="any" value="2" data-solver="solve_inducer" class="default-value" data-default="2">
         </div>
       </div>
       <div class="field">
         <label>NPSH margin M (fraction)</label>
-        <input type="number" id="marg" step="any" value="0.2">
+        <input type="number" id="marg" step="any" value="0.2" data-solver="solve_inducer" class="default-value" data-default="0.2">
       </div>
       <div class="field">
         <label>hub-to-tip ratio Dh/Dt</label>
-        <input type="number" id="dht" step="any" value="0.3">
+        <input type="number" id="dht" step="any" value="0.3" data-solver="solve_inducer" class="default-value" data-default="0.3">
       </div>
       <div class="field">
         <label>flow coefficient phi</label>
-        <input type="number" id="phi" step="any" value="0.2">
+        <input type="number" id="phi" step="any" value="0.2" data-solver="solve_inducer" class="default-value" data-default="0.2">
       </div>
       <div class="field">
         <label>impeller suction specific speed Nss (rpm, gpm, ft)</label>
-        <input type="number" id="nss" step="any" value="5000">
+        <input type="number" id="nss" step="any" value="5000" data-solver="solve_inducer" class="default-value" data-default="5000">
       </div>
       <div class="field">
         <label>incidence angle i (deg)</label>
-        <input type="number" id="inc" step="any" value="5">
+        <input type="number" id="inc" step="any" value="5" data-solver="solve_inducer" class="default-value" data-default="5">
       </div>
       <div class="field">
         <label>inducer efficiency eta</label>
-        <input type="number" id="eta" step="any" value="0.8">
+        <input type="number" id="eta" step="any" value="0.8" data-solver="solve_inducer" class="default-value" data-default="0.8">
       </div>
       <div class="field">
         <label>velocity coefficient A (1 for hydrogen)</label>
-        <input type="number" id="acoeff" step="any" value="1">
+        <input type="number" id="acoeff" step="any" value="1" data-solver="solve_inducer" class="default-value" data-default="1">
       </div>
-      <button class="btn-primary" onclick="solve_inducer()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -117,6 +116,7 @@ c_m &amp;= \sqrt{\frac{2g\,\mathrm{NPSH}_c}{A}}, \quad \phi = \frac{c_m}{U_t}, \
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="inducer.js"></script>
 </body>
 </html>

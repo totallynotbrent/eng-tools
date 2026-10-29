@@ -32,29 +32,28 @@ K_p &amp;= \frac{\omega_n^2}{K}, \quad K_v = \frac{2\zeta\omega_n}{K}
 <div class="section calc-section">
       <div class="field">
         <label>plant steady-state gain K</label>
-        <input type="number" id="k_plant" step="any" value="1.53">
+        <input type="number" id="k_plant" step="any" value="1.53" data-solver="solve_servo" class="default-value" data-default="1.53">
       </div>
       <div class="field">
         <label>plant time constant τ (s)</label>
-        <input type="number" id="tau" step="any" value="1">
+        <input type="number" id="tau" step="any" value="1" data-solver="solve_servo" class="default-value" data-default="1">
       </div>
       <div class="field">
         <label>percent overshoot spec (%)</label>
-        <input type="number" id="po" step="any" value="16.3">
+        <input type="number" id="po" step="any" value="16.3" data-solver="solve_servo" class="default-value" data-default="16.3">
       </div>
       <div class="field">
         <label>peak time spec tp (s)</label>
-        <input type="number" id="tp" step="any" value="0.907">
+        <input type="number" id="tp" step="any" value="0.907" data-solver="solve_servo" class="default-value" data-default="0.907">
       </div>
       <div class="field">
         <label>amplifier type</label>
-        <select id="amp" style="width: 90px">
+        <select id="amp" style="width: 90px" data-solver="solve_servo">
           <option value="q3">current (Q3)</option>
           <option value="volt">voltage</option>
         </select>
       </div>
-      <button class="btn-primary" onclick="solve_servo()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -80,6 +79,7 @@ K_p &amp;= \frac{\omega_n^2}{K}, \quad K_v = \frac{2\zeta\omega_n}{K}
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="servo-design.js"></script>
 </body>
 </html>

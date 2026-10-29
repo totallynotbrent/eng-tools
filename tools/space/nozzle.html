@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">\frac{A_e}{A_t} = \frac{1}{M_e}\left[\frac{2}{\gamma+1}\left(1 + \frac{\gamma-1}{2}M_e^2\right)\right]^{\frac{\gamma+1}{2(\gamma-1)}}</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-nozzle"></div>
       </section>
@@ -25,22 +27,19 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">\frac{A_e}{A_t} = \frac{1}{M_e}\left[\frac{2}{\gamma+1}\left(1 + \frac{\gamma-1}{2}M_e^2\right)\right]^{\frac{\gamma+1}{2(\gamma-1)}}</div>
-
       <div class="field">
         <label>chamber pressure pc and exit pressure pe</label>
         <div class="row">
-          <input type="number" id="pc" step="any" value="100">
-          <input type="number" id="pe" step="any" value="1">
+          <input type="number" id="pc" step="any" value="100" data-solver="solve_nozzle" class="default-value" data-default="100">
+          <input type="number" id="pe" step="any" value="1" data-solver="solve_nozzle" class="default-value" data-default="1">
         </div>
       </div>
       <div class="field">
         <label>ratio of specific heats γ (optional)</label>
-        <input type="number" id="gamma" step="any" placeholder="1.2" value="1.4">
+        <input type="number" id="gamma" step="any" placeholder="1.2" value="1.4" data-solver="solve_nozzle" class="default-value" data-default="1.4">
       </div>
 
-      <button class="btn-primary" onclick="solve_nozzle()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -61,6 +60,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="nozzle.js"></script>
 </body>
 </html>

@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">V(x) = R_A - \sum_{x_i \le x} P_i, \qquad M(x) = \int_0^x V\,dx</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-beam"></div>
       </section>
@@ -25,28 +27,25 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">V(x) = R_A - \sum_{x_i \le x} P_i, \qquad M(x) = \int_0^x V\,dx</div>
-
       <div class="field">
         <label>span L (m)</label>
-        <input type="number" id="len" step="any" value="10">
+        <input type="number" id="len" step="any" value="10" data-solver="solve_beam" class="default-value" data-default="10">
       </div>
       <div class="field">
         <label>point loads (magnitude, distance; one per line)</label>
         <textarea id="point" rows="3" placeholder="1000 2
-500 4"></textarea>
+500 4" data-solver="solve_beam"></textarea>
       </div>
       <div class="field">
         <label>uniform load w over the full span (optional) (N/m)</label>
-        <input type="number" id="udl" step="any" value="100">
+        <input type="number" id="udl" step="any" value="100" data-solver="solve_beam" class="default-value" data-default="100">
       </div>
       <div class="field">
         <label>positions to evaluate (comma separated, optional)</label>
-        <input type="text" id="xs" value="5">
+        <input type="text" id="xs" value="5" data-solver="solve_beam" class="default-value" data-default="5">
       </div>
 
-      <button class="btn-primary" onclick="solve_beam()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -66,6 +65,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="beam-shear-moment.js"></script>
 </body>
 </html>

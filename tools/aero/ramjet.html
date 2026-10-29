@@ -33,98 +33,97 @@ F_N &amp;= \dot{m}_9 V_9 - \dot{m}_a V_0 + (p_9 - p_0)A_9
       <h2>freestream and inlet</h2>
       <div class="field">
         <label>flight mach M0</label>
-        <input type="number" id="m0" step="any" value="3">
+        <input type="number" id="m0" step="any" value="3" data-solver="solve_ramjet" class="default-value" data-default="3">
       </div>
       <div class="field">
         <label>static temperature T0 and pressure p0 (K, kPa)</label>
         <div class="row">
-          <input type="number" id="t0" step="any" value="228.78">
-          <input type="number" id="p0" step="any" value="30.16">
+          <input type="number" id="t0" step="any" value="228.78" data-solver="solve_ramjet" class="default-value" data-default="228.78">
+          <input type="number" id="p0" step="any" value="30.16" data-solver="solve_ramjet" class="default-value" data-default="30.16">
         </div>
       </div>
       <div class="field">
         <label>captured area A2 (m²)</label>
-        <input type="number" id="a2" step="any" value="0.015">
+        <input type="number" id="a2" step="any" value="0.015" data-solver="solve_ramjet" class="default-value" data-default="0.015">
       </div>
       <div class="field">
         <label>ramp turn angles (comma separated, deg)</label>
-        <input type="text" id="turns" value="8, 10, 15">
+        <input type="text" id="turns" value="8, 10, 15" data-solver="solve_ramjet" class="default-value" data-default="8, 10, 15">
       </div>
       <div class="field">
         <label>cold values γc, cp,c</label>
         <div class="row">
-          <input type="number" id="gc" step="any" value="1.4">
-          <input type="number" id="cpc" step="any" value="1004">
+          <input type="number" id="gc" step="any" value="1.4" data-solver="solve_ramjet" class="default-value" data-default="1.4">
+          <input type="number" id="cpc" step="any" value="1004" data-solver="solve_ramjet" class="default-value" data-default="1004">
         </div>
       </div>
       <div class="field">
         <label>diffuser total-pressure loss (fraction)</label>
-        <input type="number" id="dif_loss" step="any" value="0.1">
+        <input type="number" id="dif_loss" step="any" value="0.1" data-solver="solve_ramjet" class="default-value" data-default="0.1">
       </div>
       <div class="field">
         <label>combustor inlet mach M3</label>
-        <input type="number" id="m3" step="any" value="0.1001">
+        <input type="number" id="m3" step="any" value="0.1001" data-solver="solve_ramjet" class="default-value" data-default="0.1001">
       </div>
     </div>
 <div class="section calc-section">
       <h2>combustor</h2>
       <div class="field">
         <label>burner mode</label>
-        <select id="bmode">
+        <select id="bmode" data-solver="solve_ramjet">
           <option value="tet">given Tt4, solve fuel-air ratio</option>
           <option value="far">given fuel-air ratio, solve Tt4</option>
         </select>
       </div>
       <div class="field">
         <label>burner exit total temperature Tt4</label>
-        <input type="number" id="tt4" step="any" value="2200">
+        <input type="number" id="tt4" step="any" value="2200" data-solver="solve_ramjet" class="default-value" data-default="2200">
       </div>
       <div class="field">
         <label>fuel-air ratio f</label>
-        <input type="number" id="far" step="any" value="0.02">
+        <input type="number" id="far" step="any" value="0.02" data-solver="solve_ramjet" class="default-value" data-default="0.02">
       </div>
       <div class="field">
         <label>hot values γh, cp,h</label>
         <div class="row">
-          <input type="number" id="gh" step="any" value="1.33">
-          <input type="number" id="cph" step="any" value="1152">
+          <input type="number" id="gh" step="any" value="1.33" data-solver="solve_ramjet" class="default-value" data-default="1.33">
+          <input type="number" id="cph" step="any" value="1152" data-solver="solve_ramjet" class="default-value" data-default="1152">
         </div>
       </div>
       <div class="field">
         <label>burner efficiency ηb and LHV (kJ/kg)</label>
         <div class="row">
-          <input type="number" id="etab" step="any" value="0.95">
-          <input type="number" id="lhv" step="any" value="42000">
+          <input type="number" id="etab" step="any" value="0.95" data-solver="solve_ramjet" class="default-value" data-default="0.95">
+          <input type="number" id="lhv" step="any" value="42000" data-solver="solve_ramjet" class="default-value" data-default="42000">
         </div>
       </div>
       <div class="field">
         <label>burner total-pressure loss (fraction)</label>
-        <input type="number" id="burn_loss" step="any" value="0.03">
+        <input type="number" id="burn_loss" step="any" value="0.03" data-solver="solve_ramjet" class="default-value" data-default="0.03">
       </div>
       <div class="field">
         <label>burner exit mach M4</label>
-        <input type="number" id="m4" step="any" value="0.4003">
+        <input type="number" id="m4" step="any" value="0.4003" data-solver="solve_ramjet" class="default-value" data-default="0.4003">
       </div>
     </div>
 <div class="section calc-section">
       <h2>duct and nozzle</h2>
       <div class="field">
         <label>duct total-temperature change ΔTt</label>
-        <input type="number" id="dtt" step="any" value="-125">
+        <input type="number" id="dtt" step="any" value="-125" data-solver="solve_ramjet" class="default-value" data-default="-125">
       </div>
       <div class="field">
         <label>duct total-pressure loss (fraction)</label>
-        <input type="number" id="duct_loss" step="any" value="0.02">
+        <input type="number" id="duct_loss" step="any" value="0.02" data-solver="solve_ramjet" class="default-value" data-default="0.02">
       </div>
       <div class="field">
         <label>discharge coefficient CD and velocity coefficient CV</label>
         <div class="row">
-          <input type="number" id="cd" step="any" value="0.95">
-          <input type="number" id="cv" step="any" value="0.97">
+          <input type="number" id="cd" step="any" value="0.95" data-solver="solve_ramjet" class="default-value" data-default="0.95">
+          <input type="number" id="cv" step="any" value="0.97" data-solver="solve_ramjet" class="default-value" data-default="0.97">
         </div>
       </div>
-      <button class="btn-primary" onclick="solve_ramjet()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -157,6 +156,7 @@ F_N &amp;= \dot{m}_9 V_9 - \dot{m}_a V_0 + (p_9 - p_0)A_9
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="ramjet.js"></script>
 </body>
 </html>

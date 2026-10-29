@@ -34,38 +34,35 @@
       <h2>saturated, by temperature</h2>
       <div class="field">
         <label>temperature T (°C)</label>
-        <input type="number" id="sat_t" step="any" value="100">
+        <input type="number" id="sat_t" step="any" value="100" data-solver="sat_temp" class="default-value" data-default="100">
       </div>
       <div class="field">
         <label>quality x (optional, 0–1)</label>
-        <input type="number" id="sat_t_x" step="any" min="0" max="1" value="0.4">
+        <input type="number" id="sat_t_x" step="any" min="0" max="1" value="0.4" data-solver="sat_temp" class="default-value" data-default="0.4">
       </div>
-      <button onclick="sat_temp()">look up</button>
-    </div>
+      </div>
 <div class="section calc-section" id="panel_satP" style="display:none">
       <h2>saturated, by pressure</h2>
       <div class="field">
         <label>pressure p (kPa)</label>
-        <input type="number" id="sat_p" step="any" value="101.325">
+        <input type="number" id="sat_p" step="any" value="101.325" data-solver="sat_press" class="default-value" data-default="101.325">
       </div>
       <div class="field">
         <label>quality x (optional, 0–1)</label>
-        <input type="number" id="sat_p_x" step="any" min="0" max="1" value="0.5">
+        <input type="number" id="sat_p_x" step="any" min="0" max="1" value="0.5" data-solver="sat_press" class="default-value" data-default="0.5">
       </div>
-      <button onclick="sat_press()">look up</button>
-    </div>
+      </div>
 <div class="section calc-section" id="panel_super" style="display:none">
       <h2>superheated vapor</h2>
       <div class="field">
         <label>pressure p (MPa)</label>
-        <input type="number" id="sup_p" step="any" value="0.1">
+        <input type="number" id="sup_p" step="any" value="0.1" data-solver="superheat" class="default-value" data-default="0.1">
       </div>
       <div class="field">
         <label>temperature T (°C)</label>
-        <input type="number" id="sup_t" step="any" value="200">
+        <input type="number" id="sup_t" step="any" value="200" data-solver="superheat" class="default-value" data-default="200">
       </div>
-      <button onclick="superheat()">look up</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -98,6 +95,7 @@
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
   <script src="steam-data.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="steam-tables.js"></script>
 </body>
 </html>

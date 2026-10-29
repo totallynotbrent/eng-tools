@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">T = T_0 - L h, \qquad p = p_0 \left(\frac{T}{T_0}\right)^{g/(RL)}</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-isa"></div>
       </section>
@@ -25,15 +27,12 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">T = T_0 - L h, \qquad p = p_0 \left(\frac{T}{T_0}\right)^{g/(RL)}</div>
-
       <div class="field">
         <label>altitude h (m)</label>
-        <input type="number" id="alt" step="any" value="11000">
+        <input type="number" id="alt" step="any" value="11000" data-solver="solve_isa" class="default-value" data-default="11000">
       </div>
 
-      <button class="btn-primary" onclick="solve_isa()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -57,6 +56,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="standard-atmosphere.js"></script>
 </body>
 </html>

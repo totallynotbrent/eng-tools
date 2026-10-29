@@ -28,7 +28,7 @@
 <div class="section calc-section">
       <div class="field">
         <label>structure</label>
-        <select id="struct">
+        <select id="struct" data-solver="solve_block">
           <option value="series">series: G1 then G2</option>
           <option value="parallel">parallel: G1 + G2</option>
           <option value="feedback">unity feedback around G1</option>
@@ -36,22 +36,21 @@
       </div>
       <div class="field">
         <label>G1 numerator, highest power first</label>
-        <input type="text" id="g1n" value="4">
+        <input type="text" id="g1n" value="4" data-solver="solve_block" class="default-value" data-default="4">
       </div>
       <div class="field">
         <label>G1 denominator, highest power first</label>
-        <input type="text" id="g1d" value="1, 2, 5">
+        <input type="text" id="g1d" value="1, 2, 5" data-solver="solve_block" class="default-value" data-default="1, 2, 5">
       </div>
       <div class="field">
         <label>G2 numerator, highest power first</label>
-        <input type="text" id="g2n" value="1">
+        <input type="text" id="g2n" value="1" data-solver="solve_block" class="default-value" data-default="1">
       </div>
       <div class="field">
         <label>G2 denominator, highest power first</label>
-        <input type="text" id="g2d" value="1, 1">
+        <input type="text" id="g2d" value="1, 1" data-solver="solve_block" class="default-value" data-default="1, 1">
       </div>
-      <button onclick="solve_block()">reduce</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -74,6 +73,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="block-reduction.js"></script>
 </body>
 </html>

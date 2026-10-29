@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">\frac{T_0}{T} = 1 + \frac{\gamma - 1}{2} M^2</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-isentropic"></div>
       </section>
@@ -25,19 +27,16 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">\frac{T_0}{T} = 1 + \frac{\gamma - 1}{2} M^2</div>
-
       <div class="field">
         <label>mach number M</label>
-        <input type="number" id="mach" step="any" value="2">
+        <input type="number" id="mach" step="any" value="2" data-solver="solve_isen" class="default-value" data-default="2">
       </div>
       <div class="field">
         <label>ratio of specific heats γ (optional)</label>
-        <input type="number" id="gamma" step="any" placeholder="1.4" value="1.4">
+        <input type="number" id="gamma" step="any" placeholder="1.4" value="1.4" data-solver="solve_isen" class="default-value" data-default="1.4">
       </div>
 
-      <button class="btn-primary" onclick="solve_isen()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -59,6 +58,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="isentropic.js"></script>
 </body>
 </html>

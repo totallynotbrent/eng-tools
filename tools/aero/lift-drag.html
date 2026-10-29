@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">q = \tfrac{1}{2}\rho V^2, \qquad L = q\,S\,C_L, \qquad D = q\,S\,C_D</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-liftdrag"></div>
       </section>
@@ -25,38 +27,35 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">q = \tfrac{1}{2}\rho V^2, \qquad L = q\,S\,C_L, \qquad D = q\,S\,C_D</div>
-
       <div class="field">
         <label>density ρ</label>
-        <input type="number" id="rho" step="any" value="1.225">
+        <input type="number" id="rho" step="any" value="1.225" data-solver="solve_ld" class="default-value" data-default="1.225">
       </div>
       <div class="field">
         <label>velocity V (m/s)</label>
-        <input type="number" id="vel" step="any" value="50">
+        <input type="number" id="vel" step="any" value="50" data-solver="solve_ld" class="default-value" data-default="50">
       </div>
       <div class="field">
         <label>wing area S (m²)</label>
-        <input type="number" id="area" step="any" value="5">
+        <input type="number" id="area" step="any" value="5" data-solver="solve_ld" class="default-value" data-default="5">
       </div>
       <div class="field">
         <label>lift coefficient CL</label>
-        <input type="number" id="cl" step="any" value="0.5">
+        <input type="number" id="cl" step="any" value="0.5" data-solver="solve_ld" class="default-value" data-default="0.5">
       </div>
       <div class="field">
         <label>drag coefficient CD (direct, optional)</label>
-        <input type="number" id="cd" step="any" value="0.02">
+        <input type="number" id="cd" step="any" value="0.02" data-solver="solve_ld" class="default-value" data-default="0.02">
       </div>
       <div class="field">
         <label>polar CD0 and k (used if CD is blank)</label>
         <div class="row">
-          <input type="number" id="cd0" step="any" value="0.02">
-          <input type="number" id="k" step="any" value="0.05">
+          <input type="number" id="cd0" step="any" value="0.02" data-solver="solve_ld" class="default-value" data-default="0.02">
+          <input type="number" id="k" step="any" value="0.05" data-solver="solve_ld" class="default-value" data-default="0.05">
         </div>
       </div>
 
-      <button class="btn-primary" onclick="solve_ld()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -78,6 +77,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="lift-drag.js"></script>
 </body>
 </html>

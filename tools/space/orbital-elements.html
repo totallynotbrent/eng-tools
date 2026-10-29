@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">h = |\vec{r} \times \vec{v}|, \qquad e = \sqrt{1 + \frac{2 \varepsilon h^2}{\mu^2}}</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-orbit"></div>
       </section>
@@ -25,27 +27,24 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">h = |\vec{r} \times \vec{v}|, \qquad e = \sqrt{1 + \frac{2 \varepsilon h^2}{\mu^2}}</div>
-
       <div class="field">
         <label>radius r (m)</label>
-        <input type="number" id="r" step="any" value="6771000.0">
+        <input type="number" id="r" step="any" value="6771000.0" data-solver="solve_elements" class="default-value" data-default="6771000.0">
       </div>
       <div class="field">
         <label>speed v (m/s)</label>
-        <input type="number" id="v" step="any" value="7726">
+        <input type="number" id="v" step="any" value="7726" data-solver="solve_elements" class="default-value" data-default="7726">
       </div>
       <div class="field">
         <label>flight path angle γ</label>
-        <input type="number" id="gamma" step="any" value="0">
+        <input type="number" id="gamma" step="any" value="0" data-solver="solve_elements" class="default-value" data-default="0">
       </div>
       <div class="field">
         <label>gravitational parameter μ (optional)</label>
-        <input type="number" id="mu" step="any" placeholder="3.986e14" value="398600441800000.0">
+        <input type="number" id="mu" step="any" placeholder="3.986e14" value="398600441800000.0" data-solver="solve_elements" class="default-value" data-default="398600441800000.0">
       </div>
 
-      <button class="btn-primary" onclick="solve_elements()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -71,6 +70,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="orbital-elements.js"></script>
 </body>
 </html>

@@ -35,8 +35,6 @@
 const el = document.getElementById("fig-liftdrag");
 const note = document.getElementById("fig-liftdrag-note");
 if (!el || !window.fig) return;
-const seed = function (id, v) { const e = document.getElementById(id); if (e && e.value.trim() === "") e.value = v; };
-seed("vel", 100); seed("area", 20); seed("cl", 0.5); seed("cd0", 0.02); seed("k", 0.05);
 // park a direct cd so the sweep walks the polar instead
 const cdEl = document.getElementById("cd");
 const cdParked = cdEl.value;

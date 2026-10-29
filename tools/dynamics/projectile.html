@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">R = \frac{v_0^2 \sin 2\theta}{g}</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-projectile"></div>
       </section>
@@ -25,27 +27,24 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">R = \frac{v_0^2 \sin 2\theta}{g}</div>
-
       <div class="field">
         <label>launch speed v0 (m/s)</label>
-        <input type="number" id="v0" step="any" value="20">
+        <input type="number" id="v0" step="any" value="20" data-solver="solve_proj" class="default-value" data-default="20">
       </div>
       <div class="field">
         <label>launch angle θ</label>
-        <input type="number" id="angle" step="any" value="45">
+        <input type="number" id="angle" step="any" value="45" data-solver="solve_proj" class="default-value" data-default="45">
       </div>
       <div class="field">
         <label>initial height h0 (m)</label>
-        <input type="number" id="h0" step="any" value="0">
+        <input type="number" id="h0" step="any" value="0" data-solver="solve_proj" class="default-value" data-default="0">
       </div>
       <div class="field">
         <label>gravity g</label>
-        <input type="number" id="grav" step="any" value="9.81">
+        <input type="number" id="grav" step="any" value="9.81" data-solver="solve_proj" class="default-value" data-default="9.81">
       </div>
 
-      <button class="btn-primary" onclick="solve_proj()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -68,6 +67,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="projectile.js"></script>
 </body>
 </html>

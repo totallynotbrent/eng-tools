@@ -1,5 +1,5 @@
 <!doctype html>
-<!--?xml version="1.0" encoding="UTF-8"?--><html lang="en">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -33,11 +33,11 @@
       <h2>closed system</h2>
       <div class="field">
         <label>mass m (kg)</label>
-        <input type="number" id="m" step="any" value="2">
+        <input type="number" id="m" step="any" value="2" data-solver="solve_closed" class="default-value" data-default="2">
       </div>
       <div class="field">
         <label>energy change mode</label>
-        <select id="emode" onchange="emode_ui()">
+        <select id="emode" onchange="emode_ui()" data-solver="solve_closed">
           <option value="u">internal energies u1, u2</option>
           <option value="gas">ideal gas cv, T1, T2</option>
         </select>
@@ -45,74 +45,72 @@
       <div id="fields_u">
         <div class="field">
           <label>u1 (kJ/kg)</label>
-          <input type="number" id="u1" step="any" value="200">
+          <input type="number" id="u1" step="any" value="200" data-solver="solve_closed" class="default-value" data-default="200">
         </div>
         <div class="field">
           <label>u2 (kJ/kg)</label>
-          <input type="number" id="u2" step="any" value="250">
+          <input type="number" id="u2" step="any" value="250" data-solver="solve_closed" class="default-value" data-default="250">
         </div>
       </div>
       <div id="fields_gas" style="display:none">
         <div class="field">
           <label>cv</label>
-          <input type="number" id="cv" step="any" value="0.718">
+          <input type="number" id="cv" step="any" value="0.718" data-solver="solve_closed" class="default-value" data-default="0.718">
         </div>
         <div class="field">
           <label>T1 (K)</label>
-          <input type="number" id="t1" step="any" value="300">
+          <input type="number" id="t1" step="any" value="300" data-solver="solve_closed" class="default-value" data-default="300">
         </div>
         <div class="field">
           <label>T2 (K)</label>
-          <input type="number" id="t2" step="any" value="500">
+          <input type="number" id="t2" step="any" value="500" data-solver="solve_closed" class="default-value" data-default="500">
         </div>
       </div>
       <div class="field">
         <label>heat Q (leave blank to solve) (kJ)</label>
-        <input type="number" id="q" step="any" value="130">
+        <input type="number" id="q" step="any" value="130" data-solver="solve_closed" class="default-value" data-default="130">
       </div>
       <div class="field">
         <label>work W (leave blank to solve) (kJ)</label>
-        <input type="number" id="w" step="any" value="30">
+        <input type="number" id="w" step="any" value="30" data-solver="solve_closed" class="default-value" data-default="30">
       </div>
-      <button class="btn-primary" onclick="solve_closed()">solve</button>
-    </div>
+      </div>
 <div class="section calc-section" id="panel_flow" style="display:none">
       <h2>steady flow</h2>
       <div class="field">
         <label>h1, h2</label>
         <div class="row">
-          <input type="number" id="h1" step="any" value="300">
-          <input type="number" id="h2" step="any" value="500">
+          <input type="number" id="h1" step="any" value="300" data-solver="solve_flow" class="default-value" data-default="300">
+          <input type="number" id="h2" step="any" value="500" data-solver="solve_flow" class="default-value" data-default="500">
         </div>
       </div>
       <div class="field">
         <label>velocity V1, V2</label>
         <div class="row">
-          <input type="number" id="v1" step="any" value="10">
-          <input type="number" id="v2" step="any" value="20">
+          <input type="number" id="v1" step="any" value="10" data-solver="solve_flow" class="default-value" data-default="10">
+          <input type="number" id="v2" step="any" value="20" data-solver="solve_flow" class="default-value" data-default="20">
         </div>
       </div>
       <div class="field">
         <label>elevation z1, z2</label>
         <div class="row">
-          <input type="number" id="z1" step="any" value="0">
-          <input type="number" id="z2" step="any" value="5">
+          <input type="number" id="z1" step="any" value="0" data-solver="solve_flow" class="default-value" data-default="0">
+          <input type="number" id="z2" step="any" value="5" data-solver="solve_flow" class="default-value" data-default="5">
         </div>
       </div>
       <div class="field">
         <label>gravity g</label>
-        <input type="number" id="g" value="9.81" step="any">
+        <input type="number" id="g" value="9.81" step="any" data-solver="solve_flow" class="default-value" data-default="9.81">
       </div>
       <div class="field">
         <label>heat q (leave blank to solve) (kJ/kg)</label>
-        <input type="number" id="qf" step="any">
+        <input type="number" id="qf" step="any" data-solver="solve_flow">
       </div>
       <div class="field">
         <label>work w (leave blank to solve) (kJ/kg)</label>
-        <input type="number" id="wf" step="any" value="0">
+        <input type="number" id="wf" step="any" value="0" data-solver="solve_flow" class="default-value" data-default="0">
       </div>
-      <button class="btn-primary" onclick="solve_flow()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -141,6 +139,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="energy-balance.js"></script>
 </body>
 </html>

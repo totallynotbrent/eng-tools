@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">\tan\theta = \frac{2\cot\beta\left(M_1^2\sin^2\beta - 1\right)}{M_1^2\left(\gamma + \cos 2\beta\right) + 2}</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-polar"></div>
       </section>
@@ -25,30 +27,27 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">\tan\theta = \frac{2\cot\beta\left(M_1^2\sin^2\beta - 1\right)}{M_1^2\left(\gamma + \cos 2\beta\right) + 2}</div>
-
       <div class="field">
         <label>upstream mach M1</label>
-        <input type="number" id="m1" step="any" value="2.5">
+        <input type="number" id="m1" step="any" value="2.5" data-solver="solve_oblique" class="default-value" data-default="2.5">
       </div>
       <div class="field">
         <label>deflection angle θ (deg)</label>
-        <input type="number" id="theta" step="any" value="15">
+        <input type="number" id="theta" step="any" value="15" data-solver="solve_oblique" class="default-value" data-default="15">
       </div>
       <div class="field">
         <label>ratio of specific heats γ (optional)</label>
-        <input type="number" id="gamma" step="any" placeholder="1.4" value="1.4">
+        <input type="number" id="gamma" step="any" placeholder="1.4" value="1.4" data-solver="solve_oblique" class="default-value" data-default="1.4">
       </div>
       <div class="field">
         <label>solution branch</label>
-        <select id="branch">
+        <select id="branch" data-solver="solve_oblique">
           <option value="weak">weak (supersonic downstream)</option>
           <option value="strong">strong (subsonic downstream)</option>
         </select>
       </div>
 
-      <button class="btn-primary" onclick="solve_oblique()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -71,6 +70,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="oblique-shock.js"></script>
 </body>
 </html>

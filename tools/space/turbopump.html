@@ -32,54 +32,53 @@
       <h2>pump</h2>
       <div class="field">
         <label>mass flow mdot (kg/s)</label>
-        <input type="number" id="p_mdot" step="any" value="536">
+        <input type="number" id="p_mdot" step="any" value="536" data-solver="solve_tp" class="default-value" data-default="536">
       </div>
       <div class="field">
         <label>density rho</label>
-        <input type="number" id="p_rho" step="any" value="1141">
+        <input type="number" id="p_rho" step="any" value="1141" data-solver="solve_tp" class="default-value" data-default="1141">
       </div>
       <div class="field">
         <label>outlet pressure and tank pressure (MPa)</label>
         <div class="row">
-          <input type="number" id="p_out" step="any" value="43">
-          <input type="number" id="p_in" step="any" value="0.2">
+          <input type="number" id="p_out" step="any" value="43" data-solver="solve_tp" class="default-value" data-default="43">
+          <input type="number" id="p_in" step="any" value="0.2" data-solver="solve_tp" class="default-value" data-default="0.2">
         </div>
       </div>
       <div class="field">
         <label>measured pump power (optional)</label>
-        <input type="number" id="p_meas" step="any" value="8.5">
+        <input type="number" id="p_meas" step="any" value="8.5" data-solver="solve_tp" class="default-value" data-default="8.5">
       </div>
     </div>
 <div class="section calc-section">
       <h2>turbine</h2>
       <div class="field">
         <label>turbine mass flow mdot-t (kg/s)</label>
-        <input type="number" id="t_mdot" step="any" value="510.7">
+        <input type="number" id="t_mdot" step="any" value="510.7" data-solver="solve_tp" class="default-value" data-default="510.7">
       </div>
       <div class="field">
         <label>inlet temperature T-t (K)</label>
-        <input type="number" id="t_temp" step="any" value="760">
+        <input type="number" id="t_temp" step="any" value="760" data-solver="solve_tp" class="default-value" data-default="760">
       </div>
       <div class="field">
         <label>gas cp and gamma</label>
         <div class="row">
-          <input type="number" id="t_cp" step="any" value="1.0864">
-          <input type="number" id="t_gam" step="any" value="1.3225">
+          <input type="number" id="t_cp" step="any" value="1.0864" data-solver="solve_tp" class="default-value" data-default="1.0864">
+          <input type="number" id="t_gam" step="any" value="1.3225" data-solver="solve_tp" class="default-value" data-default="1.3225">
         </div>
       </div>
       <div class="field">
         <label>inlet pressure and exit pressure (MPa)</label>
         <div class="row">
-          <input type="number" id="t_pin" step="any" value="61.1">
-          <input type="number" id="t_pout" step="any" value="43">
+          <input type="number" id="t_pin" step="any" value="61.1" data-solver="solve_tp" class="default-value" data-default="61.1">
+          <input type="number" id="t_pout" step="any" value="43" data-solver="solve_tp" class="default-value" data-default="43">
         </div>
       </div>
       <div class="field">
         <label>measured turbine power (optional)</label>
-        <input type="number" id="t_meas" step="any" value="31.0">
+        <input type="number" id="t_meas" step="any" value="31.0" data-solver="solve_tp" class="default-value" data-default="31.0">
       </div>
-      <button class="btn-primary" onclick="solve_tp()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -102,6 +101,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="turbopump.js"></script>
 </body>
 </html>

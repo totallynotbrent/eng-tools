@@ -36,7 +36,7 @@ N_j &amp;= a_x \textstyle\sum_{i\ \mathrm{above}\ j} m_i + \textstyle\sum_{i\ \m
         <label>segments: mass kg, base diameter m, tip diameter m, length m, max-q mass kg (optional)</label>
         <textarea id="segs" rows="6" placeholder="145000 4 4 12 72500
 2100 4 3 3
-56500 3 3 8">145000 4 4 12 72500
+56500 3 3 8" data-solver="solve_loads">145000 4 4 12 72500
 2100 4 3 3
 56500 3 3 8
 994 3 2 2
@@ -45,24 +45,24 @@ N_j &amp;= a_x \textstyle\sum_{i\ \mathrm{above}\ j} m_i + \textstyle\sum_{i\ \m
       </div>
       <div class="field">
         <label>dynamic pressure q (blank skips flight loads) (Pa)</label>
-        <input type="number" id="q" step="any" value="40530">
+        <input type="number" id="q" step="any" value="40530" data-solver="solve_loads" class="default-value" data-default="40530">
       </div>
       <div class="field">
         <label>angle of attack alpha</label>
-        <input type="number" id="alpha" step="any" value="9.34882">
+        <input type="number" id="alpha" step="any" value="9.34882" data-solver="solve_loads" class="default-value" data-default="9.34882">
       </div>
       <div class="field">
         <label>axial acceleration at liftoff and max-q, in g</label>
         <div class="row">
-          <input type="number" id="ax_lo" step="any" value="2">
-          <input type="number" id="ax_mq" step="any" value="2">
+          <input type="number" id="ax_lo" step="any" value="2" data-solver="solve_loads" class="default-value" data-default="2">
+          <input type="number" id="ax_mq" step="any" value="2" data-solver="solve_loads" class="default-value" data-default="2">
         </div>
       </div>
       <div class="field">
         <label>aero coefficients: CN-alpha per radian, CD (blank = cylinder drag 0.7)</label>
         <textarea id="coefs" rows="6" placeholder="0 0.7
 1.4 0.036
-0 0.7">0 0.7
+0 0.7" data-solver="solve_loads">0 0.7
 1.4 0.036111
 0 0.7
 1.45 0.09375
@@ -72,12 +72,11 @@ N_j &amp;= a_x \textstyle\sum_{i\ \mathrm{above}\ j} m_i + \textstyle\sum_{i\ \m
       <div class="field">
         <label>ground wind: air density and gust factor</label>
         <div class="row">
-          <input type="number" id="g_rho" step="any" value="1.208">
-          <input type="number" id="g_gust" step="any" value="2.85">
+          <input type="number" id="g_rho" step="any" value="1.208" data-solver="solve_loads" class="default-value" data-default="1.208">
+          <input type="number" id="g_gust" step="any" value="2.85" data-solver="solve_loads" class="default-value" data-default="2.85">
         </div>
       </div>
-      <button class="btn-primary" onclick="solve_loads()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -98,6 +97,7 @@ N_j &amp;= a_x \textstyle\sum_{i\ \mathrm{above}\ j} m_i + \textstyle\sum_{i\ \m
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="launch-loads.js"></script>
 </body>
 </html>

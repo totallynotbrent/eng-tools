@@ -25,8 +25,6 @@
 const el = document.getElementById("fig-isentropic");
 const note = document.getElementById("fig-isentropic-note");
 if (!el || !window.fig) return;
-const seed = function (id, v) { const e = document.getElementById(id); if (e && e.value.trim() === "") e.value = v; };
-seed("mach", 1);
 const scratch = document.createElement("div");
 scratch.id = "fig-isentropic-scratch";
 const out = fig.sweep(scratch, {

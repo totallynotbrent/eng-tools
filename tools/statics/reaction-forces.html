@@ -1,5 +1,5 @@
 <!doctype html>
-<!--?xml version="1.0" encoding="UTF-8"?--><html lang="en">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">\sum M_A = 0, \qquad \sum F_y = 0</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-react"></div>
       </section>
@@ -25,44 +27,41 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">\sum M_A = 0, \qquad \sum F_y = 0</div>
-
       <div class="field">
         <label>span L (m)</label>
-        <input type="number" id="len" step="any" value="10">
+        <input type="number" id="len" step="any" value="10" data-solver="solve_reactions" class="default-value" data-default="10">
       </div>
 
       <div class="field">
         <label>point load 1 (magnitude, distance from A)</label>
         <div class="row">
-          <input type="number" id="p1" step="any" value="0">
-          <input type="number" id="x1" step="any" value="0">
+          <input type="number" id="p1" step="any" value="0" data-solver="solve_reactions" class="default-value" data-default="0">
+          <input type="number" id="x1" step="any" value="0" data-solver="solve_reactions" class="default-value" data-default="0">
         </div>
       </div>
 
       <div class="field">
         <label>point load 2</label>
         <div class="row">
-          <input type="number" id="p2" step="any" value="0">
-          <input type="number" id="x2" step="any" value="3">
+          <input type="number" id="p2" step="any" value="0" data-solver="solve_reactions" class="default-value" data-default="0">
+          <input type="number" id="x2" step="any" value="3" data-solver="solve_reactions" class="default-value" data-default="3">
         </div>
       </div>
 
       <div class="field">
         <label>point load 3</label>
         <div class="row">
-          <input type="number" id="p3" step="any" value="0">
-          <input type="number" id="x3" step="any" value="0">
+          <input type="number" id="p3" step="any" value="0" data-solver="solve_reactions" class="default-value" data-default="0">
+          <input type="number" id="x3" step="any" value="0" data-solver="solve_reactions" class="default-value" data-default="0">
         </div>
       </div>
 
       <div class="field">
         <label>uniform distributed load w (full span, optional)</label>
-        <input type="number" id="udl" step="any" value="4">
+        <input type="number" id="udl" step="any" value="4" data-solver="solve_reactions" class="default-value" data-default="4">
       </div>
 
-      <button class="btn-primary" onclick="solve_reactions()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -84,6 +83,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="reaction-forces.js"></script>
 </body>
 </html>

@@ -17,7 +17,9 @@
       <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="cols calc-layout calc-compact">
+    <div class="calc-equation"><div class="eq">\sigma_{\max} = K_t\,\sigma_{\mathrm{nom}}</div>
+
+      </div><div class="cols calc-layout calc-compact">
       <section class="calc-panel calc-fig-panel">
         <div class="figure calc-figure" id="fig-kt"></div>
       </section>
@@ -25,27 +27,24 @@
         <div class="calc-input-area">
 <div class="section calc-section">
 
-      <div class="eq">\sigma_{\max} = K_t\,\sigma_{\mathrm{nom}}</div>
-
       <div class="field">
         <label>nominal stress σ_nom (Pa)</label>
-        <input type="number" id="snom" step="any" value="100000000.0">
+        <input type="number" id="snom" step="any" value="100000000.0" data-solver="solve_kt" class="default-value" data-default="100000000.0">
       </div>
       <div class="field">
         <label>stress concentration factor Kt (enter, or estimate below)</label>
-        <input type="number" id="kt" step="any" value="2.5">
+        <input type="number" id="kt" step="any" value="2.5" data-solver="solve_kt" class="default-value" data-default="2.5">
       </div>
 
       <div class="field">
         <label>for a circular hole: hole diameter d and plate width w (estimates Kt)</label>
         <div class="row">
-          <input type="number" id="d" step="any" value="0.05">
-          <input type="number" id="w" step="any" value="0.1">
+          <input type="number" id="d" step="any" value="0.05" data-solver="solve_kt" class="default-value" data-default="0.05">
+          <input type="number" id="w" step="any" value="0.1" data-solver="solve_kt" class="default-value" data-default="0.1">
         </div>
       </div>
 
-      <button class="btn-primary" onclick="solve_kt()">solve</button>
-    </div>
+      </div>
         </div>
       </section>
       <section class="calc-panel calc-output-panel">
@@ -65,6 +64,7 @@
   <script src="../../js/figures.js"></script>
   <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
+  <script src="../../js/autosolve.js"></script>
   <script src="stress-concentration.js"></script>
 </body>
 </html>

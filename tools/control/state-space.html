@@ -5,101 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>state space analysis</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>state space analysis</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
-
-    <p class="muted">eigenvalues, controllability, and stability of a state space system.</p>
-
-    <div class="eq">\dot{x} = A x + B u, \qquad \det(sI - A) = 0</div>
-
-    <div class="section">
+    <div class="calc-equation">
+<div class="eq">\dot{x} = A x + B u, \qquad \det(sI - A) = 0</div>
+    </div>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-splane"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
       <div class="field">
         <label>matrix size n (2 or 3)</label>
-        <input type="number" id="n" step="1" min="2" max="3" placeholder="2 or 3">
+        <input type="number" id="n" step="1" min="2" max="3" value="2">
       </div>
       <div class="field">
         <label>A rows, semicolon separated</label>
-        <input type="text" id="a_mat" placeholder="e.g. 0 1; -2 -3">
+        <input type="text" id="a_mat" value="0 1; 0 0">
       </div>
       <div class="field">
         <label>B rows, semicolon separated</label>
-        <input type="text" id="b_mat" placeholder="e.g. 0; 1">
+        <input type="text" id="b_mat" value="1; 0">
       </div>
-      <button onclick="solve_ss()">solve</button>
-      <div class="note">eigenvalues from the characteristic polynomial, controllability by rank of [B AB ...].</div>
+      <button class="btn-primary" onclick="solve_ss()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="4">
+          <div class="result-line"><span class="label">characteristic polynomial</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">eigenvalues</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">stability</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">controllability rank</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    // parse "a b; c d" into a matrix
-    function parse_matrix(t) {
-      const rows = t.split(";").map(function (r) {
-        return r.trim().split(/[\s,]+/).filter(Boolean).map(parseFloat);
-      });
-      if (rows.some(function (r) { return r.some(isNaN); })) return null;
-      return rows;
-    }
-
-    function solve_ss() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const n = parseInt(document.getElementById("n").value, 10);
-      const a = parse_matrix(document.getElementById("a_mat").value);
-      const b = parse_matrix(document.getElementById("b_mat").value);
-      if (n !== 2 && n !== 3) { err.textContent = "n must be 2 or 3"; return; }
-      if (!a || a.length !== n || a.some(function (r) { return r.length !== n; })) { err.textContent = "A must be " + n + "x" + n; return; }
-      if (!b || b.length !== n || b.some(function (r) { return r.length !== 1; })) { err.textContent = "B must be " + n + "x1"; return; }
-
-      // eigenvalues from the characteristic polynomial
-      const cp = charpoly(a);
-      const eig = polyroots(cp);
-
-      // controllability matrix [B AB A^2B ...]
-      const cols = [];
-      let v = b;
-      for (let k = 0; k < n; k++) {
-        cols.push(v.map(function (r) { return r[0]; }));
-        v = matvec(a, v.map(function (r) { return r[0]; })).map(function (x) { return [x]; });
-      }
-      const ctrb = [];
-      for (let i = 0; i < n; i++) {
-        ctrb.push([]);
-        for (let j = 0; j < n; j++) ctrb[i].push(cols[j][i]);
-      }
-      const rank = matrank(ctrb);
-      const stable = eig.every(function (r) { return r[0] < -1e-9; });
-
-      const lines = [];
-      lines.push(["characteristic polynomial", poly_str(cp)]);
-      lines.push(["eigenvalues", eig.map(function (r) {
-        if (Math.abs(r[1]) < 1e-8) return fmt(r[0], 4);
-        return fmt(r[0], 4) + (r[1] >= 0 ? " + " : " &minus; ") + fmt(Math.abs(r[1]), 4) + "j";
-      }).join(", ")]);
-      lines.push(["stability", stable ? "asymptotically stable" : "not asymptotically stable"]);
-      lines.push(["controllability rank", rank + " of " + n + (rank === n ? ", controllable" : ", not controllable")]);
-
-      render_lines("lines", lines);
-      document.getElementById("results").style.display = "";
-    }
-  </script>
+  <script src="state-space.js"></script>
 </body>
 </html>

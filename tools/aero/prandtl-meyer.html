@@ -5,84 +5,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>prandtl-meyer expansion</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>prandtl-meyer expansion</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">mach number through a centered expansion fan from entry mach and deflection angle.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-pm"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">\nu(M) = \sqrt{\tfrac{\gamma+1}{\gamma-1}}\,\tan^{-1}\sqrt{\tfrac{\gamma-1}{\gamma+1}\left(M^2-1\right)} - \tan^{-1}\sqrt{M^2-1}</div>
 
       <div class="field">
         <label>entry mach M1</label>
-        <input type="number" id="m1" step="any" placeholder="M1">
+        <input type="number" id="m1" step="any" value="2">
       </div>
       <div class="field">
-        <label>deflection angle &theta; (deg, positive = expansion)</label>
-        <input type="number" id="theta" step="any" placeholder="&deg;">
+        <label>deflection angle θ (deg, positive = expansion)</label>
+        <input type="number" id="theta" step="any" value="10">
       </div>
       <div class="field">
-        <label>ratio of specific heats &gamma; (optional)</label>
-        <input type="number" id="gamma" step="any" placeholder="1.4">
+        <label>ratio of specific heats γ (optional)</label>
+        <input type="number" id="gamma" step="any" placeholder="1.4" value="1.4">
       </div>
 
-      <button onclick="solve_pm()">solve</button>
+      <button class="btn-primary" onclick="solve_pm()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="3">
+          <div class="result-line"><span class="label">entry ν(M1)</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">exit ν(M2)</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">exit mach M2</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function prandtl_meyer(m, g) {
-      const k = Math.sqrt((g + 1) / (g - 1));
-      const m2m1 = Math.sqrt(m * m - 1);
-      return k * Math.atan(m2m1 / k) - Math.atan(m2m1);
-    }
-
-    function solve_pm() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const m1 = val("m1"), theta_deg = val("theta"), g = val("gamma") || 1.4;
-      if (m1 === null || theta_deg === null) { err.textContent = "fill M1 and theta"; return; }
-      if (m1 < 1) { err.textContent = "expansion needs supersonic M1 >= 1"; return; }
-      if (g <= 1) { err.textContent = "gamma must be greater than 1"; return; }
-
-      const nu1 = prandtl_meyer(m1, g);
-      const nu2 = nu1 + theta_deg * Math.PI / 180;
-      const nu_max = (Math.PI / 2) * (Math.sqrt((g + 1) / (g - 1)) - 1);
-      if (nu2 < 0 || nu2 > nu_max) { err.textContent = "deflection pushes past the vacuum limit"; return; }
-
-      // invert nu(m) with bisection on mach from 1 to a large cap
-      let lo = 1.0001, hi = 50;
-      for (let i = 0; i < 80; i++) {
-        const mid = (lo + hi) / 2;
-        if (prandtl_meyer(mid, g) < nu2) lo = mid; else hi = mid;
-      }
-      const m2 = (lo + hi) / 2;
-
-      render_lines("lines", [
-        ["entry &nu;(M1)", fmt(nu1 * 180 / Math.PI, 6) + " &deg;"],
-        ["exit &nu;(M2)", fmt(nu2 * 180 / Math.PI, 6) + " &deg;"],
-        ["exit mach M2", fmt(m2, 6)]
-      ]);
-    }
-  </script>
+  <script src="prandtl-meyer.js"></script>
 </body>
 </html>

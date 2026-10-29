@@ -5,25 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>resistors and capacitors</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>resistors and capacitors</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">series and parallel equivalents for a list of values.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-equivalents"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">R_s = R_1 + R_2 + \cdots, \qquad \frac{1}{R_p} = \frac{1}{R_1} + \frac{1}{R_2} + \cdots</div>
 
       <div class="field">
         <label>values</label>
-        <input type="text" id="values" placeholder="10, 20, 30">
+        <input type="text" id="values" value="10, 20, 30">
       </div>
 
       <div class="field">
@@ -42,49 +48,27 @@
         </select>
       </div>
 
-      <button onclick="solve_equiv()">solve</button>
-      <div class="note">capacitors combine opposite to resistors: series adds reciprocals, parallel just sums.</div>
+      <button class="btn-primary" onclick="solve_equiv()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="2">
+          <div class="result-line"><span class="label">equivalent resistance</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">equivalent capacitance</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_equiv() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const raw = document.getElementById("values").value;
-      const nums = raw.split(/[\s,]+/).filter(function (t) { return t !== ""; }).map(parseFloat);
-      if (!nums.length || nums.some(function (n) { return !isFinite(n); })) {
-        err.textContent = "enter a list of numbers";
-        return;
-      }
-      if (nums.some(function (n) { return n <= 0; })) { err.textContent = "values must be positive"; return; }
-
-      const elem = document.getElementById("elem").value;
-      const conn = document.getElementById("conn").value;
-
-      let eq;
-      if (elem === "r") {
-        if (conn === "series") eq = nums.reduce(function (a, b) { return a + b; }, 0);
-        else eq = 1 / nums.reduce(function (a, b) { return a + 1 / b; }, 0);
-      } else {
-        if (conn === "parallel") eq = nums.reduce(function (a, b) { return a + b; }, 0);
-        else eq = 1 / nums.reduce(function (a, b) { return a + 1 / b; }, 0);
-      }
-
-      const unit = elem === "r" ? " &Omega;" : " F";
-      render_lines("lines", [["equivalent " + (elem === "r" ? "resistance" : "capacitance"), fmt(eq, 6) + unit]]);
-    }
-  </script>
+  <script src="resistors.js"></script>
 </body>
 </html>

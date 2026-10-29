@@ -5,19 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>thrust coefficient and c*</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>thrust coefficient and c*</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">characteristic velocity c* and nozzle thrust coefficient Cf from chamber conditions and the pressure ratio.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-cf"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">c^* = \frac{\sqrt{\gamma R T_0}}{\Gamma}</div>
       <div class="eq">C_F = \sqrt{\frac{2\gamma^2}{\gamma-1}\left(\frac{2}{\gamma+1}\right)^{(\gamma+1)/(\gamma-1)}\left[1 - \left(\frac{p_e}{p_c}\right)^{(\gamma-1)/\gamma}\right]} + \frac{(p_e - p_a)\, A_e}{p_c A_t}</div>
@@ -25,77 +31,49 @@
       <div class="field">
         <label>chamber pressure pc and exit pressure pe</label>
         <div class="row">
-          <input type="number" id="pc" step="any" placeholder="pc">
-          <input type="number" id="pe" step="any" placeholder="pe">
+          <input type="number" id="pc" step="any" value="100">
+          <input type="number" id="pe" step="any" value="1">
         </div>
       </div>
       <div class="field">
         <label>ambient pressure pa (for Cf; 0 = vacuum)</label>
-        <input type="number" id="pa" step="any" placeholder="pa" value="0">
+        <input type="number" id="pa" step="any" value="0">
       </div>
       <div class="field">
         <label>chamber temperature T0 and gas constant R</label>
         <div class="row">
-          <input type="number" id="t0" step="any" placeholder="T0 (K)">
-          <input type="number" id="rg" step="any" placeholder="R (J/kgK)">
+          <input type="number" id="t0" step="any" value="3500">
+          <input type="number" id="rg" step="any" value="375">
         </div>
       </div>
       <div class="field">
-        <label>ratio of specific heats &gamma; (optional)</label>
-        <input type="number" id="gamma" step="any" placeholder="1.2">
+        <label>ratio of specific heats γ (optional)</label>
+        <input type="number" id="gamma" step="any" placeholder="1.2" value="1.2">
       </div>
 
-      <button onclick="solve_cf()">solve</button>
+      <button class="btn-primary" onclick="solve_cf()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="4">
+          <div class="result-line"><span class="label">exit mach Me</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">area ratio Ae/At</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">thrust coefficient Cf</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">characteristic velocity c*</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_cf() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const pc = val("pc"), pe = val("pe"), pa = val("pa") || 0, g = val("gamma") || 1.2;
-      if (pc === null || pe === null) { err.textContent = "fill pc and pe"; return; }
-      if (pc <= 0 || pe <= 0 || pc <= pe) { err.textContent = "need pc > pe > 0"; return; }
-      if (g <= 1) { err.textContent = "gamma must be greater than 1"; return; }
-
-      const pr = pc / pe;
-
-      // exit mach and area ratio from the isentropic pressure ratio
-      const me = Math.sqrt((2 / (g - 1)) * (Math.pow(pr, (g - 1) / g) - 1));
-      const term = (2 / (g + 1)) * (1 + (g - 1) / 2 * me * me);
-      const aera_ratio = (1 / me) * Math.pow(term, (g + 1) / (2 * (g - 1)));
-
-      // thrust coefficient: momentum term plus the pressure term
-      const mom = Math.sqrt(2 * g * g / (g - 1) * Math.pow(2 / (g + 1), (g + 1) / (g - 1)) * (1 - Math.pow(pe / pc, (g - 1) / g)));
-      const cf = mom + (pe - pa) / pc * aera_ratio;
-
-      const lines = [
-        ["exit mach Me", fmt(me, 6)],
-        ["area ratio Ae/At", fmt(aera_ratio, 6)],
-        ["thrust coefficient Cf", fmt(cf, 6)]
-      ];
-
-      const t0 = val("t0"), rg = val("rg");
-      if (t0 !== null && rg !== null) {
-        if (t0 <= 0 || rg <= 0) { err.textContent = "T0 and R must be positive"; return; }
-        const Gamma = Math.sqrt(g) * Math.pow(2 / (g + 1), (g + 1) / (2 * (g - 1)));
-        const cstar = Math.sqrt(g * rg * t0) / Gamma;
-        lines.push(["characteristic velocity c*", fmt(cstar, 4) + " m/s"]);
-      }
-
-      render_lines("lines", lines);
-    }
-  </script>
+  <script src="thrust-coefficient.js"></script>
 </body>
 </html>

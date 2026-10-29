@@ -5,154 +5,118 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>inducer design</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>inducer design</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
-
-    <p class="muted">lH2 inducer sizing from tank state to blade angles: NPSH, tip diameter, speed, and head rise.</p>
-
-    <div class="eq">\begin{aligned}
-\mathrm{NPSH}_{min} &= \frac{P_1 - P_v}{\rho g}, \quad \mathrm{NPSH}_c = \frac{\mathrm{NPSH}_{min}}{1+M} \\\\
-c_m &= \sqrt{\frac{2g\,\mathrm{NPSH}_c}{A}}, \quad \phi = \frac{c_m}{U_t}, \quad N = \frac{60 U_t}{\pi D_t}
+    <div class="calc-equation">
+<div class="eq">\begin{aligned}
+\mathrm{NPSH}_{min} &amp;= \frac{P_1 - P_v}{\rho g}, \quad \mathrm{NPSH}_c = \frac{\mathrm{NPSH}_{min}}{1+M} \\\\
+c_m &amp;= \sqrt{\frac{2g\,\mathrm{NPSH}_c}{A}}, \quad \phi = \frac{c_m}{U_t}, \quad N = \frac{60 U_t}{\pi D_t}
 \end{aligned}</div>
-
-    <div class="section">
+    </div>
+    <div class="cols calc-layout">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-inducer"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
       <div class="field">
-        <label>mass flow mdot</label>
-        <input type="number" id="mdot" step="any" placeholder="kg/s">
+        <label>mass flow mdot (kg/s)</label>
+        <input type="number" id="mdot" step="any" value="3">
       </div>
       <div class="field">
         <label>liquid density rho</label>
-        <input type="number" id="rho" step="any" placeholder="kg/m&sup3;">
+        <input type="number" id="rho" step="any" value="71.265">
       </div>
       <div class="field">
-        <label>vapor pressure Pv</label>
-        <input type="number" id="pv" step="any" placeholder="kPa">
+        <label>vapor pressure Pv (kPa)</label>
+        <input type="number" id="pv" step="any" value="90.717">
       </div>
       <div class="field">
-        <label>tank pressure Ptank</label>
-        <input type="number" id="ptank" step="any" placeholder="MPa">
+        <label>tank pressure Ptank (MPa)</label>
+        <input type="number" id="ptank" step="any" value="0.2">
       </div>
       <div class="field">
-        <label>feed line loss and tank height</label>
+        <label>feed line loss and tank height (kPa) (m)</label>
         <div class="row">
-          <input type="number" id="dpf" step="any" placeholder="kPa">
-          <input type="number" id="z" step="any" placeholder="m">
+          <input type="number" id="dpf" step="any" value="35">
+          <input type="number" id="z" step="any" value="2">
         </div>
       </div>
       <div class="field">
         <label>NPSH margin M (fraction)</label>
-        <input type="number" id="marg" step="any" placeholder="e.g. 0.20">
+        <input type="number" id="marg" step="any" value="0.2">
       </div>
       <div class="field">
         <label>hub-to-tip ratio Dh/Dt</label>
-        <input type="number" id="dht" step="any" placeholder="e.g. 0.30">
+        <input type="number" id="dht" step="any" value="0.3">
       </div>
       <div class="field">
         <label>flow coefficient phi</label>
-        <input type="number" id="phi" step="any" placeholder="e.g. 0.20">
+        <input type="number" id="phi" step="any" value="0.2">
       </div>
       <div class="field">
         <label>impeller suction specific speed Nss (rpm, gpm, ft)</label>
-        <input type="number" id="nss" step="any" placeholder="e.g. 5000">
+        <input type="number" id="nss" step="any" value="5000">
       </div>
       <div class="field">
         <label>incidence angle i (deg)</label>
-        <input type="number" id="inc" step="any" placeholder="e.g. 5">
+        <input type="number" id="inc" step="any" value="5">
       </div>
       <div class="field">
         <label>inducer efficiency eta</label>
-        <input type="number" id="eta" step="any" placeholder="e.g. 0.8">
+        <input type="number" id="eta" step="any" value="0.8">
       </div>
       <div class="field">
         <label>velocity coefficient A (1 for hydrogen)</label>
-        <input type="number" id="acoeff" step="any" placeholder="e.g. 1">
+        <input type="number" id="acoeff" step="any" value="1">
       </div>
-      <button onclick="solve_inducer()">solve</button>
-      <div class="note">suction specific speeds use the huang and huzel us-unit convention: rpm, gpm, and feet of head.</div>
+      <button class="btn-primary" onclick="solve_inducer()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="18">
+          <div class="result-line"><span class="label">volumetric flow Q</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">inducer eye pressure P1</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">minimum NPSH available</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">corrected NPSH</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">inlet axial velocity cm</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">tip diameter Dt</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">hub diameter Dh</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">tip speed Ut</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">shaft speed N</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">inducer suction specific speed</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">impeller NPSH required</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">inducer head rise</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">head coefficient psi</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">inlet flow angle alpha</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">tip blade angle beta-1t</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">hub blade angle beta-1h</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">exit tangential velocity cu2</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">tip blade angle beta-2t</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_inducer() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const mdot = val("mdot"), rho = val("rho"), pv = val("pv"), ptank = val("ptank");
-      const dpf = val("dpf"), z = val("z"), marg = val("marg"), dht = val("dht");
-      const phi = val("phi"), nss = val("nss"), inc = val("inc"), eta = val("eta"), acoeff = val("acoeff");
-      const g = 9.81, m2ft = 3.28084;
-
-      if (mdot === null || rho === null || pv === null || ptank === null || dpf === null || z === null ||
-          marg === null || dht === null || phi === null || nss === null || inc === null || eta === null || acoeff === null) {
-        err.textContent = "fill every field"; return;
-      }
-      if (rho <= 0 || mdot <= 0 || phi <= 0 || nss <= 0 || eta <= 0 || acoeff <= 0 || dht >= 1) {
-        err.textContent = "check the physical ranges (Dh/Dt must be under 1)"; return;
-      }
-
-      const q_vol = mdot / rho;
-      const q_gpm = q_vol * 264.172 * 60;
-      const p1 = ptank * 1e6 + rho * g * z - dpf * 1e3;
-      const npsh_min = (p1 - pv * 1e3) / (rho * g);
-      if (npsh_min <= 0) { err.textContent = "inducer eye pressure is below vapor pressure"; return; }
-      const npsh_c = npsh_min / (1 + marg);
-      const cm = Math.sqrt(2 * g * npsh_c / acoeff);
-      const a1 = q_vol / cm;
-      const dt = Math.sqrt(4 * a1 / Math.PI / (1 - dht * dht));
-      const dh = dht * dt;
-      const ut = cm / phi;
-      const n_rpm = 60 * ut / (Math.PI * dt);
-      const npsh_c_ft = npsh_c * m2ft;
-      const nss_ind = n_rpm * Math.sqrt(q_gpm) / Math.pow(npsh_c_ft, 0.75);
-      const npsh_i_ft = Math.pow(n_rpm * Math.sqrt(q_gpm) / nss, 4 / 3);
-      const npsh_i = npsh_i_ft / m2ft;
-      const dh_ind = npsh_i - npsh_min;
-      const psi = dh_ind * g / (ut * ut);
-      const alpha_i = Math.atan(phi) * 180 / Math.PI;
-      const beta_1t = alpha_i + inc;
-      const beta_1h = Math.atan(Math.tan(beta_1t * Math.PI / 180) / dht) * 180 / Math.PI;
-      const cu2 = g * dh_ind / (eta * ut);
-      const beta_2t = Math.atan(cm / (ut - cu2)) * 180 / Math.PI;
-
-      render_lines("lines", [
-        ["volumetric flow Q", fmt(q_vol, 6) + " m&sup3;/s (" + fmt(q_gpm, 6) + " gpm)"],
-        ["inducer eye pressure P1", fmt(p1 / 1e3, 6) + " kPa"],
-        ["minimum NPSH available", fmt(npsh_min, 6) + " m"],
-        ["corrected NPSH", fmt(npsh_c, 6) + " m"],
-        ["inlet axial velocity cm", fmt(cm, 6) + " m/s"],
-        ["tip diameter Dt", fmt(dt * 1000, 6) + " mm"],
-        ["hub diameter Dh", fmt(dh * 1000, 6) + " mm"],
-        ["tip speed Ut", fmt(ut, 6) + " m/s"],
-        ["shaft speed N", fmt(n_rpm, 6) + " rpm"],
-        ["inducer suction specific speed", fmt(nss_ind, 6)],
-        ["impeller NPSH required", fmt(npsh_i, 6) + " m"],
-        ["inducer head rise", fmt(dh_ind, 6) + " m"],
-        ["head coefficient psi", fmt(psi, 6)],
-        ["inlet flow angle alpha", fmt(alpha_i, 6) + "&deg;"],
-        ["tip blade angle beta-1t", fmt(beta_1t, 6) + "&deg;"],
-        ["hub blade angle beta-1h", fmt(beta_1h, 6) + "&deg;"],
-        ["exit tangential velocity cu2", fmt(cu2, 6) + " m/s"],
-        ["tip blade angle beta-2t", fmt(beta_2t, 6) + "&deg;"]
-      ]);
-    }
-  </script>
+  <script src="inducer.js"></script>
 </body>
 </html>

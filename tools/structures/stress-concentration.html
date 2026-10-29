@@ -5,78 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>stress concentration</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>stress concentration</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">peak stress at a hole or fillet from the nominal stress and a stress concentration factor.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-kt"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">\sigma_{\max} = K_t\,\sigma_{\mathrm{nom}}</div>
 
       <div class="field">
-        <label>nominal stress &sigma;_nom</label>
-        <input type="number" id="snom" step="any" placeholder="Pa">
+        <label>nominal stress σ_nom (Pa)</label>
+        <input type="number" id="snom" step="any" value="100000000.0">
       </div>
       <div class="field">
         <label>stress concentration factor Kt (enter, or estimate below)</label>
-        <input type="number" id="kt" step="any" placeholder="dimensionless">
+        <input type="number" id="kt" step="any" value="2.5">
       </div>
 
       <div class="field">
         <label>for a circular hole: hole diameter d and plate width w (estimates Kt)</label>
         <div class="row">
-          <input type="number" id="d" step="any" placeholder="d">
-          <input type="number" id="w" step="any" placeholder="w">
+          <input type="number" id="d" step="any" value="0.05">
+          <input type="number" id="w" step="any" value="0.1">
         </div>
       </div>
 
-      <button onclick="solve_kt()">solve</button>
+      <button class="btn-primary" onclick="solve_kt()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="2">
+          <div class="result-line"><span class="label">stress concentration Kt</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">peak stress σ_max</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_kt() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const snom = val("snom");
-      let kt = val("kt");
-
-      const d = val("d"), w = val("w");
-      if (d !== null && w !== null) {
-        if (w <= 0 || d <= 0 || d >= w) { err.textContent = "need 0 < d < w"; return; }
-        const r = d / w;
-        // peterson's fit for a circular hole in an infinite-width plate, widened for finite width
-        kt = 3 - 3.13 * r + 3.66 * r * r - 1.53 * r * r * r;
-      }
-
-      if (snom === null) { err.textContent = "enter the nominal stress"; return; }
-      if (kt === null) { err.textContent = "give Kt directly or both d and w for the hole"; return; }
-      if (kt < 1) { err.textContent = "Kt must be at least 1"; return; }
-
-      render_lines("lines", [
-        ["stress concentration Kt", fmt(kt, 6)],
-        ["peak stress &sigma;_max", fmt(kt * snom, 6) + " Pa"]
-      ]);
-    }
-  </script>
+  <script src="stress-concentration.js"></script>
 </body>
 </html>

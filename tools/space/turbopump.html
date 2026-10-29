@@ -5,128 +5,103 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>turbopump power balance</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>turbopump power balance</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
-
-    <p class="muted">ideal pump and turbine power from flow, pressures, and gas state, with the efficiency each side implies.</p>
-
-    <div class="eq">\begin{aligned}
-\dot{W}_{pump} &= \frac{\dot{m}\,\Delta P}{\rho} \\\\
-\dot{W}_{turb} &= \dot{m}_t\,C_p\,T_{in}\!\left[1 - \left(\tfrac{P_{out}}{P_{in}}\right)^{(\gamma-1)/\gamma}\right]
+    <div class="calc-equation">
+<div class="eq">\begin{aligned}
+\dot{W}_{pump} &amp;= \frac{\dot{m}\,\Delta P}{\rho} \\\\
+\dot{W}_{turb} &amp;= \dot{m}_t\,C_p\,T_{in}\!\left[1 - \left(\tfrac{P_{out}}{P_{in}}\right)^{(\gamma-1)/\gamma}\right]
 \end{aligned}</div>
-
-    <div class="section">
+    </div>
+    <div class="cols calc-layout">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-turbopump"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area calc-sections-2">
+<div class="section calc-section">
       <h2>pump</h2>
       <div class="field">
-        <label>mass flow mdot</label>
-        <input type="number" id="p_mdot" step="any" placeholder="kg/s">
+        <label>mass flow mdot (kg/s)</label>
+        <input type="number" id="p_mdot" step="any" value="536">
       </div>
       <div class="field">
         <label>density rho</label>
-        <input type="number" id="p_rho" step="any" placeholder="kg/m&sup3;">
+        <input type="number" id="p_rho" step="any" value="1141">
       </div>
       <div class="field">
-        <label>outlet pressure and tank pressure</label>
+        <label>outlet pressure and tank pressure (MPa)</label>
         <div class="row">
-          <input type="number" id="p_out" step="any" placeholder="MPa">
-          <input type="number" id="p_in" step="any" placeholder="MPa">
+          <input type="number" id="p_out" step="any" value="43">
+          <input type="number" id="p_in" step="any" value="0.2">
         </div>
       </div>
       <div class="field">
         <label>measured pump power (optional)</label>
-        <input type="number" id="p_meas" step="any" placeholder="MW">
+        <input type="number" id="p_meas" step="any" value="8.5">
       </div>
     </div>
-
-    <div class="section">
+<div class="section calc-section">
       <h2>turbine</h2>
       <div class="field">
-        <label>turbine mass flow mdot-t</label>
-        <input type="number" id="t_mdot" step="any" placeholder="kg/s">
+        <label>turbine mass flow mdot-t (kg/s)</label>
+        <input type="number" id="t_mdot" step="any" value="510.7">
       </div>
       <div class="field">
-        <label>inlet temperature T-t</label>
-        <input type="number" id="t_temp" step="any" placeholder="K">
+        <label>inlet temperature T-t (K)</label>
+        <input type="number" id="t_temp" step="any" value="760">
       </div>
       <div class="field">
         <label>gas cp and gamma</label>
         <div class="row">
-          <input type="number" id="t_cp" step="any" placeholder="kJ/(kg&middot;K)">
-          <input type="number" id="t_gam" step="any" placeholder="e.g. 1.15">
+          <input type="number" id="t_cp" step="any" value="1.0864">
+          <input type="number" id="t_gam" step="any" value="1.3225">
         </div>
       </div>
       <div class="field">
-        <label>inlet pressure and exit pressure</label>
+        <label>inlet pressure and exit pressure (MPa)</label>
         <div class="row">
-          <input type="number" id="t_pin" step="any" placeholder="MPa">
-          <input type="number" id="t_pout" step="any" placeholder="MPa">
+          <input type="number" id="t_pin" step="any" value="61.1">
+          <input type="number" id="t_pout" step="any" value="43">
         </div>
       </div>
       <div class="field">
         <label>measured turbine power (optional)</label>
-        <input type="number" id="t_meas" step="any" placeholder="MW">
+        <input type="number" id="t_meas" step="any" value="31.0">
       </div>
-      <button onclick="solve_tp()">solve</button>
-      <div class="note">turbine work uses the frozen-flow isentropic expansion; efficiency is measured power divided by ideal power.</div>
+      <button class="btn-primary" onclick="solve_tp()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="5">
+          <div class="result-line"><span class="label">pump volumetric flow Q</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">implied pump efficiency</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">turbine pressure ratio</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">isentropic temperature drop</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">implied turbine efficiency</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_tp() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const pm = val("p_mdot"), pr = val("p_rho"), pout = val("p_out"), pin = val("p_in"), pmeas = val("p_meas");
-      const tm = val("t_mdot"), ttemp = val("t_temp"), tcp = val("t_cp"), tgam = val("t_gam");
-      const tpin = val("t_pin"), tpout = val("t_pout"), tmeas = val("t_meas");
-
-      if (pr === null || pr <= 0 || tm === null || tm <= 0 || ttemp === null || ttemp <= 0 ||
-          tcp === null || tcp <= 0 || tgam === null || tgam <= 1) { err.textContent = "check the pump and turbine inputs"; return; }
-      if (pout === null || pin === null || tpin === null || tpout === null || pm === null) { err.textContent = "fill every pressure and flow field"; return; }
-
-      const lines = [];
-
-      // pump side
-      const dp = (pout - pin) * 1e6;
-      const vol = pm / pr;
-      const wp = pm * dp / pr;
-      lines.push(["pump volumetric flow Q", fmt(vol, 4) + " m&sup3;/s"]);
-      lines.push(["pump ideal power", fmt(wp / 1e6, 4) + " MW"]);
-      if (pmeas !== null && wp > 0) {
-        lines.push(["implied pump efficiency", fmt(pmeas * 1e6 / wp, 4)]);
-      }
-
-      // turbine side
-      const pr_t = tpout / tpin;
-      if (pr_t >= 1) { err.textContent = "turbine exit pressure must be below inlet"; return; }
-      const wt = tm * tcp * 1000 * ttemp * (1 - Math.pow(pr_t, (tgam - 1) / tgam));
-      lines.push(["turbine pressure ratio", fmt(pr_t, 6)]);
-      lines.push(["isentropic temperature drop", fmt(ttemp * (1 - Math.pow(pr_t, (tgam - 1) / tgam)), 4) + " K"]);
-      lines.push(["turbine ideal power", fmt(wt / 1e6, 4) + " MW"]);
-      if (tmeas !== null && wt > 0) {
-        lines.push(["implied turbine efficiency", fmt(tmeas * 1e6 / wt, 4)]);
-      }
-
-      render_lines("lines", lines);
-    }
-  </script>
+  <script src="turbopump.js"></script>
 </body>
 </html>

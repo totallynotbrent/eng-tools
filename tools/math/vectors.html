@@ -5,97 +5,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>vector operations</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>vector operations</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">two 3d vectors. use it for dot and cross products, projections, and r &times; F moments.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-vec"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">\vec{a}\cdot\vec{b} = ab\cos\theta</div>
 
       <div class="field">
         <label>vector a (ax, ay, az)</label>
         <div class="row">
-          <input type="number" id="ax" step="any" placeholder="ax">
-          <input type="number" id="ay" step="any" placeholder="ay">
-          <input type="number" id="az" step="any" placeholder="az">
+          <input type="number" id="ax" step="any" value="2">
+          <input type="number" id="ay" step="any" value="-1">
+          <input type="number" id="az" step="any" value="3">
         </div>
       </div>
 
       <div class="field">
         <label>vector b (bx, by, bz)</label>
         <div class="row">
-          <input type="number" id="bx" step="any" placeholder="bx">
-          <input type="number" id="by" step="any" placeholder="by">
-          <input type="number" id="bz" step="any" placeholder="bz">
+          <input type="number" id="bx" step="any" value="1">
+          <input type="number" id="by" step="any" value="4">
+          <input type="number" id="bz" step="any" value="-2">
         </div>
       </div>
 
-      <button onclick="solve_vec()">solve</button>
+      <button class="btn-primary" onclick="solve_vec()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="7">
+          <div class="result-line"><span class="label">|a|</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">|b|</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">a × b</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">|a × b|</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">projection of a onto b</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">projection components</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">angle between</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_vec() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const ax = val("ax"), ay = val("ay"), az = val("az");
-      const bx = val("bx"), by = val("by"), bz = val("bz");
-      if (ax === null || ay === null || az === null || bx === null || by === null || bz === null) {
-        err.textContent = "fill all six components";
-        return;
-      }
-
-      const maga = Math.hypot(ax, ay, az);
-      const magb = Math.hypot(bx, by, bz);
-      const dot = ax * bx + ay * by + az * bz;
-      const cx = ay * bz - az * by;
-      const cy = az * bx - ax * bz;
-      const cz = ax * by - ay * bx;
-      const magc = Math.hypot(cx, cy, cz);
-
-      const lines = [
-        ["|a|", fmt(maga, 6)],
-        ["|b|", fmt(magb, 6)],
-        ["a &middot; b", fmt(dot, 6)],
-        ["a &times; b", "(" + fmt(cx, 6) + ", " + fmt(cy, 6) + ", " + fmt(cz, 6) + ")"],
-        ["|a &times; b|", fmt(magc, 6)]
-      ];
-
-      if (magb > 0) {
-        const pscalar = dot / magb;
-        lines.push(["projection of a onto b", fmt(pscalar, 6) + " &middot; b&circ;"]);
-        lines.push(["projection components", "(" + fmt(pscalar * bx / magb, 6) + ", " + fmt(pscalar * by / magb, 6) + ", " + fmt(pscalar * bz / magb, 6) + ")"]);
-      } else {
-        lines.push(["projection of a onto b", "n/a (b is zero)"]);
-      }
-
-      if (maga > 0 && magb > 0) {
-        const cos = Math.max(-1, Math.min(1, dot / (maga * magb)));
-        lines.push(["angle between", fmt(Math.acos(cos) * 180 / Math.PI, 6) + " &deg;"]);
-      }
-
-      render_lines("lines", lines);
-    }
-  </script>
+  <script src="vectors.js"></script>
 </body>
 </html>

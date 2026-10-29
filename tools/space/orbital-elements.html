@@ -5,86 +5,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>orbital elements</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>orbital elements</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">shape of the orbit from a single point: radius, speed, and flight path angle. elliptic assumption.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-orbit"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">h = |\vec{r} \times \vec{v}|, \qquad e = \sqrt{1 + \frac{2 \varepsilon h^2}{\mu^2}}</div>
 
       <div class="field">
-        <label>radius r</label>
-        <input type="number" id="r" step="any" placeholder="m">
+        <label>radius r (m)</label>
+        <input type="number" id="r" step="any" value="6771000.0">
       </div>
       <div class="field">
-        <label>speed v</label>
-        <input type="number" id="v" step="any" placeholder="m/s">
+        <label>speed v (m/s)</label>
+        <input type="number" id="v" step="any" value="7726">
       </div>
       <div class="field">
-        <label>flight path angle &gamma;</label>
-        <input type="number" id="gamma" step="any" placeholder="deg" value="0">
+        <label>flight path angle γ</label>
+        <input type="number" id="gamma" step="any" value="0">
       </div>
       <div class="field">
-        <label>gravitational parameter &mu; (optional)</label>
-        <input type="number" id="mu" step="any" placeholder="3.986e14">
+        <label>gravitational parameter μ (optional)</label>
+        <input type="number" id="mu" step="any" placeholder="3.986e14" value="398600441800000.0">
       </div>
 
-      <button onclick="solve_elements()">solve</button>
+      <button class="btn-primary" onclick="solve_elements()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="8">
+          <div class="result-line"><span class="label">specific energy ε</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">specific angular momentum h</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">semi-major axis a</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">eccentricity e</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">periapsis rp</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">apoapsis ra</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">period T</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">escape trajectory</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_elements() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const r = val("r"), v = val("v"), gamma = (val("gamma") || 0) * Math.PI / 180;
-      const mu = val("mu") || 3.986e14;
-      if (r === null || v === null) { err.textContent = "fill r and v"; return; }
-      if (r <= 0 || mu <= 0) { err.textContent = "r and mu must be positive"; return; }
-
-      const eps = v * v / 2 - mu / r;
-      const h = r * v * Math.cos(gamma);
-      const a = -mu / (2 * eps);
-      const e2 = 1 + 2 * eps * h * h / (mu * mu);
-      if (e2 < 0) { err.textContent = "unphysical state, check r, v, and gamma"; return; }
-      const e = Math.sqrt(e2);
-
-      const lines = [
-        ["specific energy &epsilon;", fmt(eps, 6) + " J/kg"],
-        ["specific angular momentum h", fmt(h, 6) + " m&sup2;/s"],
-        ["semi-major axis a", fmt(a, 6) + " m"],
-        ["eccentricity e", fmt(e, 6)]
-      ];
-      if (e < 1 && a > 0) {
-        lines.push(["periapsis rp", fmt(a * (1 - e), 6) + " m"]);
-        lines.push(["apoapsis ra", fmt(a * (1 + e), 6) + " m"]);
-        lines.push(["period T", fmt(2 * Math.PI * Math.sqrt(a * a * a / mu), 6) + " s"]);
-      } else {
-        lines.push(["escape trajectory", "e >= 1, no bound orbit"]);
-      }
-
-      render_lines("lines", lines);
-    }
-  </script>
+  <script src="orbital-elements.js"></script>
 </body>
 </html>

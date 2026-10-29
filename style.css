@@ -9,6 +9,98 @@
   --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --display: "Newsreader", Georgia, "Times New Roman", serif;
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --card: #191919;
+}
+
+.col-fig {
+  min-width: 0;
+}
+
+.wide-input-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-flow: dense;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.wide-input-grid .section {
+  min-width: 0;
+}
+
+/* editable defaults stay subdued until the field receives attention */
+input.default-value {
+  color: var(--muted);
+}
+
+input.default-value:hover,
+input.default-value:focus {
+  color: var(--text);
+}
+
+input::placeholder {
+  color: #676767;
+  opacity: 1;
+}
+
+/* interactive figures */
+.figure {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 0.75rem 0.9rem 0.55rem;
+  margin-top: 1.25rem;
+}
+
+.figure svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+.fig-grid { stroke: #222222; stroke-width: 1; }
+.fig-axis { stroke: #3a3a3a; stroke-width: 1; }
+.fig-label { fill: var(--muted); font-family: var(--mono); font-size: 10px; }
+.fig-val { fill: var(--text); font-family: var(--mono); font-size: 10px; }
+.fig-ref { stroke: #6b6b6b; stroke-width: 1.8; fill: none; stroke-dasharray: 7 5; }
+.fig-ref-label { fill: #9c9c9c; font-family: var(--mono); font-size: 12px; }
+.fig-axis-x { stroke: #e0a458; stroke-width: 2.4; fill: none; }
+.fig-axis-y { stroke: #6f8fd0; stroke-width: 2.4; fill: none; }
+.fig-axis-z { stroke: #c8c8c8; stroke-width: 2.4; fill: none; }
+.fig-lab-x { fill: #e0a458; font-family: var(--mono); font-size: 13px; font-weight: 500; }
+.fig-lab-y { fill: #6f8fd0; font-family: var(--mono); font-size: 13px; font-weight: 500; }
+.fig-lab-z { fill: #c8c8c8; font-family: var(--mono); font-size: 13px; font-weight: 500; }
+
+.fig-third-fill { fill: #6f8fd0; stroke: var(--card); stroke-width: 1.5; }
+.fig-val-stroke { stroke: var(--text); stroke-width: 1.2; fill: none; opacity: 0.75; }
+.fig-cross { stroke: #e06c5a; stroke-width: 2; fill: none; }
+.fig-ring { stroke: #6f8fd0; stroke-width: 1.8; fill: none; }
+.fig-box { fill: var(--card); stroke: var(--border); stroke-width: 1; }
+.fig-box-title { font-family: "JetBrains Mono", monospace; font-size: 13px; fill: var(--text); }
+.fig-sub { font-family: "JetBrains Mono", monospace; font-size: 10px; fill: var(--muted); }
+.fig-wire { stroke: var(--border); stroke-width: 1.5; fill: none; }
+.fig-wire-mid { stroke: var(--border); stroke-width: 1.5; fill: none; opacity: 0.7; }
+
+.fig-line { stroke: var(--accent); stroke-width: 1.6; fill: none; }
+.fig-alt { stroke: var(--text); stroke-width: 1.4; fill: none; opacity: 0.85; }
+.fig-third { stroke: #6f8fd0; stroke-width: 1.3; fill: none; }
+.fig-dash { stroke-dasharray: 4 3; }
+.fig-dot { fill: var(--accent); stroke: var(--card); stroke-width: 1.5; }
+.fig-guide { stroke: #454545; stroke-width: 1; stroke-dasharray: 3 3; }
+.fig-band { fill: #202020; }
+.fig-em { fill: rgba(224, 164, 88, 0.13); }
+.fig-fill { fill: rgba(224, 164, 88, 0.1); stroke: none; }
+.fig-region { fill: rgba(224, 164, 88, 0.07); stroke: #555555; stroke-width: 1; }
+.fig-region-alt { fill: rgba(111, 143, 208, 0.08); stroke: #555555; stroke-width: 1; }
+.fig-bar { fill: var(--accent); }
+.fig-bar-alt { fill: #6f8fd0; }
+.fig-square { fill: none; stroke: var(--text); stroke-width: 1.2; }
+.fig-tri { fill: none; stroke: var(--accent); stroke-width: 1.3; }
+.fig-good { stroke: #7bb87a; stroke-width: 1.4; fill: none; }
+.fig-bad { stroke: var(--error); stroke-width: 1.4; fill: none; }
+.fig-solid { fill: var(--accent); stroke: none; }
+.fig-head { fill: var(--accent); stroke: none; }
+.figure-note {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin-top: 0.35rem;
+  font-family: var(--mono);
+  display: none;
 }
 
 * { box-sizing: border-box; }
@@ -112,7 +204,25 @@ a:hover { text-decoration: underline; }
 
 .field .row { display: flex; gap: 0.5rem; }
 
-input, select {
+.unit-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.unit-input input {
+  min-width: 0;
+}
+
+.unit-input .unit {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+input, select, textarea {
   background: var(--field);
   border: 1px solid var(--border);
   color: var(--text);
@@ -122,7 +232,17 @@ input, select {
   width: 100%;
 }
 
-input:focus, select:focus { outline: none; border-color: var(--accent); }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+
+/* multi-line entry (circuit lists) matches the single-line fields */
+textarea {
+  resize: vertical;
+  line-height: 1.5;
+  min-height: 4.5rem;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+}
 
 button {
   background: var(--field);
@@ -196,6 +316,81 @@ button:hover { border-color: var(--accent); color: var(--accent); }
 
 .note { color: var(--muted); font-size: 0.85rem; margin-top: 0.6rem; }
 
+/* the header and equation row track the calculator block so they do not overhang the columns */
+.wrap.with-cols > .top,
+.wrap.with-cols > .calc-equation {
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* calculator pages use the shared component sheet */
+.wrap.with-cols {
+  max-width: none;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.intro {
+  margin-bottom: 1.4rem;
+}
+
+.eq-row {
+  width: 100%;
+}
+
+/* the shared calculator sheet owns the grid */
+.cols {
+  display: block;
+  overflow: visible;
+}
+
+.section,
+.col-fig,
+.col-out {
+  min-width: 0;
+}
+
+@media (max-width: 820px) {
+  .cols {
+    grid-auto-columns: minmax(300px, 1fr);
+  }
+}
+
+/* tool catalogue: dense desktop grid with fewer long scrolls */
+.index-page .wrap {
+  max-width: 1720px;
+}
+
+.grp {
+  break-inside: avoid;
+  margin-bottom: 1.5rem;
+}
+
+.index-cols {
+  column-count: 4;
+  column-gap: 1.6rem;
+}
+
+@media (max-width: 1200px) {
+  .index-cols {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 900px) {
+  .index-cols {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 560px) {
+  .index-cols {
+    column-count: 1;
+  }
+}
+
 /* governing equation block, typeset by katex */
 .eq {
   font-size: 1.05rem;
@@ -217,7 +412,7 @@ body.with-sidebar .wrap {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-top: 2rem;
+  padding-top: 1.5rem;
   padding-bottom: 2rem;
 }
 
@@ -237,7 +432,7 @@ body.with-sidebar .wrap {
 }
 .nav-toggle:hover { border-color: var(--accent); }
 
-@media (max-width: 720px) {
+@media (max-width: 1200px) {
   body.with-sidebar { padding-left: 0; }
   .side-nav {
     transform: translateX(-100%);

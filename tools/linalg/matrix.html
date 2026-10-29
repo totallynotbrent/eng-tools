@@ -5,19 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>matrix operations</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>matrix operations</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">determinant, inverse, and reduced row echelon form for a 2x2 or 3x3 matrix.</p>
+    <div class="cols calc-layout">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-matrix"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">C_{ij} = \sum_k A_{ik} B_{kj}</div>
 
@@ -32,116 +38,50 @@
       <div class="field">
         <label>row 1</label>
         <div class="row">
-          <input type="number" id="a11" step="any" placeholder="a">
-          <input type="number" id="a12" step="any" placeholder="b">
-          <input type="number" id="a13" step="any" placeholder="c">
+          <input type="number" id="a11" step="any" value="1">
+          <input type="number" id="a12" step="any" value="2">
+          <input type="number" id="a13" step="any" value="0">
         </div>
       </div>
       <div class="field">
         <label>row 2</label>
         <div class="row">
-          <input type="number" id="a21" step="any" placeholder="d">
-          <input type="number" id="a22" step="any" placeholder="e">
-          <input type="number" id="a23" step="any" placeholder="f">
+          <input type="number" id="a21" step="any" value="3">
+          <input type="number" id="a22" step="any" placeholder="e" value="4">
+          <input type="number" id="a23" step="any" value="0">
         </div>
       </div>
       <div class="field">
-        <label>row 3 (for 3x3)</label>
+        <label>row 3 (for 3x3) (g)</label>
         <div class="row">
-          <input type="number" id="a31" step="any" placeholder="g">
-          <input type="number" id="a32" step="any" placeholder="h">
-          <input type="number" id="a33" step="any" placeholder="i">
+          <input type="number" id="a31" step="any" value="0">
+          <input type="number" id="a32" step="any" value="0">
+          <input type="number" id="a33" step="any" value="1">
         </div>
       </div>
 
-      <button onclick="solve_mat()">solve</button>
+      <button class="btn-primary" onclick="solve_mat()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="3">
+          <div class="result-line"><span class="label">determinant</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">rref</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">inverse</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function mat_str(m) {
-      return m.map(function (row) { return "[" + row.map(function (x) { return fmt(x, 4); }).join(", ") + "]"; }).join(", ");
-    }
-
-    function det2(m) { return m[0][0] * m[1][1] - m[0][1] * m[1][0]; }
-
-    function det3(m) {
-      return m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
-        - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
-        + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
-    }
-
-    function rref(m) {
-      const a = m.map(function (row) { return row.slice(); });
-      const nr = a.length, nc = a[0].length;
-      let lead = 0;
-      for (let r = 0; r < nr; r++) {
-        if (lead >= nc) break;
-        let i = r;
-        while (a[i][lead] === 0) {
-          i++;
-          if (i === nr) { i = r; lead++; if (lead === nc) break; }
-        }
-        if (lead >= nc) break;
-        const tmp = a[i]; a[i] = a[r]; a[r] = tmp;
-        const lv = a[r][lead];
-        for (let c = 0; c < nc; c++) a[r][c] /= lv;
-        for (let i2 = 0; i2 < nr; i2++) {
-          if (i2 === r) continue;
-          const f = a[i2][lead];
-          for (let c = 0; c < nc; c++) a[i2][c] -= f * a[r][c];
-        }
-        lead++;
-      }
-      return a;
-    }
-
-    function solve_mat() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const size = parseInt(document.getElementById("size").value) || 2;
-      const m = [];
-      if (size === 2) {
-        m.push([val("a11"), val("a12")], [val("a21"), val("a22")]);
-      } else {
-        m.push([val("a11"), val("a12"), val("a13")],
-               [val("a21"), val("a22"), val("a23")],
-               [val("a31"), val("a32"), val("a33")]);
-      }
-      for (const row of m) for (const x of row) if (x === null) { err.textContent = "fill every entry"; return; }
-
-      const d = size === 2 ? det2(m) : det3(m);
-      const lines = [["determinant", fmt(d, 6)], ["rref", mat_str(rref(m))]];
-
-      if (Math.abs(d) < 1e-12) {
-        lines.push(["inverse", "singular, no inverse"]);
-      } else if (size === 2) {
-        const inv = [[m[1][1] / d, -m[0][1] / d], [-m[1][0] / d, m[0][0] / d]];
-        lines.push(["inverse", mat_str(inv)]);
-      } else {
-        const inv = [];
-        for (let j = 0; j < 3; j++) {
-          const e = [0, 0, 0]; e[j] = 1;
-          const col = gauss_solve(m, e);
-          if (col === null) { lines.push(["inverse", "singular, no inverse"]); break; }
-          for (let i = 0; i < 3; i++) inv[i][j] = col[i];
-        }
-        if (inv.length === 3) lines.push(["inverse", mat_str(inv)]);
-      }
-
-      render_lines("lines", lines);
-    }
-  </script>
+  <script src="matrix.js"></script>
 </body>
 </html>

@@ -5,73 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ohm's law and power</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>ohm's law and power</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">leave one of V, I, R blank and it solves for it. power is computed from the result.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-ohm"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">V = IR, \qquad P = VI</div>
 
       <div class="field">
-        <label>voltage V</label>
-        <input type="number" id="volt" placeholder="V" step="any">
+        <label>voltage V (V)</label>
+        <input type="number" id="volt" step="any" value="12">
       </div>
 
       <div class="field">
-        <label>current I</label>
-        <input type="number" id="curr" placeholder="A" step="any">
+        <label>current I (A)</label>
+        <input type="number" id="curr" step="any" value="2">
       </div>
 
       <div class="field">
-        <label>resistance R</label>
-        <input type="number" id="res" placeholder="&Omega;" step="any">
+        <label>resistance R (Ω)</label>
+        <input type="number" id="res" step="any">
       </div>
 
-      <button onclick="solve_ohm()">solve</button>
+      <button class="btn-primary" onclick="solve_ohm()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="4">
+          <div class="result-line"><span class="label">voltage</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">current</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">resistance</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">power P = VI</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_ohm() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const v = val("volt"), i = val("curr"), r = val("res");
-      const known = [v, i, r].filter(function (x) { return x !== null; }).length;
-      if (known !== 2) { err.textContent = "leave exactly one of V, I, R blank"; return; }
-
-      let ov = v, oi = i, or = r;
-      if (v === null) { ov = i * r; }
-      else if (i === null) { if (r === 0) { err.textContent = "R is zero"; return; } oi = v / r; }
-      else if (r === null) { if (i === 0) { err.textContent = "I is zero"; return; } or = v / i; }
-
-      const p = ov * oi;
-      render_lines("lines", [
-        ["voltage", fmt(ov, 6) + " V"],
-        ["current", fmt(oi, 6) + " A"],
-        ["resistance", fmt(or, 6) + " &Omega;"],
-        ["power P = VI", fmt(p, 6) + " W"]
-      ]);
-    }
-  </script>
+  <script src="ohms-law.js"></script>
 </body>
 </html>

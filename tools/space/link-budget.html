@@ -5,100 +5,81 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>link budget</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>link budget</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">carrier to noise ratio for a radio link from power, gain, distance, and frequency.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-linkbudget"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">P_r = P_t\, G_t\, G_r \left(\frac{c}{4\pi d f}\right)^2</div>
 
       <div class="field">
-        <label>transmit power Pt</label>
-        <input type="number" id="pt" step="any" placeholder="W">
+        <label>transmit power Pt (W)</label>
+        <input type="number" id="pt" step="any" value="10">
       </div>
       <div class="field">
         <label>transmit and receive gain Gt, Gr (linear)</label>
         <div class="row">
-          <input type="number" id="gt" step="any" placeholder="Gt">
-          <input type="number" id="gr" step="any" placeholder="Gr">
+          <input type="number" id="gt" step="any" value="100">
+          <input type="number" id="gr" step="any" value="100">
         </div>
       </div>
       <div class="field">
-        <label>distance d</label>
-        <input type="number" id="dist" step="any" placeholder="m">
+        <label>distance d (m)</label>
+        <input type="number" id="dist" step="any" value="1000">
       </div>
       <div class="field">
-        <label>frequency f</label>
-        <input type="number" id="freq" step="any" placeholder="Hz">
+        <label>frequency f (Hz)</label>
+        <input type="number" id="freq" step="any" value="2.4e9">
       </div>
       <div class="field">
-        <label>system noise temperature Tsys (optional)</label>
-        <input type="number" id="tsys" step="any" placeholder="K" value="290">
+        <label>system noise temperature Tsys (optional) (K)</label>
+        <input type="number" id="tsys" step="any" value="290">
       </div>
       <div class="field">
-        <label>bandwidth B (optional)</label>
-        <input type="number" id="bw" step="any" placeholder="Hz">
+        <label>bandwidth B (optional) (Hz)</label>
+        <input type="number" id="bw" step="any" value="1e6">
       </div>
 
-      <button onclick="solve_link()">solve</button>
+      <button class="btn-primary" onclick="solve_link()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="6">
+          <div class="result-line"><span class="label">wavelength λ</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">free-space loss</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">path loss</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">received power Pr</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">C/N0</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">carrier to noise C/N</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    const C_SPEED = 299792458, KB = 1.380649e-23;
-
-    function solve_link() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const pt = val("pt"), gt = val("gt"), gr = val("gr"), d = val("dist"), f = val("freq");
-      if (pt === null || gt === null || gr === null || d === null || f === null) {
-        err.textContent = "fill Pt, Gt, Gr, d, and f";
-        return;
-      }
-      if (d <= 0 || f <= 0 || pt <= 0) { err.textContent = "d, f, and Pt must be positive"; return; }
-
-      const lam = C_SPEED / f;
-      const fspl = Math.pow(lam / (4 * Math.PI * d), 2);
-      const pr = pt * gt * gr * fspl;
-      const pr_dbm = 10 * Math.log10(pr * 1000);
-
-      const lines = [
-        ["wavelength &lambda;", fmt(lam, 6) + " m"],
-        ["free-space loss", fmt(fspl, 6)],
-        ["path loss", fmt(-10 * Math.log10(fspl), 4) + " dB"],
-        ["received power Pr", fmt(pr, 6) + " W (" + fmt(pr_dbm, 4) + " dBm)"]
-      ];
-
-      const tsys = val("tsys"), bw = val("bw");
-      if (tsys !== null && bw !== null) {
-        if (tsys <= 0 || bw <= 0) { err.textContent = "Tsys and B must be positive"; return; }
-        const cn = pr / (KB * tsys * bw);
-        lines.push(["C/N0", fmt(pr / (KB * tsys), 4) + " dB-Hz"]);
-        lines.push(["carrier to noise C/N", fmt(cn, 4) + " (" + fmt(10 * Math.log10(cn), 4) + " dB)"]);
-      }
-
-      render_lines("lines", lines);
-    }
-  </script>
+  <script src="link-budget.js"></script>
 </body>
 </html>

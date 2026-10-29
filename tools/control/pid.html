@@ -5,65 +5,59 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>pid tuning</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>pid tuning</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">ziegler-nichols gains from ultimate gain and ultimate period.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-pid"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">u(t) = K_p e(t) + K_i \int_0^t e(\tau)\,d\tau + K_d \frac{de}{dt}</div>
 
       <div class="field">
         <label>ultimate gain Ku</label>
-        <input type="number" id="ku" step="any" placeholder="Ku">
+        <input type="number" id="ku" step="any" value="10">
       </div>
       <div class="field">
-        <label>ultimate period Tu</label>
-        <input type="number" id="tu" step="any" placeholder="s">
+        <label>ultimate period Tu (s)</label>
+        <input type="number" id="tu" step="any" value="2">
       </div>
 
-      <button onclick="solve_pid()">solve</button>
-      <div class="note">classic ziegler-nichols closed-loop method.</div>
+      <button class="btn-primary" onclick="solve_pid()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="3">
+          <div class="result-line"><span class="label">P controller: Kp</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">PI controller: Kp, Ti</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">PID controller: Kp, Ti, Td</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_pid() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const ku = val("ku"), tu = val("tu");
-      if (ku === null || tu === null) { err.textContent = "fill Ku and Tu"; return; }
-      if (ku <= 0 || tu <= 0) { err.textContent = "Ku and Tu must be positive"; return; }
-
-      const lines = [];
-      const p = 0.6 * ku, pi_kp = 0.45 * ku, pi_ti = tu / 1.2;
-      const pid_kp = 0.6 * ku, pid_ti = tu / 2, pid_td = tu / 8;
-
-      lines.push(["P only  Kp", fmt(p, 6)]);
-      lines.push(["PI      Kp", fmt(pi_kp, 4) + ",  Ti " + fmt(pi_ti, 4)]);
-      lines.push(["PID     Kp", fmt(pid_kp, 4) + ",  Ti " + fmt(pid_ti, 4) + ",  Td " + fmt(pid_td, 4)]);
-
-      render_lines("lines", lines);
-    }
-  </script>
+  <script src="pid.js"></script>
 </body>
 </html>

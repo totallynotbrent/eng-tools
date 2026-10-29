@@ -5,19 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>strain gauge</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>strain gauge</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">stress from a measured strain in a quarter, half, or full wheatstone bridge.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-gauge"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">\varepsilon = \frac{\Delta L}{L} = \frac{1}{GF}\frac{\Delta R}{R}</div>
 
@@ -31,51 +37,38 @@
       </div>
       <div class="field">
         <label>gauge factor GF</label>
-        <input type="number" id="gf" step="any" placeholder="dimensionless" value="2">
+        <input type="number" id="gf" step="any" value="2">
       </div>
       <div class="field">
         <label>output to excitation ratio Vout/Vex</label>
-        <input type="number" id="ratio" step="any" placeholder="V/V">
+        <input type="number" id="ratio" step="any" value="0.005">
       </div>
       <div class="field">
-        <label>young's modulus E (optional)</label>
-        <input type="number" id="e_mod" step="any" placeholder="Pa">
+        <label>young's modulus E (optional) (Pa)</label>
+        <input type="number" id="e_mod" step="any" value="200000000000">
       </div>
 
-      <button onclick="solve_gauge()">solve</button>
-      <div class="note">quarter: Vout/Vex = GF&middot;&epsilon;/4. half and full scale it by 2 and 4.</div>
+      <button class="btn-primary" onclick="solve_gauge()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="2">
+          <div class="result-line"><span class="label">strain ε</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">stress σ</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_gauge() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const config = document.getElementById("config").value;
-      const gf = val("gf"), ratio = val("ratio");
-      if (gf === null || ratio === null) { err.textContent = "fill GF and Vout/Vex"; return; }
-      if (gf <= 0) { err.textContent = "GF must be positive"; return; }
-
-      const arms = config === "quarter" ? 1 : config === "half" ? 2 : 4;
-      const strain = 4 * ratio / (gf * arms);
-      const lines = [["strain &epsilon;", fmt(strain, 6)]];
-
-      const e = val("e_mod");
-      if (e !== null) lines.push(["stress &sigma;", fmt(e * strain, 6) + " Pa"]);
-
-      render_lines("lines", lines);
-    }
-  </script>
+  <script src="strain-gauge.js"></script>
 </body>
 </html>

@@ -5,27 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ideal gas solver</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>ideal gas solver</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-ideal"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
       <h2>state</h2>
-      <p class="muted">leave one field empty and it gets solved. p and T units are selected per field.</p>
 
       <div class="eq">p V = m R T</div>
 
       <div class="field">
         <label>pressure p</label>
         <div class="row">
-          <input type="number" id="p" class="blank" placeholder="leave blank to solve">
+          <input type="number" id="p" class="blank" value="100">
           <select id="p_unit" style="width: 130px">
             <option value="kpa">kPa</option>
             <option value="mpa">MPa</option>
@@ -37,23 +43,23 @@
       </div>
 
       <div class="field">
-        <label>volume V</label>
-        <input type="number" id="vol" placeholder="m&sup3;" step="any">
+        <label>volume V (m³)</label>
+        <input type="number" id="vol" step="any" value="2">
       </div>
 
       <div class="field">
-        <label>mass m</label>
-        <input type="number" id="mass" placeholder="kg" step="any">
+        <label>mass m (kg)</label>
+        <input type="number" id="mass" step="any">
       </div>
 
       <div class="field">
         <label>temperature T</label>
         <div class="row">
-          <input type="number" id="temp" class="blank" placeholder="leave blank to solve">
+          <input type="number" id="temp" class="blank" value="300">
           <select id="t_unit" style="width: 130px">
             <option value="k">K</option>
-            <option value="c">&deg;C</option>
-            <option value="f">&deg;F</option>
+            <option value="c">°C</option>
+            <option value="f">°F</option>
           </select>
         </div>
       </div>
@@ -70,94 +76,35 @@
           <option value="0.5182">methane (0.5182)</option>
           <option value="custom">custom</option>
         </select>
-        <input type="number" id="r_custom" placeholder="R in kJ/(kg&middot;K)" step="any" style="display:none; margin-top:0.5rem">
+        <input type="number" id="r_custom" step="any" style="display:none; margin-top:0.5rem" value="287">
       </div>
 
-      <button onclick="solve()">solve</button>
+      <button class="btn-primary" onclick="solve()">solve</button>
       <div id="err" class="error"></div>
     </div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
 
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="6">
+          <div class="result-line"><span class="label">pressure</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">volume</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">mass</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">temperature</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">specific volume v = V/m</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">density ρ = m/V</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    const KPA = { kpa: 1, mpa: 1000, bar: 100, atm: 101.325, psia: 6.89476 };
-
-    function custom_gas() {
-      document.getElementById("r_custom").style.display =
-        document.getElementById("gas").value === "custom" ? "block" : "none";
-    }
-
-    function to_kpa(n, unit) { return n * KPA[unit]; }
-    function to_kelvin(n, unit) {
-      if (unit === "c") return n + 273.15;
-      if (unit === "f") return (n - 32) * 5 / 9 + 273.15;
-      return n;
-    }
-
-    function gas_r() {
-      const g = document.getElementById("gas").value;
-      if (g === "custom") {
-        const rc = val("r_custom");
-        return rc === null ? NaN : rc;
-      }
-      return parseFloat(g);
-    }
-
-    function solve() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const p = val("p");
-      const p_unit = document.getElementById("p_unit").value;
-      const v = val("vol");
-      const m = val("mass");
-      const t = val("temp");
-      const t_unit = document.getElementById("t_unit").value;
-      const r = gas_r();
-
-      if (!isFinite(r) || r <= 0) { err.textContent = "choose a gas or enter a positive custom R"; return; }
-
-      const p_kpa = p === null ? null : to_kpa(p, p_unit);
-      const t_k = t === null ? null : to_kelvin(t, t_unit);
-      const known = [p_kpa, v, m, t_k].filter(function (x) { return x !== null; }).length;
-      if (known !== 3) { err.textContent = "leave exactly one field empty"; return; }
-
-      let out_p = p_kpa, out_v = v, out_m = m, out_t = t_k;
-      let missing = "";
-      if (p_kpa === null) { missing = "p"; out_p = m * r * t_k / v; }
-      else if (v === null) { missing = "V"; out_v = m * r * t_k / p_kpa; }
-      else if (m === null) { missing = "m"; out_m = p_kpa * v / (r * t_k); }
-      else if (t_k === null) { missing = "T"; out_t = p_kpa * v / (m * r); }
-
-      if (!isFinite(out_p) || !isFinite(out_v) || !isFinite(out_m) || !isFinite(out_t)) {
-        err.textContent = "division by zero, check your inputs";
-        return;
-      }
-
-      const lines = [];
-      const unit = document.getElementById("p_unit").value;
-      lines.push(["pressure", fmt(out_p, 6) + " kPa"]);
-      lines.push(["volume", fmt(out_v, 6) + " m&sup3;"]);
-      lines.push(["mass", fmt(out_m, 6) + " kg"]);
-      lines.push(["temperature", fmt(out_t, 6) + " K  (" + fmt(out_t - 273.15, 6) + " &deg;C)"]);
-      const v_spec = out_v / out_m;
-      lines.push(["specific volume v = V/m", fmt(v_spec, 6) + " m&sup3;/kg"]);
-      lines.push(["density &rho; = m/V", fmt(out_m / out_v, 6) + " kg/m&sup3;"]);
-
-      const box = document.getElementById("lines");
-      box.innerHTML = lines.map(function (l) {
-        return '<div class="result-line"><span class="label">' + l[0] + "</span><span class=\"value\">" + l[1] + "</span></div>";
-      }).join("");
-
-      document.getElementById("results").style.display = "block";
-    }
-  </script>
+  <script src="ideal-gas.js"></script>
 </body>
 </html>

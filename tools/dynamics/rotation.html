@@ -5,87 +5,77 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>rotational motion</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>rotational motion</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">constant angular acceleration, torque, and an rpm to rad/s switch.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-rot"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">\sum \tau = I\alpha</div>
 
       <div class="field">
-        <label>initial angular velocity &omega;0</label>
-        <input type="number" id="w0" step="any" placeholder="rad/s" value="0">
+        <label>initial angular velocity ω0 (rad/s)</label>
+        <input type="number" id="w0" step="any" value="0">
       </div>
       <div class="field">
-        <label>angular acceleration &alpha;</label>
-        <input type="number" id="alpha" step="any" placeholder="rad/s&sup2;" value="0">
+        <label>angular acceleration α (rad/s²)</label>
+        <input type="number" id="alpha" step="any" value="0">
       </div>
       <div class="field">
-        <label>time t</label>
-        <input type="number" id="tt" step="any" placeholder="s" value="0">
+        <label>time t (s)</label>
+        <input type="number" id="tt" step="any" value="0">
       </div>
 
       <div class="field">
         <label>rpm (converts to rad/s)</label>
-        <input type="number" id="rpm" step="any" placeholder="rpm">
+        <input type="number" id="rpm" step="any" value="60">
       </div>
 
       <div class="field">
-        <label>moment of inertia I and torque &tau; = I&alpha;</label>
+        <label>moment of inertia I and torque τ = Iα</label>
         <div class="row">
-          <input type="number" id="inertia" step="any" placeholder="I (kg&middot;m&sup2;)">
-          <input type="number" id="torque" step="any" placeholder="&tau; (N&middot;m, optional)">
+          <input type="number" id="inertia" step="any" value="2">
+          <input type="number" id="torque" step="any" value="0">
         </div>
       </div>
 
-      <button onclick="solve_rot()">solve</button>
+      <button class="btn-primary" onclick="solve_rot()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="4">
+          <div class="result-line"><span class="label">final ω</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">angular displacement θ</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">rpm in rad/s</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">torque τ = Iα</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_rot() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const w0 = val("w0") || 0, a = val("alpha") || 0, t = val("tt") || 0;
-      const lines = [];
-      if (t !== null) {
-        const w = w0 + a * t;
-        const th = w0 * t + 0.5 * a * t * t;
-        lines.push(["final &omega;", fmt(w, 6) + " rad/s"]);
-        lines.push(["angular displacement &theta;", fmt(th, 6) + " rad (" + fmt(th / (2 * Math.PI), 6) + " rev)"]);
-      }
-
-      const rpm = val("rpm");
-      if (rpm !== null) lines.push(["rpm in rad/s", fmt(rpm * 2 * Math.PI / 60, 6) + " rad/s"]);
-
-      const inertia = val("inertia");
-      if (inertia !== null && a !== null) {
-        lines.push(["torque &tau; = I&alpha;", fmt(inertia * a, 6) + " N&middot;m"]);
-      }
-
-      if (!lines.length) { err.textContent = "fill at least one section"; return; }
-      render_lines("lines", lines);
-    }
-  </script>
+  <script src="rotation.js"></script>
 </body>
 </html>

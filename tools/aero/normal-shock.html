@@ -5,68 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>normal shock</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>normal shock</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">conditions downstream of a normal shock from the upstream mach number.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-normalshock"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">\frac{p_2}{p_1} = 1 + \frac{2\gamma}{\gamma + 1}\left(M_1^2 - 1\right)</div>
 
       <div class="field">
         <label>upstream mach M1</label>
-        <input type="number" id="m1" step="any" placeholder="M1">
+        <input type="number" id="m1" step="any" value="2">
       </div>
       <div class="field">
-        <label>ratio of specific heats &gamma; (optional)</label>
-        <input type="number" id="gamma" step="any" placeholder="1.4">
+        <label>ratio of specific heats γ (optional)</label>
+        <input type="number" id="gamma" step="any" placeholder="1.4" value="1.4">
       </div>
 
-      <button onclick="solve_shock()">solve</button>
+      <button class="btn-primary" onclick="solve_shock()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="4">
+          <div class="result-line"><span class="label">downstream mach M2</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">pressure ratio P2 / P1</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">density ratio ρ2 / ρ1</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">temperature ratio T2 / T1</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_shock() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const m1 = val("m1"), g = val("gamma") || 1.4;
-      if (m1 === null) { err.textContent = "enter upstream mach"; return; }
-      if (m1 <= 1) { err.textContent = "a shock needs supersonic flow, M1 > 1"; return; }
-      if (g <= 1) { err.textContent = "gamma must be greater than 1"; return; }
-
-      const m2sq = (1 + (g - 1) / 2 * m1 * m1) / (g * m1 * m1 - (g - 1) / 2);
-      const m2 = Math.sqrt(m2sq);
-      const p2p1 = 1 + 2 * g / (g + 1) * (m1 * m1 - 1);
-      const r2r1 = ((g + 1) * m1 * m1) / ((g - 1) * m1 * m1 + 2);
-      const t2t1 = p2p1 / r2r1;
-
-      render_lines("lines", [
-        ["downstream mach M2", fmt(m2, 6)],
-        ["pressure ratio P2 / P1", fmt(p2p1, 6)],
-        ["density ratio &rho;2 / &rho;1", fmt(r2r1, 6)],
-        ["temperature ratio T2 / T1", fmt(t2t1, 6)]
-      ]);
-    }
-  </script>
+  <script src="normal-shock.js"></script>
 </body>
 </html>

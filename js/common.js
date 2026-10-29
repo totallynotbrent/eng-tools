@@ -33,6 +33,30 @@ function set_text(id, text) {
   document.getElementById(id).textContent = text;
 }
 
+// defaults remain subdued until a value is edited
+(function () {
+  if (!document.querySelectorAll) return;
+  const inputs = document.querySelectorAll("input.default-value");
+  Array.prototype.forEach.call(inputs, function (input) {
+    input.addEventListener("input", function () {
+      input.classList.remove("default-value");
+      input.removeAttribute("data-default");
+    });
+  });
+})();
+
+// units are fixed metadata beside numeric fields
+(function () {
+  const inputs = document.querySelectorAll("input[data-unit]");
+  Array.prototype.forEach.call(inputs, function (input) {
+    if (input.nextElementSibling && input.nextElementSibling.classList.contains("unit")) return;
+    const unit = document.createElement("span");
+    unit.className = "unit";
+    unit.textContent = input.getAttribute("data-unit");
+    input.insertAdjacentElement("afterend", unit);
+  });
+})();
+
 function fmt(n, sig) {
   if (!isFinite(n)) return "n/a";
   sig = sig || 6;

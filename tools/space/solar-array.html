@@ -5,25 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>solar array budget</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>solar array budget</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">array end-of-life power versus a load, plus required array area given a cell efficiency.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-solar"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">P_{\mathrm{eol}} = P_0 (1 - d)^n</div>
 
       <div class="field">
-        <label>beginning-of-life power P0</label>
-        <input type="number" id="p0" step="any" placeholder="W">
+        <label>beginning-of-life power P0 (W)</label>
+        <input type="number" id="p0" step="any" value="100">
       </div>
       <div class="field">
         <label>annual degradation per year (fraction, optional)</label>
@@ -31,66 +37,43 @@
       </div>
       <div class="field">
         <label>mission life (years)</label>
-        <input type="number" id="years" step="any" placeholder="yr">
+        <input type="number" id="years" step="any" value="10">
       </div>
       <div class="field">
-        <label>average load (optional)</label>
-        <input type="number" id="load" step="any" placeholder="W">
+        <label>average load (optional) (W)</label>
+        <input type="number" id="load" step="any" value="800">
       </div>
       <div class="field">
-        <label>cell efficiency &eta; and solar flux S (optional, gives area)</label>
+        <label>cell efficiency η and solar flux S (optional, gives area)</label>
         <div class="row">
-          <input type="number" id="eta" step="any" placeholder="&eta; (0-1)">
-          <input type="number" id="flux" step="any" placeholder="W/m&sup2;" value="1361">
+          <input type="number" id="eta" step="any" value="0.85">
+          <input type="number" id="flux" step="any" value="1361">
         </div>
       </div>
 
-      <button onclick="solve_solar()">solve</button>
+      <button class="btn-primary" onclick="solve_solar()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="4">
+          <div class="result-line"><span class="label">EOL power</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">power lost</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">EOL margin</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">array area for P0</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_solar() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const p0 = val("p0"), years = val("years");
-      const deg = val("deg") || 0.028;
-      if (p0 === null || years === null) { err.textContent = "fill P0 and mission life"; return; }
-      if (years < 0) { err.textContent = "mission life must be non-negative"; return; }
-
-      const peol = p0 * Math.pow(1 - deg, years);
-      const lines = [
-        ["EOL power", fmt(peol, 6) + " W"],
-        ["power lost", fmt(p0 - peol, 6) + " W"]
-      ];
-
-      const load = val("load");
-      if (load !== null) {
-        const margin = peol - load;
-        lines.push(["EOL margin", fmt(margin, 6) + " W (" + fmt(peol / load, 4) + "x load)"]);
-      }
-
-      const eta = val("eta");
-      if (eta !== null) {
-        const flux = val("flux") || 1361;
-        if (eta <= 0 || flux <= 0) { err.textContent = "eta and flux must be positive"; return; }
-        const area = p0 / (eta * flux);
-        lines.push(["array area for P0", fmt(area, 6) + " m&sup2;"]);
-      }
-
-      render_lines("lines", lines);
-    }
-  </script>
+  <script src="solar-array.js"></script>
 </body>
 </html>

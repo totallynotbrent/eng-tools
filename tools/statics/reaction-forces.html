@@ -1,113 +1,89 @@
 <!doctype html>
-<html lang="en">
+<!--?xml version="1.0" encoding="UTF-8"?--><html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>reaction forces</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>reaction forces</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">simply supported beam, pin at A and roller at B. loads are downward-positive, distances measured from A.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-react"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">\sum M_A = 0, \qquad \sum F_y = 0</div>
 
       <div class="field">
-        <label>span L</label>
-        <input type="number" id="len" placeholder="m" step="any">
+        <label>span L (m)</label>
+        <input type="number" id="len" step="any" value="10">
       </div>
 
       <div class="field">
         <label>point load 1 (magnitude, distance from A)</label>
         <div class="row">
-          <input type="number" id="p1" placeholder="load" step="any">
-          <input type="number" id="x1" placeholder="distance" step="any">
+          <input type="number" id="p1" step="any" value="0">
+          <input type="number" id="x1" step="any" value="0">
         </div>
       </div>
 
       <div class="field">
         <label>point load 2</label>
         <div class="row">
-          <input type="number" id="p2" placeholder="load" step="any">
-          <input type="number" id="x2" placeholder="distance" step="any">
+          <input type="number" id="p2" step="any" value="0">
+          <input type="number" id="x2" step="any" value="3">
         </div>
       </div>
 
       <div class="field">
         <label>point load 3</label>
         <div class="row">
-          <input type="number" id="p3" placeholder="load" step="any">
-          <input type="number" id="x3" placeholder="distance" step="any">
+          <input type="number" id="p3" step="any" value="0">
+          <input type="number" id="x3" step="any" value="0">
         </div>
       </div>
 
       <div class="field">
         <label>uniform distributed load w (full span, optional)</label>
-        <input type="number" id="udl" placeholder="load per length" step="any">
+        <input type="number" id="udl" step="any" value="4">
       </div>
 
-      <button onclick="solve_reactions()">solve</button>
+      <button class="btn-primary" onclick="solve_reactions()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="4">
+          <div class="result-line"><span class="label">reaction at A (Ay)</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">reaction at B (By)</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">total downward load</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">moment about A</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_reactions() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const L = val("len");
-      if (L === null || L <= 0) { err.textContent = "enter a positive span"; return; }
-
-      const loads = [];
-      let total = 0;
-      for (let i = 1; i <= 3; i++) {
-        const p = val("p" + i), x = val("x" + i);
-        if (p !== null && x !== null) {
-          if (x < 0 || x > L) { err.textContent = "point load " + i + " must sit on the beam"; return; }
-          loads.push([p, x]);
-          total += p;
-        } else if (p !== null || x !== null) {
-          err.textContent = "point load " + i + " needs both a magnitude and a distance";
-          return;
-        }
-      }
-
-      const w = val("udl");
-      if (w !== null) total += w * L;
-
-      let sum_m = 0;
-      for (const l of loads) sum_m += l[0] * l[1];
-      if (w !== null) sum_m += w * L * L / 2;
-
-      const by = sum_m / L;
-      const ay = total - by;
-
-      render_lines("lines", [
-        ["reaction at A (Ay)", fmt(ay, 6) + " up"],
-        ["reaction at B (By)", fmt(by, 6) + " up"],
-        ["total downward load", fmt(total, 6)],
-        ["moment about A", fmt(sum_m, 6)]
-      ]);
-    }
-  </script>
+  <script src="reaction-forces.js"></script>
 </body>
 </html>

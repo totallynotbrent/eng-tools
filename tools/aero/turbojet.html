@@ -5,134 +5,83 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>turbojet cycle</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>turbojet cycle</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
-
-    <p class="muted">ideal turbojet on-design analysis: stations 0-9, specific thrust and tsfc from altitude, mach, and compressor ratio.</p>
-
-    <div class="eq">F = \dot{m}\left[(1+f)V_9 - V_0\right], \qquad f = \frac{c_p (T_{t4} - T_{t3})}{h_{PR} - c_p T_{t4}}</div>
-
-    <div class="section">
+    <div class="calc-equation">
+<div class="eq">F = \dot{m}\left[(1+f)V_9 - V_0\right], \qquad f = \frac{c_p (T_{t4} - T_{t3})}{h_{PR} - c_p T_{t4}}</div>
+    </div>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-turbojet"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
       <div class="field">
         <label>altitude, m</label>
-        <input type="number" id="alt" step="any" placeholder="e.g. 10000">
+        <input type="number" id="alt" step="any" value="10000">
       </div>
       <div class="field">
         <label>flight mach M0</label>
-        <input type="number" id="mach" step="any" placeholder="e.g. 0.7">
+        <input type="number" id="mach" step="any" value="0.85">
       </div>
       <div class="field">
         <label>compressor pressure ratio</label>
-        <input type="number" id="prc" step="any" placeholder="e.g. 10">
+        <input type="number" id="prc" step="any" value="30">
       </div>
       <div class="field">
         <label>burner exit temperature Tt4, K</label>
-        <input type="number" id="tt4" step="any" placeholder="e.g. 1600">
+        <input type="number" id="tt4" step="any" value="1600">
       </div>
       <div class="field">
         <label>fuel heating value hPR, J/kg</label>
-        <input type="number" id="hpr" step="any" placeholder="e.g. 43000000">
+        <input type="number" id="hpr" step="any" value="43000000">
       </div>
       <div class="field">
         <label>inlet mass flow mdot0, kg/s (optional)</label>
-        <input type="number" id="mdot" step="any" placeholder="e.g. 20">
+        <input type="number" id="mdot" step="any" value="20">
       </div>
-      <button onclick="solve_tj()">solve</button>
-      <div class="note">diffuser, compressor, burner, turbine, and nozzle all ideal; the nozzle expands fully to ambient.</div>
+      <button class="btn-primary" onclick="solve_tj()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="13">
+          <div class="result-line"><span class="label">freestream T0 / p0</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">face total Tt2 / pt2</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">compressor exit Tt3 / pt3</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">fuel-air ratio f</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">turbine exit Tt5 / pt5</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">nozzle exit mach M9</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">nozzle exit velocity V9</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">specific thrust F/mdot</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">thrust specific fuel consumption</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">gross thrust Fmdot9 V9</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">ram drag mdot0 V0</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">net thrust FN</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">fuel flow mdotf</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_tj() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const alt = val("alt"), mach = val("mach"), prc = val("prc"), tt4 = val("tt4"), hpr = val("hpr");
-      const mdot_in = val("mdot");
-      if (alt === null || mach === null || prc === null || tt4 === null || hpr === null) { err.textContent = "fill every field"; return; }
-      if (mdot_in !== null && mdot_in <= 0) { err.textContent = "mass flow must be positive"; return; }
-      if (alt < 0 || alt > 47000) { err.textContent = "altitude 0 - 47 km"; return; }
-      if (mach < 0 || prc < 1) { err.textContent = "M0 >= 0 and compressor ratio >= 1"; return; }
-      if (tt4 < 300 || hpr <= 0) { err.textContent = "Tt4 >= 300 K and hPR > 0"; return; }
-
-      const R = 287, gam = 1.4, cp = gam * R / (gam - 1);
-
-      // 1976 standard atmosphere
-      let t0, p0;
-      if (alt <= 11000) { t0 = 288.15 - 0.0065 * alt; p0 = 101325 * Math.pow(t0 / 288.15, 5.2559); }
-      else if (alt <= 20000) { t0 = 216.65; p0 = 22632 * Math.exp(-(alt - 11000) / 6341.6); }
-      else { t0 = 216.65 + 0.001 * (alt - 20000); p0 = 5474.9 * Math.pow(t0 / 216.65, -34.163); }
-      const a0 = Math.sqrt(gam * R * t0);
-      const v0 = mach * a0;
-
-      // ideal diffuser
-      const tt2 = t0 * (1 + (gam - 1) / 2 * mach * mach);
-      const pt2 = p0 * Math.pow(tt2 / t0, gam / (gam - 1));
-
-      // compressor
-      const tt3 = tt2 * Math.pow(prc, (gam - 1) / gam);
-      const pt3 = pt2 * prc;
-      if (tt4 <= tt3) { err.textContent = "Tt4 must exceed compressor exit temp " + fmt(tt3, 0) + " K"; return; }
-
-      // burner energy balance fixes f
-      const f = cp * (tt4 - tt3) / (hpr - cp * tt4);
-      if (f <= 0) { err.textContent = "burner exit temp too high for this fuel"; return; }
-
-      // turbine drives the compressor
-      const tt5 = tt4 - (tt3 - tt2) / (1 + f);
-      const pt5 = pt3 * Math.pow(tt5 / tt4, gam / (gam - 1));
-
-      // nozzle, fully expanded to ambient
-      const m9 = Math.sqrt(2 / (gam - 1) * (Math.pow(pt5 / p0, (gam - 1) / gam) - 1));
-      const t9 = tt5 / (1 + (gam - 1) / 2 * m9 * m9);
-      const v9 = m9 * Math.sqrt(gam * R * t9);
-
-      const sp_thrust = (1 + f) * v9 - v0;
-      if (sp_thrust <= 0) { err.textContent = "no net thrust at these settings"; return; }
-      const tsfc = f / sp_thrust * 3600;
-
-      const lines = [];
-      lines.push(["freestream T0 / p0", fmt(t0, 5) + " K / " + fmt(p0, 5) + " Pa"]);
-      lines.push(["face total Tt2 / pt2", fmt(tt2, 5) + " K / " + fmt(pt2, 5) + " Pa"]);
-      lines.push(["compressor exit Tt3 / pt3", fmt(tt3, 5) + " K / " + fmt(pt3, 5) + " Pa"]);
-      lines.push(["fuel-air ratio f", fmt(f, 5)]);
-      lines.push(["turbine exit Tt5 / pt5", fmt(tt5, 5) + " K / " + fmt(pt5, 5) + " Pa"]);
-      lines.push(["nozzle exit mach M9", fmt(m9, 5)]);
-      lines.push(["nozzle exit velocity V9", fmt(v9, 5) + " m/s"]);
-      lines.push(["specific thrust F/mdot", fmt(sp_thrust, 5) + " N/(kg/s)"]);
-      lines.push(["thrust specific fuel consumption", fmt(tsfc, 5) + " kg/(N*h)"]);
-      if (mdot_in !== null) {
-        const gross = mdot_in * (1 + f) * v9 / 1000;
-        const ram = mdot_in * v0 / 1000;
-        const net = mdot_in * sp_thrust / 1000;
-        const fuel = f * mdot_in;
-        lines.push(["gross thrust Fmdot9 V9", fmt(gross, 4) + " kN"]);
-        lines.push(["ram drag mdot0 V0", fmt(ram, 4) + " kN"]);
-        lines.push(["net thrust FN", fmt(net, 4) + " kN"]);
-        lines.push(["fuel flow mdotf", fmt(fuel, 5) + " kg/s"]);
-      }
-
-      render_lines("lines", lines);
-      document.getElementById("results").style.display = "";
-    }
-  </script>
+  <script src="turbojet.js"></script>
 </body>
 </html>

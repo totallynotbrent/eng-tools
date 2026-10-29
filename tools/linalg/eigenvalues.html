@@ -5,84 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>eigenvalues and vectors</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>eigenvalues and vectors</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">eigenvalues and eigenvectors of a 2x2 matrix.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-eig"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">A\vec{v} = \lambda\vec{v}</div>
 
       <div class="field">
         <label>matrix entries</label>
         <div class="row">
-          <input type="number" id="a11" step="any" placeholder="a">
-          <input type="number" id="a12" step="any" placeholder="b">
+          <input type="number" id="a11" step="any" value="2">
+          <input type="number" id="a12" step="any" value="1">
         </div>
         <div class="row" style="margin-top:0.4rem">
-          <input type="number" id="a21" step="any" placeholder="c">
-          <input type="number" id="a22" step="any" placeholder="d">
+          <input type="number" id="a21" step="any" value="1">
+          <input type="number" id="a22" step="any" value="2">
         </div>
       </div>
 
-      <button onclick="solve_eig()">solve</button>
+      <button class="btn-primary" onclick="solve_eig()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="7">
+          <div class="result-line"><span class="label">trace</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">determinant</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">λ1</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">λ2</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">v1</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">v2</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">complex pair</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solver_disc(trace, det) { return trace * trace - 4 * det; }
-
-    function eigvec(a, b, c, d, lam) {
-      if (b !== 0) return [b, lam - a];
-      if (c !== 0) return [lam - d, c];
-      return [1, 0];
-    }
-
-    function solve_eig() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const a = val("a11"), b = val("a12"), c = val("a21"), d = val("a22");
-      if (a === null || b === null || c === null || d === null) { err.textContent = "fill all four entries"; return; }
-
-      const trace = a + d, det = a * d - b * c;
-      const disc = solver_disc(trace, det);
-      const lines = [["trace", fmt(trace, 6)], ["determinant", fmt(det, 6)]];
-
-      if (disc >= 0) {
-        const s = Math.sqrt(disc);
-        const l1 = (trace + s) / 2, l2 = (trace - s) / 2;
-        lines.push(["&lambda;1", fmt(l1, 6)]);
-        lines.push(["&lambda;2", fmt(l2, 6)]);
-        const v1 = eigvec(a, b, c, d, l1);
-        const v2 = eigvec(a, b, c, d, l2);
-        lines.push(["v1", "(" + fmt(v1[0], 4) + ", " + fmt(v1[1], 4) + ")"]);
-        lines.push(["v2", "(" + fmt(v2[0], 4) + ", " + fmt(v2[1], 4) + ")"]);
-      } else {
-        const re = trace / 2, im = Math.sqrt(-disc) / 2;
-        lines.push(["complex pair", fmt(re, 6) + " &plusmn; " + fmt(im, 6) + " i"]);
-      }
-
-      render_lines("lines", lines);
-    }
-  </script>
+  <script src="eigenvalues.js"></script>
 </body>
 </html>

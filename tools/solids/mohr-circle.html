@@ -5,71 +5,65 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>mohr's circle</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>mohr's circle</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">principal stresses and max shear from a plane stress state. &tau;xy positive in the sign convention where tension is positive.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-mohr"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">R = \sqrt{\left(\frac{\sigma_x - \sigma_y}{2}\right)^2 + \tau_{xy}^2}</div>
 
       <div class="field">
-        <label>normal stress &sigma;x</label>
-        <input type="number" id="sx" step="any" placeholder="Pa">
+        <label>normal stress σx (Pa)</label>
+        <input type="number" id="sx" step="any" value="100">
       </div>
       <div class="field">
-        <label>normal stress &sigma;y</label>
-        <input type="number" id="sy" step="any" placeholder="Pa">
+        <label>normal stress σy (Pa)</label>
+        <input type="number" id="sy" step="any" value="20">
       </div>
       <div class="field">
-        <label>shear stress &tau;xy</label>
-        <input type="number" id="txy" step="any" placeholder="Pa">
+        <label>shear stress τxy (Pa)</label>
+        <input type="number" id="txy" step="any" value="30">
       </div>
 
-      <button onclick="solve_mohr()">solve</button>
+      <button class="btn-primary" onclick="solve_mohr()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="5">
+          <div class="result-line"><span class="label">principal stress σ1</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">principal stress σ2</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">max shear τmax</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">principal angle θp</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">average stress σavg</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_mohr() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const sx = val("sx"), sy = val("sy"), txy = val("txy");
-      if (sx === null || sy === null || txy === null) { err.textContent = "fill all three stresses"; return; }
-
-      const avg = (sx + sy) / 2;
-      const rd = (sx - sy) / 2;
-      const r = Math.hypot(rd, txy);
-      const s1 = avg + r, s2 = avg - r;
-      const thp = 0.5 * Math.atan2(txy, rd) * 180 / Math.PI;
-
-      render_lines("lines", [
-        ["principal stress &sigma;1", fmt(s1, 6) + " Pa"],
-        ["principal stress &sigma;2", fmt(s2, 6) + " Pa"],
-        ["max shear &tau;max", fmt(r, 6) + " Pa"],
-        ["principal angle &theta;p", fmt(thp, 6) + " &deg;"],
-        ["average stress &sigma;avg", fmt(avg, 6) + " Pa"]
-      ]);
-    }
-  </script>
+  <script src="mohr-circle.js"></script>
 </body>
 </html>

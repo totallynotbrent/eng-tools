@@ -5,72 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>reynolds number</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>reynolds number</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">Re = &rho;VL/&mu; from fluid properties and a characteristic length. dynamic viscosity &mu; is default air.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-reynolds"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">Re = \frac{\rho V L}{\mu}</div>
 
       <div class="field">
-        <label>density &rho;</label>
-        <input type="number" id="rho" step="any" placeholder="kg/m&sup3;" value="1.225">
+        <label>density ρ</label>
+        <input type="number" id="rho" step="any" value="1.225">
       </div>
       <div class="field">
-        <label>velocity V</label>
-        <input type="number" id="vel" step="any" placeholder="m/s">
+        <label>velocity V (m/s)</label>
+        <input type="number" id="vel" step="any" value="50">
       </div>
       <div class="field">
-        <label>characteristic length L</label>
-        <input type="number" id="len" step="any" placeholder="m">
+        <label>characteristic length L (m)</label>
+        <input type="number" id="len" step="any" value="1">
       </div>
       <div class="field">
-        <label>dynamic viscosity &mu; (optional)</label>
-        <input type="number" id="mu" step="any" placeholder="1.789e-5">
+        <label>dynamic viscosity μ (optional)</label>
+        <input type="number" id="mu" step="any" placeholder="1.789e-5" value="1.81e-5">
       </div>
 
-      <button onclick="solve_re()">solve</button>
+      <button class="btn-primary" onclick="solve_re()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="2">
+          <div class="result-line"><span class="label">reynolds number Re</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">regime (pipe)</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_re() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const rho = val("rho"), v = val("vel"), l = val("len"), mu = val("mu") || 1.789e-5;
-      if (rho === null || v === null || l === null) { err.textContent = "fill rho, V, and L"; return; }
-      if (mu <= 0 || l <= 0) { err.textContent = "mu and L must be positive"; return; }
-
-      const re = rho * v * l / mu;
-      let regime = "laminar-leaning";
-      if (re > 4000) regime = "turbulent-leaning";
-      else if (re >= 2300) regime = "transitional";
-
-      render_lines("lines", [
-        ["reynolds number Re", fmt(re, 6)],
-        ["regime (pipe)", regime]
-      ]);
-    }
-  </script>
+  <script src="reynolds.js"></script>
 </body>
 </html>

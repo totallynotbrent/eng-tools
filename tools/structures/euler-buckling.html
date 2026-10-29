@@ -5,33 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>euler buckling</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>euler buckling</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">critical buckling load for a slender column from its end conditions.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-buckle"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">P_{cr} = \frac{\pi^2 E I}{(K L)^2}</div>
 
       <div class="field">
-        <label>young's modulus E</label>
-        <input type="number" id="e_mod" step="any" placeholder="Pa">
+        <label>young's modulus E (Pa)</label>
+        <input type="number" id="e_mod" step="any" value="200000000000">
       </div>
       <div class="field">
         <label>area moment of inertia I (about the buckling axis)</label>
-        <input type="number" id="inertia" step="any" placeholder="m&#8308;">
+        <input type="number" id="inertia" step="any" value="1">
       </div>
       <div class="field">
-        <label>length L</label>
-        <input type="number" id="len" step="any" placeholder="m">
+        <label>length L (m)</label>
+        <input type="number" id="len" step="any" value="2">
       </div>
       <div class="field">
         <label>end condition</label>
@@ -43,37 +49,27 @@
         </select>
       </div>
 
-      <button onclick="solve_buckling()">solve</button>
+      <button class="btn-primary" onclick="solve_buckling()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="2">
+          <div class="result-line"><span class="label">critical load P_cr</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">effective length KL</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_buckling() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const e = val("e_mod"), i = val("inertia"), l = val("len");
-      if (e === null || i === null || l === null) { err.textContent = "fill E, I, and L"; return; }
-      if (e <= 0 || i <= 0 || l <= 0) { err.textContent = "E, I, and L must be positive"; return; }
-
-      const k = parseFloat(document.getElementById("ends").value);
-      const pcr = Math.PI * Math.PI * e * i / Math.pow(k * l, 2);
-
-      render_lines("lines", [
-        ["critical load P_cr", fmt(pcr, 6) + " N"],
-        ["effective length KL", fmt(k * l, 6) + " m"]
-      ]);
-    }
-  </script>
+  <script src="euler-buckling.js"></script>
 </body>
 </html>

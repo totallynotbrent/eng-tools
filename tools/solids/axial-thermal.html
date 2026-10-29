@@ -5,82 +5,76 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>axial and thermal deformation</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>axial and thermal deformation</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">total stretch from an axial load and a temperature change. &delta;mech = PL/(AE), &delta;therm = &alpha;L&Delta;T.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-axial"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">\delta = \frac{F L}{A E} + \alpha L \Delta T</div>
 
       <div class="field">
-        <label>axial load P</label>
-        <input type="number" id="load" step="any" placeholder="N">
+        <label>axial load P (N)</label>
+        <input type="number" id="load" step="any" value="10000">
       </div>
       <div class="field">
-        <label>length L</label>
-        <input type="number" id="length" step="any" placeholder="m">
+        <label>length L (m)</label>
+        <input type="number" id="length" step="any" value="2">
       </div>
       <div class="field">
-        <label>area A</label>
-        <input type="number" id="area" step="any" placeholder="m&sup2;">
+        <label>area A (m²)</label>
+        <input type="number" id="area" step="any" value="0.001">
       </div>
       <div class="field">
-        <label>young's modulus E</label>
-        <input type="number" id="modulus" step="any" placeholder="Pa">
+        <label>young's modulus E (Pa)</label>
+        <input type="number" id="modulus" step="any" value="200000000000">
       </div>
       <div class="field">
-        <label>coefficient of thermal expansion &alpha;</label>
-        <input type="number" id="alpha" step="any" placeholder="1/&deg;C" value="0">
+        <label>coefficient of thermal expansion α</label>
+        <input type="number" id="alpha" step="any" value="0">
       </div>
       <div class="field">
-        <label>temperature change &Delta;T</label>
-        <input type="number" id="dt" step="any" placeholder="&deg;C" value="0">
+        <label>temperature change ΔT (°C)</label>
+        <input type="number" id="dt" step="any" value="0">
       </div>
 
-      <button onclick="solve_axial()">solve</button>
+      <button class="btn-primary" onclick="solve_axial()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="4">
+          <div class="result-line"><span class="label">mechanical δ</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">thermal δ</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">total δ</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">axial stress σ</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_axial() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const p = val("load"), l = val("length"), a = val("area"), e = val("modulus");
-      const alpha = val("alpha") || 0, dt = val("dt") || 0;
-      if (p === null || l === null || a === null || e === null) { err.textContent = "fill P, L, A, and E"; return; }
-      if (a <= 0 || e <= 0) { err.textContent = "A and E must be positive"; return; }
-
-      const dmech = p * l / (a * e);
-      const dtherm = alpha * l * dt;
-      const sigma = p / a;
-
-      render_lines("lines", [
-        ["mechanical &delta;", fmt(dmech, 6) + " m"],
-        ["thermal &delta;", fmt(dtherm, 6) + " m"],
-        ["total &delta;", fmt(dmech + dtherm, 6) + " m"],
-        ["axial stress &sigma;", fmt(sigma, 6) + " Pa"]
-      ]);
-    }
-  </script>
+  <script src="axial-thermal.js"></script>
 </body>
 </html>

@@ -5,96 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>lift and drag</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>lift and drag</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">dynamic pressure, lift, and drag. enter a drag coefficient directly, or leave it blank and give a polar CD0 + k&middot;CL&sup2;.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-liftdrag"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">q = \tfrac{1}{2}\rho V^2, \qquad L = q\,S\,C_L, \qquad D = q\,S\,C_D</div>
 
       <div class="field">
-        <label>density &rho;</label>
-        <input type="number" id="rho" step="any" placeholder="kg/m&sup3;" value="1.225">
+        <label>density ρ</label>
+        <input type="number" id="rho" step="any" value="1.225">
       </div>
       <div class="field">
-        <label>velocity V</label>
-        <input type="number" id="vel" step="any" placeholder="m/s">
+        <label>velocity V (m/s)</label>
+        <input type="number" id="vel" step="any" value="50">
       </div>
       <div class="field">
-        <label>wing area S</label>
-        <input type="number" id="area" step="any" placeholder="m&sup2;">
+        <label>wing area S (m²)</label>
+        <input type="number" id="area" step="any" value="5">
       </div>
       <div class="field">
         <label>lift coefficient CL</label>
-        <input type="number" id="cl" step="any" placeholder="dimensionless">
+        <input type="number" id="cl" step="any" value="0.5">
       </div>
       <div class="field">
         <label>drag coefficient CD (direct, optional)</label>
-        <input type="number" id="cd" step="any" placeholder="dimensionless">
+        <input type="number" id="cd" step="any" value="0.02">
       </div>
       <div class="field">
         <label>polar CD0 and k (used if CD is blank)</label>
         <div class="row">
-          <input type="number" id="cd0" step="any" placeholder="CD0">
-          <input type="number" id="k" step="any" placeholder="k">
+          <input type="number" id="cd0" step="any" value="0.02">
+          <input type="number" id="k" step="any" value="0.05">
         </div>
       </div>
 
-      <button onclick="solve_ld()">solve</button>
+      <button class="btn-primary" onclick="solve_ld()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="4">
+          <div class="result-line"><span class="label">dynamic pressure q</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">lift L</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">drag D</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">lift to drag L/D</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_ld() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const rho = val("rho"), v = val("vel"), s = val("area"), cl = val("cl");
-      if (rho === null || v === null || s === null || cl === null) { err.textContent = "fill rho, V, S, and CL"; return; }
-      if (rho < 0 || v < 0 || s <= 0) { err.textContent = "check rho, V, and S"; return; }
-
-      const q = 0.5 * rho * v * v;
-      const lift = q * s * cl;
-
-      let cd = val("cd");
-      let mode = "direct";
-      if (cd === null) {
-        const cd0 = val("cd0"), k = val("k");
-        if (cd0 === null || k === null) { err.textContent = "give CD directly or both CD0 and k"; return; }
-        cd = cd0 + k * cl * cl;
-        mode = "polar";
-      }
-      const drag = q * s * cd;
-
-      const lines = [
-        ["dynamic pressure q", fmt(q, 6) + " Pa"],
-        ["lift L", fmt(lift, 6) + " N"],
-        ["drag D", fmt(drag, 6) + " N"],
-        ["effective CD (" + mode + ")", fmt(cd, 6)],
-        ["lift to drag L/D", fmt(lift / drag, 6)]
-      ];
-
-      render_lines("lines", lines);
-    }
-  </script>
+  <script src="lift-drag.js"></script>
 </body>
 </html>

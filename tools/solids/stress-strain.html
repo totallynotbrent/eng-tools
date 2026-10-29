@@ -5,88 +5,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>stress and strain</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>stress and strain</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">hooke's law &sigma; = E&middot;&epsilon;. leave one of E, &sigma;, &epsilon; blank and it solves for it.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-hooke"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">\sigma = E\varepsilon</div>
 
       <div class="field">
-        <label>young's modulus E</label>
-        <input type="number" id="e_mod" step="any" placeholder="Pa">
+        <label>young's modulus E (Pa)</label>
+        <input type="number" id="e_mod" step="any" value="200e9">
       </div>
       <div class="field">
-        <label>stress &sigma;</label>
-        <input type="number" id="stress" step="any" placeholder="Pa">
+        <label>stress σ (Pa)</label>
+        <input type="number" id="stress" step="any">
       </div>
       <div class="field">
-        <label>strain &epsilon;</label>
-        <input type="number" id="strain" step="any" placeholder="dimensionless">
+        <label>strain ε</label>
+        <input type="number" id="strain" step="any" value="0.001">
       </div>
 
       <div class="field">
-        <label>axial force F and area A (optional, gives &sigma; = F/A)</label>
+        <label>axial force F and area A (optional, gives σ = F/A)</label>
         <div class="row">
-          <input type="number" id="force" step="any" placeholder="F (N)">
-          <input type="number" id="area" step="any" placeholder="A (m&sup2;)">
+          <input type="number" id="force" step="any" value="0">
+          <input type="number" id="area" step="any" value="1">
         </div>
       </div>
 
-      <button onclick="solve_hooke()">solve</button>
+      <button class="btn-primary" onclick="solve_hooke()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="4">
+          <div class="result-line"><span class="label">young's modulus E</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">stress σ</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">strain ε</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">σ from F/A</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_hooke() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const e = val("e_mod"), s = val("stress"), ep = val("strain");
-      const known = [e, s, ep].filter(function (x) { return x !== null; }).length;
-      if (known !== 2) { err.textContent = "fill exactly two of E, sigma, epsilon"; return; }
-
-      let ove = e, ovs = s, ovep = ep;
-      if (e === null) { if (ep === 0) { err.textContent = "epsilon is zero"; return; } ove = s / ep; }
-      else if (s === null) { ovs = e * ep; }
-      else if (ep === null) { if (e === 0) { err.textContent = "E is zero"; return; } ovep = s / e; }
-
-      const lines = [
-        ["young's modulus E", fmt(ove, 6) + " Pa"],
-        ["stress &sigma;", fmt(ovs, 6) + " Pa"],
-        ["strain &epsilon;", fmt(ovep, 6)]
-      ];
-
-      const f = val("force"), a = val("area");
-      if (f !== null && a !== null) {
-        if (a <= 0) { err.textContent = "area must be positive"; return; }
-        lines.push(["&sigma; from F/A", fmt(f / a, 6) + " Pa"]);
-      } else if (f !== null || a !== null) {
-        err.textContent = "enter both F and A, or neither";
-        return;
-      }
-
-      render_lines("lines", lines);
-    }
-  </script>
+  <script src="stress-strain.js"></script>
 </body>
 </html>

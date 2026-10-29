@@ -5,69 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>nozzle flow</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>nozzle flow</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">area ratio and exit mach number for a given chamber and exit pressure.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-nozzle"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">\frac{A_e}{A_t} = \frac{1}{M_e}\left[\frac{2}{\gamma+1}\left(1 + \frac{\gamma-1}{2}M_e^2\right)\right]^{\frac{\gamma+1}{2(\gamma-1)}}</div>
 
       <div class="field">
         <label>chamber pressure pc and exit pressure pe</label>
         <div class="row">
-          <input type="number" id="pc" step="any" placeholder="pc">
-          <input type="number" id="pe" step="any" placeholder="pe">
+          <input type="number" id="pc" step="any" value="100">
+          <input type="number" id="pe" step="any" value="1">
         </div>
       </div>
       <div class="field">
-        <label>ratio of specific heats &gamma; (optional)</label>
-        <input type="number" id="gamma" step="any" placeholder="1.2">
+        <label>ratio of specific heats γ (optional)</label>
+        <input type="number" id="gamma" step="any" placeholder="1.2" value="1.4">
       </div>
 
-      <button onclick="solve_nozzle()">solve</button>
+      <button class="btn-primary" onclick="solve_nozzle()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="3">
+          <div class="result-line"><span class="label">pressure ratio pc/pe</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">exit mach Me</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">area ratio Ae/A*</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_nozzle() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const pc = val("pc"), pe = val("pe"), g = val("gamma") || 1.2;
-      if (pc === null || pe === null) { err.textContent = "fill pc and pe"; return; }
-      if (pc <= 0 || pe <= 0 || pc <= pe) { err.textContent = "need pc > pe > 0"; return; }
-      if (g <= 1) { err.textContent = "gamma must be greater than 1"; return; }
-
-      const pr = pc / pe;
-      const me = Math.sqrt((2 / (g - 1)) * (Math.pow(pr, (g - 1) / g) - 1));
-      const term = (2 / (g + 1)) * (1 + (g - 1) / 2 * me * me);
-      const aa = (1 / me) * Math.pow(term, (g + 1) / (2 * (g - 1)));
-
-      render_lines("lines", [
-        ["pressure ratio pc/pe", fmt(pr, 6)],
-        ["exit mach Me", fmt(me, 6)],
-        ["area ratio Ae/A*", fmt(aa, 6)]
-      ]);
-    }
-  </script>
+  <script src="nozzle.js"></script>
 </body>
 </html>

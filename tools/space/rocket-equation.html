@@ -5,68 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>rocket equation</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>rocket equation</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">ideal delta-v from exhaust velocity and mass ratio. &Delta;v = ve &middot; ln(m0/mf).</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-rocket"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">\Delta v = v_e \ln\frac{m_0}{m_f}</div>
 
       <div class="field">
-        <label>exhaust velocity ve (or Isp &middot; g)</label>
-        <input type="number" id="ve" step="any" placeholder="m/s">
+        <label>exhaust velocity ve (or Isp · g) (m/s)</label>
+        <input type="number" id="ve" step="any" value="3000">
       </div>
       <div class="field">
-        <label>initial mass m0</label>
-        <input type="number" id="m0" step="any" placeholder="kg">
+        <label>initial mass m0 (kg)</label>
+        <input type="number" id="m0" step="any" value="1000">
       </div>
       <div class="field">
-        <label>final mass mf</label>
-        <input type="number" id="mf" step="any" placeholder="kg">
+        <label>final mass mf (kg)</label>
+        <input type="number" id="mf" step="any" value="200">
       </div>
 
-      <button onclick="solve_rocket()">solve</button>
+      <button class="btn-primary" onclick="solve_rocket()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="2">
+          <div class="result-line"><span class="label">mass ratio m0/mf</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">propellant mass</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_rocket() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const ve = val("ve"), m0 = val("m0"), mf = val("mf");
-      if (ve === null || m0 === null || mf === null) { err.textContent = "fill ve, m0, and mf"; return; }
-      if (ve <= 0 || m0 <= 0 || mf <= 0 || mf > m0) { err.textContent = "need ve > 0 and 0 < mf <= m0"; return; }
-
-      const mr = m0 / mf;
-      const dv = ve * Math.log(mr);
-      const prop = m0 - mf;
-
-      render_lines("lines", [
-        ["mass ratio m0/mf", fmt(mr, 6)],
-        ["propellant mass", fmt(prop, 4) + " kg"],
-        ["ideal &Delta;v", fmt(dv, 6) + " m/s"]
-      ]);
-    }
-  </script>
+  <script src="rocket-equation.js"></script>
 </body>
 </html>

@@ -5,75 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>standard atmosphere</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>standard atmosphere</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">ISA temperature, pressure, density, and speed of sound by altitude, up to 20 km.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-isa"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">T = T_0 - L h, \qquad p = p_0 \left(\frac{T}{T_0}\right)^{g/(RL)}</div>
 
       <div class="field">
-        <label>altitude h</label>
-        <input type="number" id="alt" step="any" placeholder="m">
+        <label>altitude h (m)</label>
+        <input type="number" id="alt" step="any" value="11000">
       </div>
 
-      <button onclick="solve_isa()">solve</button>
+      <button class="btn-primary" onclick="solve_isa()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="6">
+          <div class="result-line"><span class="label">temperature T</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">pressure p</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">density ρ</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">speed of sound a</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">p / p0</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">ρ / ρ0</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    const T0 = 288.15, P0 = 101325, L = 0.0065, G0 = 9.80665, R = 287.0529, GAMMA = 1.4;
-    const RHO0 = P0 / (R * T0);
-    const EXP = G0 / (L * R);
-
-    function solve_isa() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const h = val("alt");
-      if (h === null) { err.textContent = "enter an altitude"; return; }
-      if (h < 0 || h > 20000) { err.textContent = "altitude must be between 0 and 20000 m"; return; }
-
-      let t, p;
-      if (h < 11000) {
-        t = T0 - L * h;
-        p = P0 * Math.pow(t / T0, EXP);
-      } else {
-        t = 216.65;
-        const p11 = P0 * Math.pow(216.65 / T0, EXP);
-        p = p11 * Math.exp(-G0 * (h - 11000) / (R * 216.65));
-      }
-      const rho = p / (R * t);
-      const a = Math.sqrt(GAMMA * R * t);
-
-      render_lines("lines", [
-        ["temperature T", fmt(t, 4) + " K (" + fmt(t - 273.15, 4) + " &deg;C)"],
-        ["pressure p", fmt(p, 4) + " Pa"],
-        ["density &rho;", fmt(rho, 6) + " kg/m&sup3;"],
-        ["speed of sound a", fmt(a, 4) + " m/s"],
-        ["p / p0", fmt(p / P0, 6)],
-        ["&rho; / &rho;0", fmt(rho / RHO0, 6)]
-      ]);
-    }
-  </script>
+  <script src="standard-atmosphere.js"></script>
 </body>
 </html>

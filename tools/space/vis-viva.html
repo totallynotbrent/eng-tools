@@ -5,66 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>vis-viva</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>vis-viva</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">orbital speed at a given radius on an orbit of semi-major axis a. v = &radic;(&mu;(2/r &minus; 1/a)).</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-visviva"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">v^2 = \mu\left(\frac{2}{r} - \frac{1}{a}\right)</div>
 
       <div class="field">
-        <label>radius r</label>
-        <input type="number" id="r" step="any" placeholder="m">
+        <label>radius r (m)</label>
+        <input type="number" id="r" step="any" value="6771000">
       </div>
       <div class="field">
-        <label>semi-major axis a</label>
-        <input type="number" id="a" step="any" placeholder="m">
+        <label>semi-major axis a (m)</label>
+        <input type="number" id="a" step="any" value="26560000">
       </div>
       <div class="field">
-        <label>gravitational parameter &mu; (optional)</label>
-        <input type="number" id="mu" step="any" placeholder="3.986e14">
+        <label>gravitational parameter μ (optional)</label>
+        <input type="number" id="mu" step="any" placeholder="3.986e14" value="398600441800000">
       </div>
 
-      <button onclick="solve_visviva()">solve</button>
+      <button class="btn-primary" onclick="solve_visviva()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="2">
+          <div class="result-line"><span class="label">speed v</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">circular speed at r (a = r)</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_visviva() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const r = val("r"), a = val("a"), mu = val("mu") || 3.986e14;
-      if (r === null || a === null) { err.textContent = "fill r and a"; return; }
-      if (r <= 0 || a <= 0 || mu <= 0) { err.textContent = "r, a, and mu must be positive"; return; }
-
-      const inside = 2 / r - 1 / a;
-      if (inside < 0) { err.textContent = "no real speed: 2/r must be at least 1/a"; return; }
-
-      render_lines("lines", [
-        ["speed v", fmt(Math.sqrt(mu * inside), 6) + " m/s"],
-        ["circular speed at r (a = r)", fmt(Math.sqrt(mu / r), 6) + " m/s"]
-      ]);
-    }
-  </script>
+  <script src="vis-viva.js"></script>
 </body>
 </html>

@@ -5,22 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>compressor and turbine efficiency</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>compressor and turbine efficiency</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
-
-    <p class="muted">isentropic efficiencies from measured inlet and exit states, plus the polytropic efficiency cross-check.</p>
-
-    <div class="eq">\eta_c = \frac{T_{t2}\left(\pi_c^{\frac{\gamma-1}{\gamma}} - 1\right)}{T_{t3} - T_{t2}}, \qquad \eta_t = \frac{T_{t4} - T_{t5}}{T_{t4}\left(1 - \tau_t^{\frac{\gamma-1}{\gamma}}\right)}</div>
-
-    <div class="section">
+    <div class="calc-equation">
+<div class="eq">\eta_c = \frac{T_{t2}\left(\pi_c^{\frac{\gamma-1}{\gamma}} - 1\right)}{T_{t3} - T_{t2}}, \qquad \eta_t = \frac{T_{t4} - T_{t5}}{T_{t4}\left(1 - \tau_t^{\frac{\gamma-1}{\gamma}}\right)}</div>
+    </div>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-eff"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
       <div class="field">
         <label>mode</label>
         <select id="mode">
@@ -30,72 +35,41 @@
       </div>
       <div class="field">
         <label>gamma</label>
-        <input type="number" id="gamma" step="any" placeholder="e.g. 1.4">
+        <input type="number" id="gamma" step="any" value="1.4">
       </div>
       <div class="field">
         <label>inlet total temperature Tt-in, K</label>
-        <input type="number" id="ttin" step="any" placeholder="e.g. 288">
+        <input type="number" id="ttin" step="any" value="288">
       </div>
       <div class="field">
         <label>exit total temperature Tt-out, K</label>
-        <input type="number" id="ttout" step="any" placeholder="e.g. 700">
+        <input type="number" id="ttout" step="any" value="700">
       </div>
       <div class="field">
         <label>total pressure ratio (exit / inlet)</label>
-        <input type="number" id="ratio" step="any" placeholder="e.g. 10">
+        <input type="number" id="ratio" step="any" value="10">
       </div>
-      <button onclick="solve_eff()">solve</button>
-      <div class="note">isentropic efficiency plus the equivalent polytropic efficiency for small-stage comparison.</div>
+      <button class="btn-primary" onclick="solve_eff()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="2">
+          <div class="result-line"><span class="label">isentropic efficiency</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">polytropic efficiency</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_eff() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const mode = document.getElementById("mode").value;
-      const gam = val("gamma"), ttin = val("ttin"), ttout = val("ttout"), ratio = val("ratio");
-      if (gam === null || ttin === null || ttout === null || ratio === null) { err.textContent = "fill every field"; return; }
-      if (gam <= 1 || ttin <= 0 || ratio <= 0) { err.textContent = "gamma > 1, positive temperatures and ratios"; return; }
-
-      const e = (gam - 1) / gam;
-      const lines = [];
-
-      if (mode === "c") {
-        if (ttout <= ttin) { err.textContent = "compressor exit temp must exceed inlet"; return; }
-        if (ratio < 1) { err.textContent = "compressor pressure ratio must be >= 1"; return; }
-        const eta = ttin * (Math.pow(ratio, e) - 1) / (ttout - ttin);
-        if (eta <= 0 || eta > 1) { err.textContent = "these states are not a valid compressor (eta out of 0-1)"; return; }
-        // polytropic efficiency: dTt/Tt = (e/eta) dpt/pt integrated to a single stage-equivalent
-        const ep = Math.log(ratio) * e / Math.log(ttout / ttin);
-        lines.push(["isentropic efficiency", fmt(eta, 5)]);
-        lines.push(["polytropic efficiency", fmt(ep, 5)]);
-        lines.push(["ideal exit temp at eta=1", fmt(ttin * Math.pow(ratio, e), 5) + " K"]);
-      } else {
-        if (ttout >= ttin) { err.textContent = "turbine exit temp must be below inlet"; return; }
-        if (ratio > 1) { err.textContent = "turbine pressure ratio must be <= 1 (exit/inlet)"; return; }
-        const eta = (ttin - ttout) / (ttin * (1 - Math.pow(ratio, e)));
-        if (eta <= 0 || eta > 1) { err.textContent = "these states are not a valid turbine (eta out of 0-1)"; return; }
-        const ep = Math.log(ttout / ttin) / (e * Math.log(ratio));
-        lines.push(["isentropic efficiency", fmt(eta, 5)]);
-        lines.push(["polytropic efficiency", fmt(ep, 5)]);
-        lines.push(["ideal exit temp at eta=1", fmt(ttin * Math.pow(ratio, e), 5) + " K"]);
-      }
-
-      render_lines("lines", lines);
-      document.getElementById("results").style.display = "";
-    }
-  </script>
+  <script src="component-efficiency.js"></script>
 </body>
 </html>

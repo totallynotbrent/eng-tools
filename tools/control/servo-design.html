@@ -5,41 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>servo controller design</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>servo controller design</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
-
-    <p class="muted">proportional-velocity and proportional-integral gains from overshoot and peak-time specs.</p>
-
-    <div class="eq">\begin{aligned}
-\zeta &= \frac{-\ln(\mathrm{OS}/100)}{\sqrt{\pi^2 + \ln^2(\mathrm{OS}/100)}} \\\\
-\omega_n &= \frac{\pi}{t_p\sqrt{1-\zeta^2}} \\\\
-K_p &= \frac{\omega_n^2}{K}, \quad K_v = \frac{2\zeta\omega_n}{K}
+    <div class="calc-equation">
+<div class="eq">\begin{aligned}
+\zeta &amp;= \frac{-\ln(\mathrm{OS}/100)}{\sqrt{\pi^2 + \ln^2(\mathrm{OS}/100)}} \\\\
+\omega_n &amp;= \frac{\pi}{t_p\sqrt{1-\zeta^2}} \\\\
+K_p &amp;= \frac{\omega_n^2}{K}, \quad K_v = \frac{2\zeta\omega_n}{K}
 \end{aligned}</div>
-
-    <div class="section">
+    </div>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-servo"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
       <div class="field">
         <label>plant steady-state gain K</label>
-        <input type="number" id="k_plant" step="any" placeholder="rad/s per V">
+        <input type="number" id="k_plant" step="any" value="1.53">
       </div>
       <div class="field">
-        <label>plant time constant &tau;</label>
-        <input type="number" id="tau" step="any" placeholder="s">
+        <label>plant time constant τ (s)</label>
+        <input type="number" id="tau" step="any" value="1">
       </div>
       <div class="field">
-        <label>percent overshoot spec</label>
-        <input type="number" id="po" step="any" placeholder="%">
+        <label>percent overshoot spec (%)</label>
+        <input type="number" id="po" step="any" value="16.3">
       </div>
       <div class="field">
-        <label>peak time spec tp</label>
-        <input type="number" id="tp" step="any" placeholder="s">
+        <label>peak time spec tp (s)</label>
+        <input type="number" id="tp" step="any" value="0.907">
       </div>
       <div class="field">
         <label>amplifier type</label>
@@ -48,63 +53,33 @@ K_p &= \frac{\omega_n^2}{K}, \quad K_v = \frac{2\zeta\omega_n}{K}
           <option value="volt">voltage</option>
         </select>
       </div>
-      <button onclick="solve_servo()">solve</button>
-      <div class="note">Q3 amps drive current: PV uses kp = wn&sup2;/K, kv = 2&zeta;&omega;n/K. voltage amps fold the plant pole in.</div>
+      <button class="btn-primary" onclick="solve_servo()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="8">
+          <div class="result-line"><span class="label">damping ratio zeta</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">natural frequency wn</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">damped frequency wd</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">proportional gain kp</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">velocity gain kv</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">integral gain ki</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">closed-loop overshoot check</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">settling time (two percent)</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_servo() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const k_plant = val("k_plant"), tau = val("tau"), po = val("po"), tp = val("tp");
-      if (k_plant === null || tau === null || po === null || tp === null) { err.textContent = "fill K, tau, overshoot, and peak time"; return; }
-      if (k_plant <= 0 || tau <= 0 || tp <= 0) { err.textContent = "K, tau, and tp must be positive"; return; }
-      if (po <= 0 || po >= 100) { err.textContent = "overshoot must be between 0 and 100 percent"; return; }
-
-      const ln_os = Math.log(po / 100);
-      const zeta = -ln_os / Math.sqrt(Math.PI * Math.PI + ln_os * ln_os);
-      const wn = Math.PI / (tp * Math.sqrt(1 - zeta * zeta));
-      const amp = document.getElementById("amp").value;
-
-      let kp, kv, ki;
-      if (amp === "q3") {
-        kp = wn * wn / k_plant;
-        kv = 2 * zeta * wn / k_plant;
-        ki = null;
-      } else {
-        kp = wn * wn / k_plant * tau;
-        kv = (-1 + 2 * zeta * wn * tau) / k_plant;
-        ki = wn * wn * tau / k_plant;
-      }
-
-      const lines = [
-        ["damping ratio zeta", fmt(zeta, 6)],
-        ["natural frequency wn", fmt(wn, 6) + " rad/s"],
-        ["damped frequency wd", fmt(wn * Math.sqrt(1 - zeta * zeta), 6) + " rad/s"],
-        ["proportional gain kp", fmt(kp, 6) + (amp === "q3" ? " V/rad" : " V&middot;s/rad")]
-      ];
-      if (amp === "q3") {
-        lines.push(["velocity gain kv", fmt(kv, 6) + " V&middot;s/rad"]);
-      } else {
-        lines.push(["integral gain ki", fmt(ki, 6) + " V/rad"]);
-      }
-      lines.push(["closed-loop overshoot check", fmt(Math.exp(-Math.PI * zeta / Math.sqrt(1 - zeta * zeta)) * 100, 4) + " %"]);
-      lines.push(["settling time (two percent)", fmt(4 / (zeta * wn), 6) + " s"]);
-
-      render_lines("lines", lines);
-    }
-  </script>
+  <script src="servo-design.js"></script>
 </body>
 </html>

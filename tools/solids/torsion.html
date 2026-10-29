@@ -5,72 +5,67 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>torsion</title>
   <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../css/calculator.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:wght@400;500&amp;display=swap">
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap with-cols">
     <header class="top">
       <h1>torsion</h1>
-      <a class="back" href="../../index.html">&larr; all tools</a>
+      <a class="back" href="../../index.html">← all tools</a>
     </header>
 
-    <div class="section">
-      <p class="muted">angle of twist and max shear stress in a solid circular shaft.</p>
+    <div class="cols calc-layout calc-compact">
+      <section class="calc-panel calc-fig-panel">
+        <div class="figure calc-figure" id="fig-torsion"></div>
+      </section>
+      <section class="calc-panel calc-input-panel">
+        <div class="calc-input-area">
+<div class="section calc-section">
 
       <div class="eq">\tau_{\max} = \frac{T r}{J}, \qquad J = \frac{\pi r^4}{2}</div>
 
       <div class="field">
-        <label>torque T</label>
-        <input type="number" id="torque" step="any" placeholder="N&middot;m">
+        <label>torque T (N·m)</label>
+        <input type="number" id="torque" step="any" value="100">
       </div>
       <div class="field">
-        <label>length L</label>
-        <input type="number" id="length" step="any" placeholder="m">
+        <label>length L (m)</label>
+        <input type="number" id="length" step="any" value="2">
       </div>
       <div class="field">
-        <label>shear modulus G</label>
-        <input type="number" id="shear" step="any" placeholder="Pa">
+        <label>shear modulus G (Pa)</label>
+        <input type="number" id="shear" step="any" value="80000000">
       </div>
       <div class="field">
-        <label>shaft radius r</label>
-        <input type="number" id="radius" step="any" placeholder="m">
+        <label>shaft radius r (m)</label>
+        <input type="number" id="radius" step="any" value="0.05">
       </div>
 
-      <button onclick="solve_torsion()">solve</button>
+      <button class="btn-primary" onclick="solve_torsion()">solve</button>
     </div>
-
-    <div id="err" class="error"></div>
-
-    <div class="results" id="results" style="display:none">
-      <h3>results</h3>
-      <div id="lines"></div>
+        </div>
+      </section>
+      <section class="calc-panel calc-output-panel">
+        <div id="err" class="error"></div>
+        <div class="results calc-results" id="results">
+          <h3>results</h3>
+          <div id="lines" data-result-contract="3">
+          <div class="result-line"><span class="label">polar moment J</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">angle of twist φ</span><span class="value">-</span></div>
+          <div class="result-line"><span class="label">max shear τmax</span><span class="value">-</span></div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script src="../../js/common.js"></script>
+  <script src="../../js/figures.js"></script>
+  <script src="../../js/catalog.js"></script>
   <script src="../../js/nav.js"></script>
-  <script>
-    function solve_torsion() {
-      const err = document.getElementById("err");
-      err.textContent = "";
-      document.getElementById("results").style.display = "none";
-
-      const t = val("torque"), l = val("length"), g = val("shear"), r = val("radius");
-      if (t === null || l === null || g === null || r === null) { err.textContent = "fill all four fields"; return; }
-      if (r <= 0 || g <= 0) { err.textContent = "radius and G must be positive"; return; }
-
-      const j = Math.PI * Math.pow(r, 4) / 2;
-      const phi = t * l / (g * j);
-      const tmax = t * r / j;
-
-      render_lines("lines", [
-        ["polar moment J", fmt(j, 6) + " m&#8308;"],
-        ["angle of twist &phi;", fmt(phi, 6) + " rad (" + fmt(phi * 180 / Math.PI, 6) + " &deg;)"],
-        ["max shear &tau;max", fmt(tmax, 6) + " Pa"]
-      ]);
-    }
-  </script>
+  <script src="torsion.js"></script>
 </body>
 </html>
